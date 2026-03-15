@@ -50,10 +50,6 @@
       "type": "boolean",
       "description": "Indicates if the extension is currently enabled."
     },
-    "built-in": {
-      "type": "boolean",
-      "description": "If true, the extension is a built-in to Bike Outliner."
-    },
     "symbol": {
       "type": "string",
       "description": "Optional SF Symbol name for the extension, used as default for commands."
