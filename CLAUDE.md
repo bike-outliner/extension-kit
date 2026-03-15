@@ -11,6 +11,7 @@ npx bike-ext watch             # Development mode with file watching
 npx bike-ext new <id>          # Scaffold a new extension
 npx bike-ext package           # Package extensions as .bkext.zip
 npx bike-ext release <id>      # Create GitHub release
+npx bike-ext submit <id>      # Submit extension to registry via PR
 npm run build-runtime          # Build React runtime (runtime/)
 npm run watch-runtime          # Watch React runtime
 ```
@@ -26,6 +27,7 @@ extension-kit/
 │   ├── dom/                #   DOM context (React UI, components)
 │   ├── style/              #   Style context (editor styling, decorations)
 │   └── core/               #   Shared types (Json, OutlinePath)
+├── docs/                   # Extension development guides and tutorials
 ├── bin/bike-ext.mjs        # CLI dispatcher
 ├── lib/                    # Build tooling
 │   ├── build.mjs           #   Main esbuild orchestration
@@ -34,7 +36,8 @@ extension-kit/
 │   ├── typecheck.mjs       #   TypeScript compiler API wrapper
 │   ├── new.mjs             #   Extension scaffolding
 │   ├── package.mjs         #   ZIP packaging (uses ditto)
-│   └── release.mjs         #   GitHub release (uses gh CLI)
+│   ├── release.mjs         #   GitHub release (uses gh CLI)
+│   └── submit.mjs          #   Registry PR submission (uses gh CLI)
 ├── runtime/                # React runtime bundled into Bike.app
 │   ├── common.ts           #   Exposes React/ReactDOM as window globals
 │   ├── sheet.tsx            #   Sheet UI template

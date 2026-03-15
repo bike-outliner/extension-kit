@@ -22,10 +22,11 @@ npx bike-ext build
 | Command | Description |
 |---------|-------------|
 | `bike-ext new [id]` | Create a new extension from template (bootstraps project on first run) |
-| `bike-ext build` | Build all extensions for production |
-| `bike-ext watch` | Build and watch for changes during development |
+| `bike-ext build [--install]` | Build all extensions for production |
+| `bike-ext watch [--install]` | Build and watch for changes during development |
 | `bike-ext package` | Package built extensions as `.bkext.zip` files |
 | `bike-ext release <id>` | Create a GitHub release for an extension |
+| `bike-ext submit <id>` | Submit extension to the registry via pull request |
 
 ## Project structure
 
@@ -51,9 +52,14 @@ my-extensions/
 
 - **App context** (`app/main.ts`) — Main logic, commands, keybindings, sidebar items
 - **DOM context** (`dom/*.ts|tsx`) — Custom UI components using React
-- **Style context** (`style/main.ts`) — Custom styling
+- **Style context** (`style/main.ts`) — Custom outline styling
 
-## Next steps
+## Documentation
 
-To learn more see [Creating Extensions](https://bikeguide.hogbaysoftware.com/bike-2-preview/customizing-bike/creating-extensions) in Bike's user guide.
+- [Creating Extensions](docs/creating-extensions.md) — overview, setup, and first extension
+- [App Context Tutorial](docs/app-context-tutorial.md) — commands, keybindings, outline manipulation
+- [DOM Context Tutorial](docs/dom-context-tutorial.md) — custom UI with sheets and React
+- [Style Context Tutorial](docs/style-context-tutorial.md) — outline styling, decorations, themes
+- [Sharing Extensions](docs/sharing-extensions.md) — packaging, releasing, and registry submission
+- [API Reference](api/) — type definitions for all three contexts
 

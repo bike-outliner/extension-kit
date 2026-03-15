@@ -27,7 +27,12 @@ switch (command) {
   }
   case 'release': {
     const { releaseExtension } = await import('../lib/release.mjs')
-    releaseExtension(args[0])
+    releaseExtension(args.find(a => a !== command && !a.startsWith('-')))
+    break
+  }
+  case 'submit': {
+    const { submitExtension } = await import('../lib/submit.mjs')
+    submitExtension(args.find(a => a !== command && !a.startsWith('-')))
     break
   }
   case 'build-runtime': {
@@ -49,6 +54,7 @@ switch (command) {
     console.log('  watch [--install]    Build and watch for changes')
     console.log('  package             Package extensions as .zip files')
     console.log('  release <id>        Create a GitHub release for an extension')
+    console.log('  submit <id>         Submit extension to the registry via PR')
     console.log('  build-runtime       Build runtime (React host environment) for production')
     console.log('  watch-runtime       Build and watch runtime for changes')
     process.exit(command ? 1 : 0)
