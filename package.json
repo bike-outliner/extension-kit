@@ -1,0 +1,34 @@
+{
+  "name": "@bike-outliner/extension-kit",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Build tooling and API types for Bike Outliner extensions",
+  "author": "Hog Bay Software",
+  "license": "MIT",
+  "bin": {
+    "bike-ext": "./bin/bike-ext.mjs"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "api/",
+    "internals/",
+    "schemas/",
+    "template/"
+  ],
+  "scripts": {
+    "build-internals": "node internals/build.mjs production",
+    "watch-internals": "node internals/build.mjs"
+  },
+  "dependencies": {
+    "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5",
+    "ajv": "^8.17.1",
+    "esbuild": "0.25.4",
+    "esbuild-plugin-external-global": "^1.0.1",
+    "fast-glob": "^3.3.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "5.8.3"
+  }
+}
