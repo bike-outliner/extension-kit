@@ -25,8 +25,7 @@ extension-kit/
 │   ├── app/                #   App context (commands, keybindings, outline API)
 │   ├── dom/                #   DOM context (React UI, components)
 │   ├── style/              #   Style context (editor styling, decorations)
-│   ├── core/               #   Shared types (Json, OutlinePath)
-│   └── theme/              #   Theme schema and examples
+│   └── core/               #   Shared types (Json, OutlinePath)
 ├── bin/bike-ext.mjs        # CLI dispatcher
 ├── lib/                    # Build tooling
 │   ├── build.mjs           #   Main esbuild orchestration
