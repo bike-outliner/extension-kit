@@ -50,6 +50,20 @@
       "type": "boolean",
       "description": "Indicates if the extension is currently enabled."
     },
+    "approved_permissions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Permissions that the user has approved. Managed by Bike, not set by extension authors."
+    },
+    "approved_host_permissions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Host permissions that the user has approved. Managed by Bike, not set by extension authors."
+    },
     "symbol": {
       "type": "string",
       "description": "Optional SF Symbol name for the extension, used as default for commands."
