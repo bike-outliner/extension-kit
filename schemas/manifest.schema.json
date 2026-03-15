@@ -50,10 +50,6 @@
       "type": "boolean",
       "description": "Indicates if the extension is currently enabled."
     },
-    "install": {
-      "type": "boolean",
-      "description": "If true, the extension will be automatically installed when built."
-    },
     "built-in": {
       "type": "boolean",
       "description": "If true, the extension is a built-in to Bike Outliner."
