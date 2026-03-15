@@ -12,13 +12,13 @@
     "bin/",
     "lib/",
     "api/",
-    "internals/",
+    "runtime/",
     "schemas/",
     "template/"
   ],
   "scripts": {
-    "build-internals": "node internals/build.mjs production",
-    "watch-internals": "node internals/build.mjs"
+    "build-runtime": "node runtime/build.mjs production",
+    "watch-runtime": "node runtime/build.mjs"
   },
   "dependencies": {
     "@types/react": "^19.1.5",

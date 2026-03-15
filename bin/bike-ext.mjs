@@ -28,14 +28,14 @@ switch (command) {
     releaseExtension(args[0])
     break
   }
-  case 'build-internals': {
-    const { buildInternals } = await import('../lib/build-internals.mjs')
-    await buildInternals('production')
+  case 'build-runtime': {
+    const { buildRuntime } = await import('../lib/build-runtime.mjs')
+    await buildRuntime('production')
     break
   }
-  case 'watch-internals': {
-    const { buildInternals } = await import('../lib/build-internals.mjs')
-    await buildInternals('watch')
+  case 'watch-runtime': {
+    const { buildRuntime } = await import('../lib/build-runtime.mjs')
+    await buildRuntime('watch')
     break
   }
   default:
@@ -47,7 +47,7 @@ switch (command) {
     console.log('  watch               Build and watch for changes')
     console.log('  package             Package extensions as .zip files')
     console.log('  release <id>        Create a GitHub release for an extension')
-    console.log('  build-internals     Build internals (React runtime) for production')
-    console.log('  watch-internals     Build and watch internals for changes')
+    console.log('  build-runtime       Build runtime (React host environment) for production')
+    console.log('  watch-runtime       Build and watch runtime for changes')
     process.exit(command ? 1 : 0)
 }

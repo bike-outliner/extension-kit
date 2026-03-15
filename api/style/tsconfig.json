@@ -1,6 +1,14 @@
 {
   "compilerOptions": {
     "lib": ["esnext"],
+    "noPropertyAccessFromIndexSignature": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitThis": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowJs": true,
+    "checkJs": false,
+    "resolveJsonModule": true,
+    "noEmit": true,
     "paths": {
       "bike/style": ["./index.d.ts"]
     }

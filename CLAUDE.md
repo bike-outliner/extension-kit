@@ -11,8 +11,8 @@ npx bike-ext watch             # Development mode with file watching
 npx bike-ext new <id>          # Scaffold a new extension
 npx bike-ext package           # Package extensions as .bkext.zip
 npx bike-ext release <id>      # Create GitHub release
-npm run build-internals        # Build React runtime (internals/)
-npm run watch-internals        # Watch React runtime
+npm run build-runtime          # Build React runtime (runtime/)
+npm run watch-runtime          # Watch React runtime
 ```
 
 There is no separate typecheck command — typechecking runs automatically during `build` and `watch` via the `typecheckPlugin`.
@@ -31,12 +31,12 @@ extension-kit/
 ├── lib/                    # Build tooling
 │   ├── build.mjs           #   Main esbuild orchestration
 │   ├── plugins.mjs         #   esbuild plugins (validate, typecheck, install)
-│   ├── build-internals.mjs #   React runtime build
+│   ├── build-runtime.mjs   #   React runtime build
 │   ├── typecheck.mjs       #   TypeScript compiler API wrapper
 │   ├── new.mjs             #   Extension scaffolding
 │   ├── package.mjs         #   ZIP packaging (uses ditto)
 │   └── release.mjs         #   GitHub release (uses gh CLI)
-├── internals/              # React runtime bundled into Bike.app
+├── runtime/                # React runtime bundled into Bike.app
 │   ├── common.ts           #   Exposes React/ReactDOM as window globals
 │   ├── sheet.tsx            #   Sheet UI template
 │   └── inspector.tsx        #   Inspector UI template
@@ -77,7 +77,7 @@ Output format is IIFE bundles. Production uses external sourcemaps + minificatio
 - ES module imports (`import`/`export`)
 - Build tooling files are `.mjs` (plain JavaScript)
 - API type definitions are `.d.ts`
-- `internals/` uses `.ts` and `.tsx`
+- `runtime/` uses `.ts` and `.tsx`
 
 ## Key Types
 
