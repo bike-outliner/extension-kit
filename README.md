@@ -24,6 +24,7 @@ npx bike-ext build
 | `bike-ext new [id]` | Create a new extension from template (bootstraps project on first run) |
 | `bike-ext build [--install]` | Build all extensions for production |
 | `bike-ext watch [--install]` | Build and watch for changes during development |
+| `bike-ext test [id]` | Build, install, and run tests (optionally for a specific extension) |
 | `bike-ext package` | Package built extensions as `.bkext.zip` files |
 | `bike-ext release <id>` | Create a GitHub release for an extension |
 | `bike-ext submit <id>` | Submit extension to the registry via pull request |
@@ -45,7 +46,8 @@ my-extensions/
         ├── manifest.json
         ├── app/main.ts
         ├── dom/hello-world.ts
-        └── style/main.ts
+        ├── style/main.ts
+        └── tests/extension.test.ts
 ```
 
 ## Extension contexts
@@ -60,6 +62,7 @@ my-extensions/
 - [App Context Tutorial](docs/app-context-tutorial.md) — commands, keybindings, outline manipulation
 - [DOM Context Tutorial](docs/dom-context-tutorial.md) — custom UI with sheets and React
 - [Style Context Tutorial](docs/style-context-tutorial.md) — outline styling, decorations, themes
+- [Testing Extensions](docs/testing-extensions.md) — writing and running tests
 - [Sharing Extensions](docs/sharing-extensions.md) — packaging, releasing, and registry submission
 - [API Reference](api/) — type definitions for all three contexts
 

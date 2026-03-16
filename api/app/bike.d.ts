@@ -112,6 +112,24 @@ declare global {
      * ```
      */
     showChoiceBox(items: ChoiceBoxItem[], options?: ChoiceBoxOptions, window?: Window): Promise<number[] | null>
+
+    /**
+     * Get an outline editor for testing.
+     *
+     * On first call, creates a new untitled document with an empty outline.
+     * On subsequent calls, resets the existing test document to an empty
+     * outline with no undo history and returns its editor.
+     */
+    testEditor(): OutlineEditor
+
+    /**
+     * Get an outline for testing.
+     *
+     * On first call, creates a new untitled document with an empty outline.
+     * On subsequent calls, resets the existing test document to an empty
+     * outline with no undo history and returns its outline.
+     */
+    testOutline(): Outline
   }
 }
 

@@ -12,7 +12,7 @@ This guide provides an overview and tutorial. For the most up-to-date and detail
 
 ## Install Bike Extension Kit
 
-Use the [Bike Extension Kit](https://github.com/jessegrosjean/bike-extension-kit) to create and modify extensions.
+Use the [Bike Extension Kit](https://github.com/bike-outliner/extension-kit) to create and modify extensions.
 
 The extension kit requires setup. First, download the kit and follow the kit's README.md setup instructions. Once you've got it working, the development cycle is fast -- save a change to the extension, then Bike reloads the extension immediately.
 
@@ -30,6 +30,8 @@ extension.bkext
 │   └── view2.ts
 ├── style (optional)
 │   └── main.ts
+├── tests (optional)
+│   └── extension.test.ts
 ├── theme (optional)
 │   ├── theme1.bktheme
 │   └── theme2.bktheme
@@ -60,6 +62,14 @@ Each subfolder corresponds to a different context where the extension code can r
 - Most extensions will not add styles; delete the style folder if unused.
 - Import the API using `import { SYMBOL } from 'bike/style'`.
 
+### Tests
+
+- Test files live in the `tests/` subfolder with a `.test.ts` extension.
+- Tests have full access to the `bike` API and run against a real outline.
+- When you create an extension with an app context, a starter test file is scaffolded automatically.
+- Run tests with `npx bike-ext test` or from Bike's Logs Explorer.
+- See [Testing Extensions](testing-extensions.md) for details.
+
 The app context and DOM context can communicate using the `postMessage` and `onmessage` methods. The common pattern involves performing work in the app context, such as querying the outline or making network requests, and then sending the results to the DOM context for display.
 
 There is also a `theme` folder. Themes are configuration files used by the style context. Any themes included with an extension will show up in Bike's themes menus when the extension is installed. Themes can also be installed in Bike independent of an extension.
@@ -68,7 +78,7 @@ There is also a `theme` folder. Themes are configuration files used by the style
 
 You should have the Bike Extension Kit installed and open it in Visual Studio Code.
 
-We'll be creating a new extension now. Later, we'll add commands, custom views, and styles. The [finished extension](https://github.com/jessegrosjean/bike-extension-kit/tree/main/example-extensions/src/tutorial.bkext) is included in the example-extensions repo. If you get stuck and something doesn't work, check the finished tutorial to see where my instructions went wrong.
+We'll be creating a new extension now. Later, we'll add commands, custom views, and styles. The [finished extension](https://github.com/bike-outliner/example-extensions/tree/main/example-extensions/src/tutorial.bkext) is included in the example-extensions repo. If you get stuck and something doesn't work, check the finished tutorial to see where my instructions went wrong.
 
 ### Open Terminal
 
@@ -186,3 +196,4 @@ Each extension has a `manifest.json` that controls metadata and behavior. Proper
 - [App Context Tutorial](app-context-tutorial.md)
 - [DOM Context Tutorial](dom-context-tutorial.md)
 - [Style Context Tutorial](style-context-tutorial.md)
+- [Testing Extensions](testing-extensions.md)

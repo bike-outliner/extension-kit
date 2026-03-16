@@ -35,7 +35,7 @@ URL for the attached ZIP asset is what you'll provide to the registry.
 ## 3. Submit to the Registry
 
 Submit your extension to the
-[extensions-registry](https://github.com/jessegrosjean/bike-extensions)
+[extensions-registry](https://github.com/bike-outliner/extensions-registry)
 so users can discover and install it from within Bike:
 
 ```sh

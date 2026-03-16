@@ -290,14 +290,14 @@ export interface AttributedString {
    * @param index - The index to get the attribute at.
    * @param affinity - The affinity to disambiguate run boundaries (default upstream).
    * @param effectiveRange - The range of the attribute returned by reference.
-   * @returns The attribute value or null if not set.
+   * @returns The attribute value or undefined if not set.
    */
   attributeAt(
     attribute: TextAttributeName,
     index: number,
     affinity?: Affinity,
     effectiveRange?: Range
-  ): string | null
+  ): string | undefined
 
   /**
    * Get attributes at index.
