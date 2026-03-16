@@ -128,7 +128,7 @@ There are two important sources for debugging your extension.
 
 To view Bike's Log Explorer:
 
-- Choose the menu Bike > Window > Logs Explorer
+- Choose the menu Bike > Logs Explorer
 
 Do that now and you should see in the logs that your extension is installed and activated. You will also see a notice originating from your extension's call to `console.log` in the activate function.
 

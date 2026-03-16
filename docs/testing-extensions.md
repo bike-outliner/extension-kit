@@ -21,7 +21,7 @@ The command finds Bike.app automatically (checking `/Applications/Bike.app` and 
 
 ### Logs Explorer
 
-Open **Window > Logs Explorer** and click the **Run Tests** button. This runs tests from all installed and enabled extensions, with results displayed in the log.
+Open **Bike > Logs Explorer** and click the **Run Tests** button. This runs tests from all installed and enabled extensions, with results displayed in the log.
 
 ## Writing Tests
 

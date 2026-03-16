@@ -96,7 +96,7 @@ style.layer('selection', (row, run, caret, viewport, include) => {
 })
 ```
 
-Use the Outline Path Explorer (Window > Outline Path Explorer) to discover available attributes for styling.
+Use the Outline Path Explorer (Bike > Outline Path Explorer) to discover available attributes for styling.
 
 ## Inline Formatting
 
