@@ -55,7 +55,7 @@ The `describe`, `it`, and `assert` functions are provided by the test harness at
 
 ## Assertions
 
-Four assertion functions are available:
+Five assertion functions are available:
 
 | Function | Description |
 |----------|-------------|
@@ -63,6 +63,7 @@ Four assertion functions are available:
 | `assert.equal(a, b, msg)` | Fails if `a !== b` (strict equality) |
 | `assert.notEqual(a, b, msg)` | Fails if `a === b` |
 | `assert.throws(fn, msg)` | Fails if `fn()` does not throw |
+| `assert.rejects(fn, msg)` | Fails if `fn()` does not reject (async) |
 
 The `msg` parameter is optional for all assertions. When omitted, a default message is generated.
 
@@ -121,10 +122,23 @@ describe("Outline Operations", () => {
 })
 ```
 
+## Async Tests
+
+Test functions can be async. The test runner will await the returned promise:
+
+```typescript
+it("fetches data", async () => {
+    const response = await fetch("https://example.com/api")
+    assert.equal(response.status, 200)
+})
+```
+
+Async tests run sequentially — each test waits for the previous one to complete.
+
 ## Tips
 
 - **Use `bike.testEditor()` or `bike.testOutline()`** at the top of each `describe` block for a fresh outline.
 - **Use transactions** for outline changes -- wrap insertions, moves, and deletions in `outline.transaction()`.
-- **Tests run synchronously** -- each `it` block runs to completion before the next one starts.
+- **Tests run sequentially** -- each `it` block runs to completion (including awaiting async tests) before the next one starts.
 - **State accumulates** within a `describe` block -- rows created in one `it` block are visible in subsequent blocks.
 - **Close all documents** before running tests -- the harness won't run if documents are open.
