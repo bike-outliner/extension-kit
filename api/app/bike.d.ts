@@ -115,7 +115,7 @@ declare global {
     showChoiceBox(items: ChoiceBoxItem[], options?: ChoiceBoxOptions, window?: Window): Promise<number[] | null>
 
     /**
-     * Show a floating panel window.
+     * Show a panel or window.
      *
      * With `window`: the panel is associated with that document window and
      * closes when the window closes. Floating, non-modal (unlike sheets).
@@ -278,6 +278,8 @@ interface SheetOptions {
   //buttons?: string[];
 }
 
+type PanelRole = 'inspector' | 'utility' | 'window'
+
 interface PanelOptions {
   /** The DOM script to run in the panel. */
   script: DOMScript
@@ -287,6 +289,22 @@ interface PanelOptions {
   width?: number
   /** Initial height in points. */
   height?: number
+  /**
+   * Panel role that sets default window behavior.
+   *
+   * - `'inspector'` — small, floating, auxiliary. Defaults: floating=true,
+   *   canBecomeMain=false, hidesOnDeactivate=false.
+   * - `'utility'` — medium, tool-like. Defaults: floating=true,
+   *   canBecomeMain=false, hidesOnDeactivate=true.
+   * - `'window'` — full, document-like, non-floating. Uses NSWindow instead
+   *   of NSPanel. Defaults: floating=false, canBecomeMain=true,
+   *   hidesOnDeactivate=false.
+   *
+   * Individual properties (floating, canBecomeMain, hidesOnDeactivate) override
+   * role defaults when specified. If no role is set, current defaults apply
+   * (floating=true, canBecomeMain=false, hidesOnDeactivate=false).
+   */
+  role?: PanelRole
   /** Whether the panel floats above other windows. Defaults to true. */
   floating?: boolean
   /** Whether the panel hides when the app deactivates. Defaults to false. */
