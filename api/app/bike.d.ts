@@ -5,6 +5,7 @@ import { Keybindings } from './keybindings'
 import { OutlineEditor } from './outline-editor'
 import { DOMScript, DOMScriptHandle } from './dom-script'
 import { URL, Disposable, Permissions } from './system'
+import { Message } from '../core/json'
 import { Outline, Row } from './outline'
 import { OutlinePath } from '../core/outline-path'
 
@@ -114,6 +115,45 @@ declare global {
     showChoiceBox(items: ChoiceBoxItem[], options?: ChoiceBoxOptions, window?: Window): Promise<number[] | null>
 
     /**
+     * Show a floating panel window.
+     *
+     * With `window`: the panel is associated with that document window and
+     * closes when the window closes. Floating, non-modal (unlike sheets).
+     *
+     * Without `window`: standalone panel not tied to any document. If `id`
+     * is provided, Bike persists open/closed state and frame position
+     * across app launches.
+     *
+     * @param options - The options for the panel
+     * @param window - A window to associate the panel with
+     * @returns A promise that resolves to a DOMScriptHandle.
+     * @example
+     * ```typescript
+     * // Panel associated with a window
+     * const handle = await bike.showPanel({
+     *   script: 'WordCount.js',
+     *   title: 'Word Count',
+     *   width: 300,
+     *   height: 200,
+     * }, bike.frontmostWindow)
+     * handle.onmessage = (msg) => { /* ... *\/ }
+     * handle.postMessage({ wordCount: 42 })
+     * ```
+     * @example
+     * ```typescript
+     * // Standalone panel with state restoration
+     * const handle = await bike.showPanel({
+     *   id: 'myext:log',
+     *   script: 'ActivityLog.js',
+     *   title: 'Activity Log',
+     *   width: 700,
+     *   height: 500,
+     * })
+     * ```
+     */
+    showPanel<TSend extends Message = Message, TReceive extends Message = Message>(options: PanelOptions, window?: Window): Promise<DOMScriptHandle<TSend, TReceive>>
+
+    /**
      * Get an outline editor for testing.
      *
      * On first call, creates a new untitled document with an empty outline.
@@ -214,7 +254,7 @@ export interface Window {
    * @param options - The options for displaying the sheet.
    * @returns A promise that resolves to a DOMScriptHandle.
    */
-  presentSheet(script: DOMScript, options?: SheetOptions): Promise<DOMScriptHandle>
+  presentSheet<TSend extends Message = Message, TReceive extends Message = Message>(script: DOMScript, options?: SheetOptions): Promise<DOMScriptHandle<TSend, TReceive>>
 
   /*
   presentRowPicker(
@@ -236,6 +276,29 @@ interface SheetOptions {
   width?: number
   height?: number
   //buttons?: string[];
+}
+
+interface PanelOptions {
+  /** The DOM script to run in the panel. */
+  script: DOMScript
+  /** Panel window title. */
+  title?: string
+  /** Initial width in points. */
+  width?: number
+  /** Initial height in points. */
+  height?: number
+  /** Whether the panel floats above other windows. Defaults to true. */
+  floating?: boolean
+  /** Whether the panel hides when the app deactivates. Defaults to false. */
+  hidesOnDeactivate?: boolean
+  /** Whether the panel can become the main window. Defaults to false. */
+  canBecomeMain?: boolean
+  /**
+   * Unique identifier for state restoration and frame autosave.
+   * Required for standalone panels (no window). Bike restores the
+   * panel on next launch if it was open when the app quit.
+   */
+  id?: string
 }
 
 interface AlertOptions {

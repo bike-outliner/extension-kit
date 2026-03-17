@@ -1,1 +1,4 @@
 export type Json = string | number | boolean | null | { [property: string]: Json } | Json[]
+
+/** Base type for all messages exchanged between app and DOM contexts. */
+export type Message = { type: string; [key: string]: any }

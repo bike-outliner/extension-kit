@@ -1,4 +1,5 @@
-import { Json } from '../core/json'
+import { Json, Message } from '../core/json'
+export { Json, Message } from '../core/json'
 
 /**
  * DOMExtensionContext is passed to DOMScript's activate function.
@@ -15,24 +16,22 @@ import { Json } from '../core/json'
  * }
  * ```
  */
-export interface DOMExtensionContext extends Record<string, any> {
+export interface DOMExtensionContext<
+  TSend extends Message = Message,
+  TReceive extends Message = Message
+> extends Record<string, any> {
   /** The element where the extension should display */
   element: HTMLElement
 
   /**
    * Receive messages from the app context.
-   *
-   * The message is typed as Json | any for easier use with typescript APIs.
-   * The message will always be a Json type and is always the result of a
-   * postMessage call elsewhere in the code.
-   *
    * @param message
    */
-  onmessage?: (message: Json | any) => void
+  onmessage?: (message: TReceive) => void
 
   /**
    * Send messages to the app context.
    * @param message
    */
-  postMessage: (message: Json) => void
+  postMessage: (message: TSend) => void
 }

@@ -24,7 +24,7 @@
  */
 
 import { Disposable, URL } from './system'
-import { Json } from '../core/json'
+import { Json, Message } from '../core/json'
 
 /**
  * Name of a script located in extension's src/dom folder or Javascript code
@@ -38,21 +38,19 @@ export type DOMScript = string
  * A handle to send and receive messages with a DOMScript. Use `.dispose()` to
  * remove the script. 
  */
-export interface DOMScriptHandle extends Disposable {
+export interface DOMScriptHandle<
+  TSend extends Message = Message,
+  TReceive extends Message = Message
+> extends Disposable {
   /**
    * Receive messages from the DOM context.
-   *
-   * The message is typed as Json | any for easier use with typescript APIs.
-   * The message will always be a Json type and is always the result of a
-   * postMessage call elsewhere in the code.
-   *
    * @param message
    */
-  onmessage?: (message: Json | any) => void
+  onmessage?: (message: TReceive) => void
 
   /**
    * Send messages to the DOM context.
    * @param message
    */
-  postMessage(message: Json): void
+  postMessage(message: TSend): void
 }
