@@ -130,6 +130,86 @@ export interface FormRowProps extends React.HTMLAttributes<HTMLDivElement> {
   label: React.ReactNode
 }
 
+// Disclosure
+
+/**
+ * A macOS-style disclosure triangle with a label.
+ *
+ * ```tsx
+ * import { Disclosure } from 'bike/components'
+ * <Disclosure label="Details" defaultExpanded>
+ *   <FormRow label="Name"><input type="text" /></FormRow>
+ * </Disclosure>
+ * ```
+ */
+export function Disclosure({ label, expanded, defaultExpanded = false, onChange, summary, children, className = '', ...rest }: DisclosureProps) {
+  const [internalExpanded, setInternalExpanded] = React.useState(defaultExpanded)
+  const isExpanded = expanded !== undefined ? expanded : internalExpanded
+
+  const toggle = () => {
+    const next = !isExpanded
+    if (expanded === undefined) setInternalExpanded(next)
+    onChange?.(next)
+  }
+
+  const classes = ['bike-disclosure', className].filter(Boolean).join(' ')
+  return (
+    <div className={classes} {...rest}>
+      <button className="bike-disclosure__header" onClick={toggle} type="button">
+        <SFSymbol className={`bike-disclosure__triangle${isExpanded ? ' bike-disclosure__triangle--expanded' : ''}`} name="chevron.forward" weight="semibold" scale="small" />
+        <span className="bike-disclosure__label">{label}</span>
+        {!isExpanded && summary && <span className="bike-disclosure__summary">{summary}</span>}
+      </button>
+      {isExpanded && <div className="bike-disclosure__content">{children}</div>}
+    </div>
+  )
+}
+
+export interface DisclosureProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  label: React.ReactNode
+  expanded?: boolean
+  defaultExpanded?: boolean
+  onChange?: (expanded: boolean) => void
+  summary?: React.ReactNode
+}
+
+// FormGroup
+
+/**
+ * Groups FormRows so their labels auto-size to the widest label using CSS Grid subgrid.
+ *
+ * ```tsx
+ * import { FormGroup, FormRow } from 'bike/components'
+ * <FormGroup>
+ *   <FormRow label="Name"><input type="text" /></FormRow>
+ *   <FormRow label="Description"><input type="text" /></FormRow>
+ * </FormGroup>
+ * ```
+ */
+export function FormGroup({ className = '', ...rest }: FormGroupProps) {
+  const classes = ['bike-form-group', className].filter(Boolean).join(' ')
+  return <div className={classes} {...rest} />
+}
+
+export interface FormGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+// Separator
+
+/**
+ * A horizontal divider line matching macOS separator appearance.
+ *
+ * ```tsx
+ * import { Separator } from 'bike/components'
+ * <Separator />
+ * ```
+ */
+export function Separator({ className = '', ...rest }: SeparatorProps) {
+  const classes = ['bike-separator', className].filter(Boolean).join(' ')
+  return <hr className={classes} {...rest} />
+}
+
+export interface SeparatorProps extends React.HTMLAttributes<HTMLHRElement> {}
+
 // SegmentedControl
 
 /**

@@ -50,6 +50,44 @@ declare module 'bike/components' {
     label: React.ReactNode
   }
 
+  // FormGroup
+
+  /**
+   * Groups FormRows so their labels auto-size to the widest label using CSS Grid subgrid.
+   */
+  export function FormGroup(props: FormGroupProps): React.JSX.Element
+
+  export interface FormGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+  // Disclosure
+
+  /**
+   * A macOS-style disclosure triangle with a label.
+   * Collapsed: shows the label with a right-pointing triangle and optional summary content.
+   * Expanded: shows the label with a down-pointing triangle and reveals children.
+   */
+  export function Disclosure(props: DisclosureProps): React.JSX.Element
+
+  export interface DisclosureProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+    /** Label text shown next to the disclosure triangle */
+    label: React.ReactNode
+    /** Whether the disclosure is expanded (controlled) */
+    expanded?: boolean
+    /** Whether the disclosure starts expanded (uncontrolled, default: false) */
+    defaultExpanded?: boolean
+    /** Called when the expanded state changes */
+    onChange?: (expanded: boolean) => void
+    /** Optional summary content shown to the right of the label in the header row */
+    summary?: React.ReactNode
+  }
+
+  // Separator
+
+  /** A horizontal divider line matching macOS separator appearance. */
+  export function Separator(props: SeparatorProps): React.JSX.Element
+
+  export interface SeparatorProps extends React.HTMLAttributes<HTMLHRElement> {}
+
   // SegmentedControl
 
   /** A tab-like segmented control matching NSSegmentedControl appearance. */

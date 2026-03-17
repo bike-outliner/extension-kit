@@ -26,6 +26,12 @@
 import { Disposable, URL } from './system'
 import { Json, Message } from '../core/json'
 
+/** Lifecycle events sent by Bike when hosting a sheet. */
+export type SheetEvent = { type: 'bike:dismissed' }
+
+/** Lifecycle events sent by Bike when hosting a panel. */
+export type PanelEvent = { type: 'bike:dismissed' }
+
 /**
  * Name of a script located in extension's src/dom folder or Javascript code
  * that can be executed. Will first look for a file in src/dom with this name.

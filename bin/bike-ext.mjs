@@ -37,7 +37,10 @@ switch (command) {
   }
   case 'test': {
     const { test } = await import('../lib/test.mjs')
-    await test(args.find(a => a !== command && !a.startsWith('-')))
+    const filterIndex = args.findIndex(a => a === '--filter' || a === '-f')
+    const filter = filterIndex !== -1 ? args[filterIndex + 1] : undefined
+    const extensionId = args.find(a => a !== command && !a.startsWith('-') && a !== filter)
+    await test(extensionId, filter)
     break
   }
   case 'build-runtime': {
@@ -59,7 +62,7 @@ switch (command) {
     console.log('  watch [--install]    Build and watch for changes')
     console.log('  package             Package extensions as .zip files')
     console.log('  release <id>        Create a GitHub release for an extension')
-    console.log('  test [id]           Run extension tests (requires Bike.app)')
+    console.log('  test [id] [-f name] Run extension tests (requires Bike.app)')
     console.log('  submit <id>         Submit extension to the registry via PR')
     console.log('  build-runtime       Build runtime (React host environment) for production')
     console.log('  watch-runtime       Build and watch runtime for changes')

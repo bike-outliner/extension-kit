@@ -27,7 +27,7 @@
 }
 
 .bike-button:hover {
-  background: var(--opaque-secondary-fill);
+  background: var(--opaque-fill);
 }
 
 .bike-button:active {
@@ -101,7 +101,7 @@
 
 .bike-form-row__label {
   font: -apple-system-body;
-  color: var(--secondary-label);
+  color: var(--label);
   flex-shrink: 0;
   text-align: right;
   width: var(--bike-form-label-width, 80px);
@@ -110,6 +110,87 @@
 .bike-form-row__content {
   flex: 1;
   min-width: 0;
+}
+
+/* FormGroup */
+
+.bike-form-group {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.bike-form-group > .bike-form-row {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.bike-form-group > .bike-form-row > .bike-form-row__label {
+  width: auto;
+}
+
+.bike-form-group > :not(.bike-form-row) {
+  grid-column: 1 / -1;
+}
+
+/* Disclosure */
+
+.bike-disclosure {
+  /* no outer spacing — let the parent control layout */
+}
+
+.bike-disclosure__header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 3px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: -apple-system-body;
+  color: var(--label);
+  text-align: left;
+}
+
+.bike-disclosure__header:hover {
+}
+
+.bike-disclosure__triangle {
+  color: var(--tertiary-label);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+  scale: 0.8;
+}
+
+.bike-disclosure__triangle--expanded {
+  transform: rotate(90deg);
+}
+
+.bike-disclosure__label {
+  font: -apple-system-body;
+  font-weight: 600;
+  flex-shrink: 0;
+  color: var(--secondary-label);
+}
+
+.bike-disclosure__summary {
+  margin-left: auto;
+}
+
+.bike-disclosure__content {
+  padding: 4px 0 4px 0px;
+}
+
+/* Separator */
+
+.bike-separator {
+  border: none;
+  border-top: 0.5px solid var(--separator);
+  margin: 8px 0;
 }
 
 /* SegmentedControl */
@@ -143,7 +224,7 @@
 }
 
 .bike-segmented__item:hover {
-  background: var(--opaque-secondary-fill);
+  background: none;
 }
 
 .bike-segmented__item:active {

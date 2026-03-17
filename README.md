@@ -21,22 +21,22 @@ npx bike-ext build
 
 | Command | Description |
 |---------|-------------|
-| `bike-ext new [id]` | Create a new extension from template (bootstraps project on first run) |
-| `bike-ext build [--install]` | Build all extensions for production |
-| `bike-ext watch [--install]` | Build and watch for changes during development |
-| `bike-ext test [id]` | Build, install, and run tests (optionally for a specific extension) |
-| `bike-ext package` | Package built extensions as `.bkext.zip` files |
-| `bike-ext release <id>` | Create a GitHub release for an extension |
-| `bike-ext submit <id>` | Submit extension to the registry via pull request |
+| `npx bike-ext new [id]` | Create a new extension from template (bootstraps project on first run) |
+| `npx bike-ext build [--install]` | Build all extensions for production |
+| `npx bike-ext watch [--install]` | Build and watch for changes during development |
+| `npx bike-ext test [id]` | Build, install, and run tests (optionally for a specific extension) |
+| `npx bike-ext package` | Package built extensions as `.bkext.zip` files |
+| `npx bike-ext release <id>` | Create a GitHub release for an extension |
+| `npx bike-ext submit <id>` | Submit extension to the registry via pull request |
 
 ## Project structure
 
-After running `bike-ext new`, your project will look like:
+After running `npx bike-ext new`, your project will look like:
 
 ```
 my-extensions/
 ├── package.json
-├── tsconfig.json          # Generated on first `bike-ext new`
+├── tsconfig.json          # Generated on first `npx bike-ext new`
 ├── configs/
 │   ├── tsconfig.app.json
 │   ├── tsconfig.dom.json

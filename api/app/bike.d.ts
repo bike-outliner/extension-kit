@@ -3,7 +3,7 @@ import { Inspector } from './inspector'
 import { Commands } from './commands'
 import { Keybindings } from './keybindings'
 import { OutlineEditor } from './outline-editor'
-import { DOMScript, DOMScriptHandle } from './dom-script'
+import { DOMScript, DOMScriptHandle, SheetEvent, PanelEvent } from './dom-script'
 import { URL, Disposable, Permissions } from './system'
 import { Message } from '../core/json'
 import { Outline, Row } from './outline'
@@ -151,7 +151,7 @@ declare global {
      * })
      * ```
      */
-    showPanel<TSend extends Message = Message, TReceive extends Message = Message>(options: PanelOptions, window?: Window): Promise<DOMScriptHandle<TSend, TReceive>>
+    showPanel<TSend extends Message = Message, TReceive extends Message = Message>(options: PanelOptions, window?: Window): Promise<DOMScriptHandle<TSend, TReceive | PanelEvent>>
 
     /**
      * Get an outline editor for testing.
@@ -254,7 +254,7 @@ export interface Window {
    * @param options - The options for displaying the sheet.
    * @returns A promise that resolves to a DOMScriptHandle.
    */
-  presentSheet<TSend extends Message = Message, TReceive extends Message = Message>(script: DOMScript, options?: SheetOptions): Promise<DOMScriptHandle<TSend, TReceive>>
+  presentSheet<TSend extends Message = Message, TReceive extends Message = Message>(script: DOMScript, options?: SheetOptions): Promise<DOMScriptHandle<TSend, TReceive | SheetEvent>>
 
   /*
   presentRowPicker(
