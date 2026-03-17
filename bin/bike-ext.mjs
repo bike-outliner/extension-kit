@@ -43,6 +43,12 @@ switch (command) {
     await test(extensionId, filter)
     break
   }
+  case 'clean': {
+    const { clean } = await import('../lib/clean.mjs')
+    const outdir = (await import('path')).join(process.cwd(), 'out')
+    clean(outdir)
+    break
+  }
   case 'build-runtime': {
     const { buildRuntime } = await import('../lib/build-runtime.mjs')
     await buildRuntime('production')
@@ -63,6 +69,7 @@ switch (command) {
     console.log('  package             Package extensions as .zip files')
     console.log('  release <id>        Create a GitHub release for an extension')
     console.log('  test [id] [-f name] Run extension tests (requires Bike.app)')
+    console.log('  clean               Remove all build output')
     console.log('  submit <id>         Submit extension to the registry via PR')
     console.log('  build-runtime       Build runtime (React host environment) for production')
     console.log('  watch-runtime       Build and watch runtime for changes')
