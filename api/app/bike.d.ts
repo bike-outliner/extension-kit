@@ -151,7 +151,7 @@ declare global {
      * })
      * ```
      */
-    showPanel<TSend extends Message = Message, TReceive extends Message = Message>(options: PanelOptions, window?: Window): Promise<DOMScriptHandle<TSend, TReceive | PanelEvent>>
+    showPanel<TSend = Message, TReceive = Message>(options: PanelOptions, window?: Window): Promise<DOMScriptHandle<TSend, TReceive | PanelEvent>>
 
     /**
      * Get an outline editor for testing.
@@ -254,7 +254,7 @@ export interface Window {
    * @param options - The options for displaying the sheet.
    * @returns A promise that resolves to a DOMScriptHandle.
    */
-  presentSheet<TSend extends Message = Message, TReceive extends Message = Message>(script: DOMScript, options?: SheetOptions): Promise<DOMScriptHandle<TSend, TReceive | SheetEvent>>
+  presentSheet<TSend = Message, TReceive = Message>(script: DOMScript, options?: SheetOptions): Promise<DOMScriptHandle<TSend, TReceive | SheetEvent>>
 
   /*
   presentRowPicker(

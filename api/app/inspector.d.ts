@@ -9,7 +9,7 @@ export interface Inspector extends View {
    * @param item - The item to add to the inspector.
    * @returns A promise that resolves to a DOMScriptHandle.
    */
-  addItem<TSend extends Message = Message, TReceive extends Message = Message>(item: InspectorItem): Promise<DOMScriptHandle<TSend, TReceive>>
+  addItem<TSend = Message, TReceive = Message>(item: InspectorItem): Promise<DOMScriptHandle<TSend, TReceive>>
 }
 
 export type InspectorItem = {

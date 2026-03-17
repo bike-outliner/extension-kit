@@ -44,10 +44,8 @@ export type DOMScript = string
  * A handle to send and receive messages with a DOMScript. Use `.dispose()` to
  * remove the script. 
  */
-export interface DOMScriptHandle<
-  TSend extends Message = Message,
-  TReceive extends Message = Message
-> extends Disposable {
+export interface DOMScriptHandle<TSend = Message, TReceive = Message>
+  extends Disposable {
   /**
    * Receive messages from the DOM context.
    * @param message
