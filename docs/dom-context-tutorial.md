@@ -2,12 +2,14 @@
 
 Use the DOM context to display custom UI using HTML and DOM.
 
-Currently, you can present a custom sheet over a window or add custom views to the inspector bar. Note, your extension might not need to use the DOM context. Instead, you can use the app context to present alerts and add items to the sidebar, just not fully custom UI.
+You can present a sheet, panel, window, and add custom views to the inspector
+bar. Note, your extension might not need to use the DOM context. Instead, you
+can also use the app context to present alerts and add items to the sidebar. The DOM context is only necessary when you want a fully custom view.
 
 - [DOM Context API](../api/dom/)
 - Entry points: `dom/*.ts(x)`
 - Code runs in web views embedded in Bike's UI.
-- Web views are sandboxed and have no network access.
+- Web views are sandboxed with no network access.
 - These views are loaded dynamically using app context APIs.
 - Communicate with the originating app context using `postMessage` and `onmessage`.
 - Import the API using `import { SYMBOL } from 'bike/dom'`.
@@ -22,9 +24,34 @@ We will modify the "Archive Done" command to show a sheet with the number of arc
 
 ### Overview
 
-1. Create a DOM script at `dom/<scriptname>`.
-2. Pass the script name to the app context API `window.presentSheet`.
-3. Use the returned handle to send the row count to the DOM context for display.
+1. Define a typed messaging protocol at `dom/protocols.ts`.
+2. Create a DOM script at `dom/<scriptname>` that uses the protocol.
+3. Pass the script name to the app context API `window.presentSheet`.
+4. Use the returned handle to send the row count to the DOM context for display.
+
+### Define a Typed Messaging Protocol
+
+App and DOM contexts communicate via `postMessage` and `onmessage`. By default these are untyped — you can send any message shape and the compiler won't catch mistakes. To get compile-time safety, define a **typed protocol**.
+
+A protocol extends `DOMProtocol` from `bike/core` and declares the message types flowing in each direction:
+
+- `toDOM` — messages sent from the app context *to* the DOM context
+- `toApp` — messages sent from the DOM context *to* the app context
+
+Create a new file at `dom/protocols.ts`:
+
+```typescript
+import { DOMProtocol } from 'bike/core'
+
+export interface ArchiveDoneProtocol extends DOMProtocol {
+  toDOM: { type: 'archiveCount'; count: number }
+  toApp: never
+}
+```
+
+This protocol says the app side will send an `archiveCount` message with a `count`, and the DOM side won't send anything back (`never`).
+
+Protocol files live at `dom/protocols.ts` by convention. This file is typechecked in both the app and DOM contexts, so both sides share a single protocol definition. When you scaffold a new extension with `npx bike-ext new` and select both contexts, this file is created automatically.
 
 ### Create the DOM Script
 
@@ -32,20 +59,26 @@ Create a new file at `dom/archive-done-sheet.ts`:
 
 ```typescript
 import { DOMExtensionContext } from 'bike/dom'
+import { ArchiveDoneProtocol } from './protocols'
 
-export async function activate(context: DOMExtensionContext) {
+export async function activate(context: DOMExtensionContext<ArchiveDoneProtocol>) {
   context.element.textContent = 'Loading...'
   context.onmessage = (message) => {
-    context.element.textContent = message
+    // message is typed as { type: 'archiveCount'; count: number }
+    context.element.textContent = `Archived ${message.count} rows`
   }
 }
 ```
+
+By passing `ArchiveDoneProtocol` as the type parameter to `DOMExtensionContext`, `context.onmessage` receives the correctly typed message. If you try to access a property that doesn't exist on the protocol, the compiler will catch it.
 
 ### Modify the App Context
 
 Update `archiveDoneCommand` in `app/main.ts` to present the sheet after archiving:
 
 ```typescript
+import { ArchiveDoneProtocol } from '../dom/protocols'
+
 function archiveDoneCommand(context: CommandContext): boolean {
   let editor = context.editor
   if (!editor) return false
@@ -71,13 +104,15 @@ function archiveDoneCommand(context: CommandContext): boolean {
   })
 
   // Present the archive done sheet with the count of done rows
-  bike.frontmostWindow?.presentSheet('archive-done-sheet.js').then((handle) => {
-    handle.postMessage(doneRows.length)
+  bike.frontmostWindow?.presentSheet<ArchiveDoneProtocol>('archive-done-sheet.js').then((handle) => {
+    handle.postMessage({ type: 'archiveCount', count: doneRows.length })
   })
 
   return true
 }
 ```
+
+The `presentSheet<ArchiveDoneProtocol>` type parameter ensures `handle.postMessage` only accepts messages matching the `toDOM` type. The returned `SheetHandle` also types `handle.onmessage` using `toApp` (plus built-in sheet lifecycle events like `bike:dismissed`).
 
 Save, and your modified extension should rebuild and install.
 

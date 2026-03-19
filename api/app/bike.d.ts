@@ -3,9 +3,9 @@ import { Inspector } from './inspector'
 import { Commands } from './commands'
 import { Keybindings } from './keybindings'
 import { OutlineEditor } from './outline-editor'
-import { DOMScript, DOMScriptHandle, SheetEvent, PanelEvent } from './dom-script'
+import { DOMScript, DOMScriptHandle, SheetHandle, PanelHandle } from './dom-script'
 import { URL, Disposable, Permissions } from './system'
-import { Message } from '../core/json'
+import { DOMProtocol } from '../core/json'
 import { Outline, Row } from './outline'
 import { OutlinePath } from '../core/outline-path'
 
@@ -127,6 +127,7 @@ declare global {
      * @param options - The options for the panel
      * @param window - A window to associate the panel with
      * @returns A promise that resolves to a DOMScriptHandle.
+     * @see {@link https://github.com/bike-outliner/extension-kit/blob/main/docs/dom-context-tutorial.md#define-a-typed-messaging-protocol | Typed Messaging Protocols}
      * @example
      * ```typescript
      * // Panel associated with a window
@@ -151,7 +152,7 @@ declare global {
      * })
      * ```
      */
-    showPanel<TSend = Message, TReceive = Message>(options: PanelOptions, window?: Window): Promise<DOMScriptHandle<TSend, TReceive | PanelEvent>>
+    showPanel<P extends DOMProtocol = DOMProtocol>(options: PanelOptions, window?: Window): Promise<PanelHandle<P>>
 
     /**
      * Get an outline editor for testing.
@@ -253,8 +254,9 @@ export interface Window {
    * @param script - The script to run.
    * @param options - The options for displaying the sheet.
    * @returns A promise that resolves to a DOMScriptHandle.
+   * @see {@link https://github.com/bike-outliner/extension-kit/blob/main/docs/dom-context-tutorial.md#define-a-typed-messaging-protocol | Typed Messaging Protocols}
    */
-  presentSheet<TSend = Message, TReceive = Message>(script: DOMScript, options?: SheetOptions): Promise<DOMScriptHandle<TSend, TReceive | SheetEvent>>
+  presentSheet<P extends DOMProtocol = DOMProtocol>(script: DOMScript, options?: SheetOptions): Promise<SheetHandle<P>>
 
   /*
   presentRowPicker(

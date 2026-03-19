@@ -24,7 +24,7 @@
  */
 
 import { Disposable, URL } from './system'
-import { Json, Message } from '../core/json'
+import { DOMProtocol } from '../core/json'
 
 /** Lifecycle events sent by Bike when hosting a sheet. */
 export type SheetEvent = { type: 'bike:dismissed' }
@@ -33,28 +33,39 @@ export type SheetEvent = { type: 'bike:dismissed' }
 export type PanelEvent = { type: 'bike:dismissed' }
 
 /**
- * Name of a script located in extension's src/dom folder or Javascript code
+ * Name of a script located in extension's src/dom folder or JavaScript code
  * that can be executed. Will first look for a file in src/dom with this name.
- * If that is not found then the passed string is used as Javascript code
- * directly.
+ * If that is not found then the passed string is used as JavaScript code
+ * directly — it must be valid JavaScript that can run in a JSContext as-is
+ * (there is no compile step).
  */
 export type DOMScript = string
 
-/** 
+/**
  * A handle to send and receive messages with a DOMScript. Use `.dispose()` to
- * remove the script. 
+ * remove the script.
+ *
+ * @see {@link https://github.com/bike-outliner/extension-kit/blob/main/docs/dom-context-tutorial.md#define-a-typed-messaging-protocol | Typed Messaging Protocols}
  */
-export interface DOMScriptHandle<TSend = Message, TReceive = Message>
+export interface DOMScriptHandle<P extends DOMProtocol = DOMProtocol>
   extends Disposable {
   /**
    * Receive messages from the DOM context.
    * @param message
    */
-  onmessage?: (message: TReceive) => void
+  onmessage?: (message: P['toApp']) => void
 
   /**
    * Send messages to the DOM context.
    * @param message
    */
-  postMessage(message: TSend): void
+  postMessage(message: P['toDOM']): void
 }
+
+/** A DOMScriptHandle whose receive channel includes sheet lifecycle events. */
+export type SheetHandle<P extends DOMProtocol = DOMProtocol> =
+  DOMScriptHandle<{ toDOM: P['toDOM']; toApp: P['toApp'] | SheetEvent }>
+
+/** A DOMScriptHandle whose receive channel includes panel lifecycle events. */
+export type PanelHandle<P extends DOMProtocol = DOMProtocol> =
+  DOMScriptHandle<{ toDOM: P['toDOM']; toApp: P['toApp'] | PanelEvent }>

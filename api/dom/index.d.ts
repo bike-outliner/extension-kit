@@ -1,5 +1,5 @@
-import { Json, Message } from '../core/json'
-export { Json, Message } from '../core/json'
+import { Json, Message, DOMProtocol } from '../core/json'
+export { Json, Message, DOMProtocol } from '../core/json'
 
 /**
  * DOMExtensionContext is passed to DOMScript's activate function.
@@ -16,10 +16,8 @@ export { Json, Message } from '../core/json'
  * }
  * ```
  */
-export interface DOMExtensionContext<
-  TSend extends Message = Message,
-  TReceive extends Message = Message
-> extends Record<string, any> {
+export interface DOMExtensionContext<P extends DOMProtocol = DOMProtocol>
+  extends Record<string, any> {
   /** The element where the extension should display */
   element: HTMLElement
 
@@ -27,11 +25,11 @@ export interface DOMExtensionContext<
    * Receive messages from the app context.
    * @param message
    */
-  onmessage?: (message: TReceive) => void
+  onmessage?: (message: P['toDOM']) => void
 
   /**
    * Send messages to the app context.
    * @param message
    */
-  postMessage: (message: TSend) => void
+  postMessage: (message: P['toApp']) => void
 }
