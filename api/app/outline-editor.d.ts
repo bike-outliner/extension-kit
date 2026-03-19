@@ -14,6 +14,11 @@ export interface OutlineEditor extends View {
    */
   focus: Row
 
+  /** Focus in to the given row, or the selected row if none provided. */
+  focusIn(row?: Row): void
+  /** Focus out one level in the focus stack. */
+  focusOut(): void
+
   /**
    * Applies a filter to the outline editor display using an OutlinePath.
    * If the path is relative, it is resolved from the focus row.
