@@ -213,17 +213,6 @@ export interface Clipboard {
   writeText(string: string, uti?: string): void
 }
 
-/**
- * RelativeOrdering specifies where an item should be placed relative to
- * other items. For example used for sidebar items and menu items. Items are
- * ordered first by section, then by beforeId, then by afterId.
- */
-export type RelativeOrdering<Section, ElementId> = {
-  readonly section?: Section
-  readonly beforeId?: ElementId
-  readonly afterId?: ElementId
-}
-
 /** Interface for an open document. */
 export interface Document {
   readonly fileURL?: URL
