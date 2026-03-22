@@ -38,32 +38,64 @@
  *   --secondary-label    — subtitles, less prominent text
  *   --tertiary-label     — disabled text, placeholders
  *   --quaternary-label   — watermarks, very subtle text
+ *   --quinary-label      — faintest text
+ *
+ * Text state:
+ *   --header-text        — header/title text
+ *   --placeholder-text   — placeholder text in inputs
  *
  * Backgrounds:
- *   --background                  — main content area
- *   --secondary-background        — grouped sections, cards
- *   --tertiary-background         — nested groups
+ *   --background                  — main content area (window background)
+ *   --secondary-background        — grouped sections, cards (under-page)
+ *   --tertiary-background         — nested groups (control background)
+ *   --text-background             — text editing areas
+ *
+ * Selection (dynamic — emphasized when app-active + window-key + view-focused):
+ *   --selected-text               — text color in selection
+ *   --selected-text-background    — text selection highlight
+ *   --selected-content-text     — text on selection background
+ *   --selected-content-background — row/item selection background
+ *
+ * Selection (static — for explicit control, ignoring window state):
+ *   --emphasized-selected-text, --unemphasized-selected-text
+ *   --emphasized-selected-text-background, --unemphasized-selected-text-background
+ *   --emphasized-selected-content-text, --unemphasized-selected-content-text
+ *   --emphasized-selected-content-background, --unemphasized-selected-content-background
  *
  * Controls:
  *   --control-accent              — buttons, toggles, links
  *   --control-background          — input fields, text areas
  *   --separator                   — dividers, borders
  *   --container-border            — panel/card borders
+ *   --grid                        — grid/table lines
  *
  * Fills:
  *   --tertiary-fill               — subtle background fill
  *   --opaque-fill                 — opaque button/control fill
  *   --opaque-secondary-fill       — hover state fill
  *
- * Selection:
- *   --selected-text               — text color when selected
- *   --alternate-selected-text     — text on accent-colored backgrounds
- *   --selected-content-background — highlighted row/item background
+ * Find:
+ *   --find-highlight-background   — search match highlight
+ *
+ * Alternating content:
+ *   --even-alternating-content-background — even row background
+ *   --odd-alternating-content-background  — odd row background
  *
  * System hues:
  *   --system-blue, --system-brown, --system-gray, --system-green,
  *   --system-orange, --system-pink, --system-purple, --system-red,
  *   --system-yellow
+ *
+ * STATE CLASSES
+ * -------------
+ * Toggled on <html> by the native host. Use to adapt styles to
+ * window/app state:
+ *   .app-active      — application is active (foreground)
+ *   .window-key      — hosting window is the key window
+ *   .view-focused    — WebView (or a child) is the first responder
+ *
+ * The dynamic selection vars above use these classes automatically,
+ * so most extensions won't need to reference state classes directly.
  */
 
 :root {
@@ -74,6 +106,7 @@
 
 body {
   font: -apple-system-body;
+  color: var(--label);
 }
 
 h1 {
@@ -120,4 +153,20 @@ h2 {
 
 .tall-body {
   font: -apple-system-tall-body;
+}
+
+/* Dynamic selection colors — auto-resolve based on window-key state */
+
+:root {
+  --selected-text: var(--unemphasized-selected-text);
+  --selected-text-background: var(--unemphasized-selected-text-background);
+  --selected-content-text: var(--emphasized-selected-content-background);
+  --selected-content-background: var(--unemphasized-selected-content-background);
+}
+
+html.app-active.window-key.view-focused {
+  --selected-text: var(--emphasized-selected-text);
+  --selected-text-background: var(--emphasized-selected-text-background);
+  --selected-content-text: var(--emphasized-selected-content-text);
+  --selected-content-background: var(--emphasized-selected-content-background);
 }
