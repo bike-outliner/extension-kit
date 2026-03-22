@@ -63,7 +63,7 @@ declare module 'bike/components' {
 
   /**
    * A macOS-style disclosure triangle with a label.
-   * Collapsed: shows the label with a right-pointing triangle and optional summary content.
+   * Collapsed: shows the label with a right-pointing triangle.
    * Expanded: shows the label with a down-pointing triangle and reveals children.
    */
   export function Disclosure(props: DisclosureProps): React.JSX.Element
@@ -77,8 +77,10 @@ declare module 'bike/components' {
     defaultExpanded?: boolean
     /** Called when the expanded state changes */
     onChange?: (expanded: boolean) => void
-    /** Optional summary content shown to the right of the label in the header row */
-    summary?: React.ReactNode
+    /** Optional accessory content (e.g. buttons) rendered in the header */
+    accessory?: React.ReactNode
+    /** Where to place the accessory: 'leading' (inline after label, default) or 'trailing' (right side) */
+    accessoryAlignment?: 'leading' | 'trailing'
   }
 
   // Separator

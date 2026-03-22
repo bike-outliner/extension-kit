@@ -142,7 +142,7 @@ export interface FormRowProps extends React.HTMLAttributes<HTMLDivElement> {
  * </Disclosure>
  * ```
  */
-export function Disclosure({ label, expanded, defaultExpanded = false, onChange, summary, children, className = '', ...rest }: DisclosureProps) {
+export function Disclosure({ label, expanded, defaultExpanded = false, onChange, accessory, accessoryAlignment = 'leading', children, className = '', ...rest }: DisclosureProps) {
   const [internalExpanded, setInternalExpanded] = React.useState(defaultExpanded)
   const isExpanded = expanded !== undefined ? expanded : internalExpanded
 
@@ -155,12 +155,15 @@ export function Disclosure({ label, expanded, defaultExpanded = false, onChange,
   const classes = ['bike-disclosure', className].filter(Boolean).join(' ')
   return (
     <div className={classes} {...rest}>
-      <button className="bike-disclosure__header" onClick={toggle} type="button">
-        <SFSymbol className={`bike-disclosure__triangle${isExpanded ? ' bike-disclosure__triangle--expanded' : ''}`} name="chevron.forward" weight="semibold" scale="small" />
-        <span className="bike-disclosure__label">{label}</span>
-        {!isExpanded && summary && <span className="bike-disclosure__summary">{summary}</span>}
-      </button>
-      {isExpanded && <div className="bike-disclosure__content">{children}</div>}
+      <div className="bike-disclosure__header">
+        <button className="bike-disclosure__toggle" onClick={toggle} type="button">
+          <SFSymbol className={`bike-disclosure__triangle${isExpanded ? ' bike-disclosure__triangle--expanded' : ''}`} name="chevron.forward" weight="semibold" scale="small" />
+          <span className="bike-disclosure__label">{label}</span>
+          {accessory && accessoryAlignment === 'leading' && <span className="bike-disclosure__accessory bike-disclosure__accessory--leading">{accessory}</span>}
+        </button>
+        {accessory && accessoryAlignment === 'trailing' && <span className="bike-disclosure__accessory">{accessory}</span>}
+      </div>
+      {isExpanded && children && <div className="bike-disclosure__content">{children}</div>}
     </div>
   )
 }
@@ -170,7 +173,10 @@ export interface DisclosureProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   expanded?: boolean
   defaultExpanded?: boolean
   onChange?: (expanded: boolean) => void
-  summary?: React.ReactNode
+  /** Optional accessory content (e.g. buttons) rendered in the header */
+  accessory?: React.ReactNode
+  /** Where to place the accessory: 'trailing' (right side, default) or 'leading' (inline after label) */
+  accessoryAlignment?: 'leading' | 'trailing'
 }
 
 // FormGroup

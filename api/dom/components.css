@@ -148,15 +148,30 @@
   gap: 4px;
   width: 100%;
   padding: 3px 0;
+}
+
+.bike-disclosure__toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   background: none;
   border: none;
   cursor: pointer;
   font: -apple-system-body;
   color: var(--label);
   text-align: left;
+  padding: 0;
 }
 
-.bike-disclosure__header:hover {
+.bike-disclosure__accessory {
+  margin-left: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.bike-disclosure__accessory--trailing {
+  margin-left: auto;
 }
 
 .bike-disclosure__triangle {
@@ -175,10 +190,6 @@
   font-weight: 600;
   flex-shrink: 0;
   color: var(--secondary-label);
-}
-
-.bike-disclosure__summary {
-  margin-left: auto;
 }
 
 .bike-disclosure__content {
