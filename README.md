@@ -56,6 +56,13 @@ my-extensions/
 - **DOM context** (`dom/*.ts|tsx`) — Custom UI components using React
 - **Style context** (`style/main.ts`) — Custom outline styling
 
+## Examples
+
+See these projects for example extensions built with this kit:
+
+[Core Extension](https://github.com/bike-outliner/core-extensions) (Ship with Bike)
+[Example Extensions](https://github.com/bike-outliner/example-extensions)
+
 ## Documentation
 
 - [Creating Extensions](docs/creating-extensions.md) — overview, setup, and first extension
