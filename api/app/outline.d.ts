@@ -1,4 +1,5 @@
-import { Json } from '../core/json'
+import { JSONValue } from '../core/json'
+import { JSONStore } from '../core/json'
 import { OutlinePath, OutlinePathValue } from '../core/outline-path'
 import { Disposable, URL } from './system'
 
@@ -25,7 +26,7 @@ export class Outline {
   constructor(rows?: RowSource)
 
   /** Runtime metadata for the outline. */
-  readonly runtimeMetadata: Metadata
+  readonly runtimeMetadata: JSONStore
 
   /**
    * Persistent metadata for the outline.
@@ -33,7 +34,7 @@ export class Outline {
    * Stored in file format frontmatter/metadata. Not stored for Plain Text
    * documents unless the key `bikemd` is set to `true`.
    */
-  readonly persistentMetadata: Metadata
+  readonly persistentMetadata: JSONStore
 
   /**
    * Archive this outline.
@@ -135,16 +136,6 @@ export class Outline {
    * @returns A Disposable to cancel the handler.
    */
   observeChanges(handler: (change: OutlineChange) => void): Disposable
-}
-
-/** Metadata (JSON) storage for outlines. */
-export interface Metadata {
-  /** Get value for key. */
-  get(key: string): Json | undefined
-  /** Set value for key. */
-  set(key: string, value: Json | undefined): void
-  /** Delete value for key. */
-  delete(key: string): void
 }
 
 export type OutlineArchive = { data: string; format: OutlineFormat }

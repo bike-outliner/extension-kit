@@ -1,6 +1,6 @@
 import { View } from './bike'
 import { DOMScript, DOMScriptHandle } from './dom-script'
-import { DOMProtocol } from '../core/json'
+import { DOMProtocol } from '../core/dom-protocol'
 
 export interface Inspector extends View {
   /**

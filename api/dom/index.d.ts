@@ -1,5 +1,7 @@
-import { Json, Message, DOMProtocol } from '../core/json'
-export { Json, Message, DOMProtocol } from '../core/json'
+import { JSONValue } from '../core/json'
+import { Message, DOMProtocol } from '../core/dom-protocol'
+export { JSONValue } from '../core/json'
+export { Message, DOMProtocol } from '../core/dom-protocol'
 
 /**
  * DOMExtensionContext is passed to DOMScript's activate function.

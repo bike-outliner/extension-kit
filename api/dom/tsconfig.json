@@ -13,7 +13,7 @@
     "paths": {
       "bike/dom": ["./index.d.ts"],
       "bike/components": ["./components.d.ts"],
-      "bike/core": ["../core/json.d.ts"]
+      "bike/core": ["../core/index.d.ts"]
     }
   }
 }

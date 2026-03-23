@@ -3,11 +3,11 @@ import { Inspector } from './inspector'
 import { Commands } from './commands'
 import { Keybindings } from './keybindings'
 import { OutlineEditor } from './outline-editor'
-import { DOMScript, DOMScriptHandle, SheetHandle, PanelHandle } from './dom-script'
+import { DOMScript, SheetHandle, PanelHandle } from './dom-script'
 import { URL, Disposable, Permissions } from './system'
-import { DOMProtocol } from '../core/json'
-import { Outline, Row } from './outline'
-import { OutlinePath } from '../core/outline-path'
+import { DOMProtocol } from '../core/dom-protocol'
+import { JSONStore } from '../core/json'
+import { Outline } from './outline'
 
 declare global {
   /** The bike global API. */
@@ -190,6 +190,7 @@ declare global {
  */
 export interface AppExtensionContext extends Record<string, any> {
   readonly permissions: Permissions
+  readonly defaults: JSONStore
 }
 
 /** Interface for managing the clipboard. */
@@ -231,6 +232,7 @@ export interface Window {
   readonly documents: Document[]
   readonly outlineEditors: OutlineEditor[]
   readonly currentOutlineEditor?: OutlineEditor
+  readonly restorableState: JSONStore
 
   observeCurrentOutlineEditor(handler: (_: OutlineEditor | undefined) => void): Disposable
 

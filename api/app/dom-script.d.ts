@@ -24,7 +24,7 @@
  */
 
 import { Disposable, URL } from './system'
-import { DOMProtocol } from '../core/json'
+import { DOMProtocol } from '../core/dom-protocol'
 
 /** Lifecycle events sent by Bike when hosting a sheet. */
 export type SheetEvent = { type: 'bike:dismissed' }

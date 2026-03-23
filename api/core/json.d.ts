@@ -1,10 +1,11 @@
-export type Json = string | number | boolean | null | { [property: string]: Json } | Json[]
+export type JSONValue = string | number | boolean | null | { [property: string]: JSONValue } | JSONValue[]
 
-/** Base type for all messages exchanged between app and DOM contexts. */
-export type Message = { type: string; [key: string]: any }
-
-/** Defines both directions of a DOMScript messaging protocol. */
-export interface DOMProtocol {
-  toDOM: Message
-  toApp: Message
+/** A key-value store of JSON values. */
+export interface JSONStore {
+  /** Get value for key. */
+  get(key: string): JSONValue | undefined
+  /** Set value for key. */
+  set(key: string, value: JSONValue | undefined): void
+  /** Delete value for key. */
+  delete(key: string): void
 }

@@ -1,4 +1,4 @@
-import { Json } from '../core/json'
+import { JSONValue } from '../core/json'
 
 /**
  * Permissions are used to control access to sensitive APIs such as the
@@ -117,6 +117,6 @@ declare global {
     /** Returns a promise with response body text. */
     text(): Promise<string>
     /** Returns a promise with response body parsed as JSON object. */
-    json(): Promise<Json | any>
+    json(): Promise<JSONValue | any>
   }
 }
