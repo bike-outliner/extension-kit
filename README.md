@@ -60,7 +60,7 @@ my-extensions/
 
 See these projects for example extensions built with this kit:
 
-- [Core Extension](https://github.com/bike-outliner/core-extensions) (Ship with Bike)
+- [Core Extensions](https://github.com/bike-outliner/core-extensions) (Ship with Bike)
 - [Example Extensions](https://github.com/bike-outliner/example-extensions)
 
 ## Documentation
