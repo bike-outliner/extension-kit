@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "bike/core": ["./core/index.d.ts"],
+      "bike/dom": ["./dom/index.d.ts"],
+      "bike/app": ["./app/index.d.ts"],
+      "bike/components": ["./dom/components.d.ts"],
+      "bike/style": ["./style/index.d.ts"]
+    }
+  }
+}
