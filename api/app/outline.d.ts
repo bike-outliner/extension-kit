@@ -268,7 +268,21 @@ export interface Row {
  * should be displayed as bold, but the acutal font is determined by the
  * editor's stylesheets.
  */
-export interface AttributedString {
+export class AttributedString {
+  /**
+   * Create an AttributedString from a Markdown string.
+   * @param markdown - The markdown string to parse.
+   * @returns A new AttributedString with the parsed formatting.
+   */
+  static fromMarkdown(markdown: string): AttributedString
+
+  /**
+   * Create an AttributedString from an HTML string.
+   * @param html - The HTML string to parse (should be a `<p>` element).
+   * @returns A new AttributedString with the parsed formatting.
+   */
+  static fromHTML(html: string): AttributedString
+
   /** Character contents as a string. */
   string: string
 
