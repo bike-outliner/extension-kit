@@ -9,6 +9,7 @@ const outdir = path.join(runtimeDir, 'out')
 console.log(`Building to directory: ${outdir}\n`)
 
 fs.mkdirSync(outdir, { recursive: true })
+fs.copyFileSync(path.join(runtimeDir, 'panel.html'), path.join(outdir, 'panel.html'))
 fs.copyFileSync(path.join(runtimeDir, 'sheet.html'), path.join(outdir, 'sheet.html'))
 fs.copyFileSync(path.join(runtimeDir, 'inspector.html'), path.join(outdir, 'inspector.html'))
 
@@ -19,6 +20,7 @@ const context = await esbuild.context({
   entryPoints: [
     path.join(runtimeDir, 'common'),
     path.join(runtimeDir, 'sheet'),
+    path.join(runtimeDir, 'panel'),
     path.join(runtimeDir, 'inspector'),
   ],
   external: ['bike/dom'],
