@@ -120,14 +120,14 @@ declare global {
      * With `window`: the panel is associated with that document window and
      * closes when the window closes. Floating, non-modal (unlike sheets).
      *
-     * Without `window`: standalone panel not tied to any document. If `id`
-     * is provided, Bike persists open/closed state and frame position
-     * across app launches.
+     * Without `window`: standalone panel not tied to any document. And will
+     * stay open until disposed by the extension or closed by user.
      *
      * @param options - The options for the panel
      * @param window - A window to associate the panel with
-     * @returns A promise that resolves to a DOMScriptHandle.
-     * @see {@link https://github.com/bike-outliner/extension-kit/blob/main/docs/dom-context-tutorial.md#define-a-typed-messaging-protocol | Typed Messaging Protocols}
+     * @returns A promise that resolves to a PaneHandle<P>.
+     * @see
+     * {@link https://github.com/bike-outliner/extension-kit/blob/main/docs/dom-context-tutorial.md#define-a-typed-messaging-protocol | Typed Messaging Protocols}
      * @example
      * ```typescript
      * // Panel associated with a window
@@ -302,11 +302,7 @@ interface PanelOptions {
   hidesOnDeactivate?: boolean
   /** Whether the panel can become the main window. Defaults to false. */
   canBecomeMain?: boolean
-  /**
-   * Unique identifier for state restoration and frame autosave.
-   * Required for standalone panels (no window). Bike restores the
-   * panel on next launch if it was open when the app quit.
-   */
+  /** Unique identifier for frame autosave. */
   id?: string
 }
 
