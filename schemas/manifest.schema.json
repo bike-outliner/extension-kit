@@ -64,10 +64,6 @@
       },
       "description": "Host permissions that the user has approved. Managed by Bike, not set by extension authors."
     },
-    "symbol": {
-      "type": "string",
-      "description": "Optional SF Symbol name for the extension, used as default for commands."
-    },
     "url": {
       "type": "string",
       "format": "uri",
