@@ -17,11 +17,12 @@ interface Commands {
   /**
    * Performs the named command.
    * @param command - The name of the command to perform.
+   * @param options - Optional editor and selection to use as the command context.
    * @returns Undefined if the command was not found. True if the command
    * was found and returned true when performed. False if the command was
    * found but returned false when performed.
    */
-  performCommand(command: CommandName): boolean | undefined
+  performCommand(command: CommandName, options?: { editor?: OutlineEditor; selection?: Selection }): boolean | undefined
 
   /** Debugging function to list all commands. */
   toString(): string

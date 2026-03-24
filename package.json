@@ -24,6 +24,7 @@
     "@types/react": "^19.1.5",
     "@types/react-dom": "^19.1.5",
     "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "esbuild": "0.25.4",
     "esbuild-plugin-external-global": "^1.0.1",
     "fast-glob": "^3.3.3",

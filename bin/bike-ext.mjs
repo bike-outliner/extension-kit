@@ -2,37 +2,38 @@
 
 const args = process.argv.slice(2)
 const command = args.find(a => !a.startsWith('-'))
+const id = args.find(a => a !== command && !a.startsWith('-'))
 const install = args.includes('--install')
 
 switch (command) {
   case 'new': {
     const { newExtension } = await import('../lib/new.mjs')
-    await newExtension(args.find(a => a !== command && !a.startsWith('-')))
+    await newExtension(id)
     break
   }
   case 'build': {
     const { build } = await import('../lib/build.mjs')
-    await build('production', { install })
+    await build('production', { install, id })
     break
   }
   case 'watch': {
     const { build } = await import('../lib/build.mjs')
-    await build('watch', { install })
+    await build('watch', { install, id })
     break
   }
   case 'package': {
     const { packageExtensions } = await import('../lib/package.mjs')
-    packageExtensions()
+    packageExtensions(id)
     break
   }
   case 'release': {
     const { releaseExtension } = await import('../lib/release.mjs')
-    releaseExtension(args.find(a => a !== command && !a.startsWith('-')))
+    releaseExtension(id)
     break
   }
   case 'submit': {
     const { submitExtension } = await import('../lib/submit.mjs')
-    submitExtension(args.find(a => a !== command && !a.startsWith('-')))
+    submitExtension(id)
     break
   }
   case 'test': {
@@ -64,9 +65,9 @@ switch (command) {
     console.log('')
     console.log('Commands:')
     console.log('  new [id]            Create a new extension from template')
-    console.log('  build [--install]    Build all extensions for production')
-    console.log('  watch [--install]    Build and watch for changes')
-    console.log('  package             Package extensions as .zip files')
+    console.log('  build [id] [--install]  Build extensions for production')
+    console.log('  watch [id] [--install]  Build and watch for changes')
+    console.log('  package [id]        Package extensions as .zip files')
     console.log('  release <id>        Create a GitHub release for an extension')
     console.log('  test [id] [-f name] Run extension tests (requires Bike.app)')
     console.log('  clean               Remove all build output')

@@ -1,6 +1,8 @@
 # Style Context Tutorial
 
-Use the style context to create custom stylesheets for Bike's outline editor. Styles are powerful, but also quite complex.
+Use the style context to create custom stylesheets for Bike's outline editor.
+Styles are powerful, but also quite complex. Themes are a simpler way to
+customize the look of your editor, see Bike's user guide for more on themes.
 
 - [Style Context API](../api/style/)
 - Entry point: `style/main.ts`
@@ -17,7 +19,9 @@ import { defineEditorStyle } from 'bike/style'
 let style = defineEditorStyle('tutorial', 'Tutorial')
 ```
 
-Save and then select your style: Bike > Style Sheets > Tutorial.
+Save and then select your style: 
+
+- Bike > Settings > Appearance > Editor Style > Tutorial.
 
 Notice that your outline editor now shows no indentation or formatting. It also doesn't show selection, etc. Editor styles are responsible for defining the visual state of the outline editor, and this style has no rules.
 
@@ -234,11 +238,13 @@ style.layer('row-formatting', (row, run, caret, viewport, include) => {
 
 Decorations have `x`, `y`, `width`, and `height` properties of type `LayoutValue`. You get layout values from the passed-in `layout` parameter. These are logical values that are resolved later in the layout process to position the decoration.
 
-The `commandName` property makes the decoration clickable — clicking it triggers the named command.
+The `commandName` property makes the decoration clickable — clicking it triggers
+the named command. But currently when you click the checkbox, nothing happens.
+Lets fix that.
 
 ### Style Done Tasks
 
-Add a rule for completed tasks that shows a checkmark:
+Add a new rule (in `row-formatting` layer) for completed tasks:
 
 ```typescript
   row(`.@type = task and @done`, (context, row) => {
@@ -253,20 +259,29 @@ Add a rule for completed tasks that shows a checkmark:
   })
 ```
 
-Note that we don't need to redo the positioning work — we are reusing the same `'mark'` decoration layer, which is already positioned correctly. We only change the image content.
+Note that we don't need to redo the positioning work — we are reusing the same
+`'mark'` decoration layer, which is already positioned correctly. We only change
+the image content.
 
-## Context and Theme
+## Context Settings and Theme
 
-Access user preferences through the context parameter:
+Outline styles have final say on outline editor styles, but they can read from settings and themes when deciding on styles. This allows your styles to respond to user settings and selected themes.
+
+For example in our editor style add these lines in the first rule:
 
 ```typescript
-row.text.font = context.theme.font
-row.text.lineHeightMultiple = context.theme.lineHeightMultiple
+row.text.font = context.settings.font
+row.text.lineHeightMultiple = context.settings.lineHeightMultiple
 ```
 
-The context's theme contains user preferred values. Now when you View > Text Size > Zoom In/Out, the text in your editor changes size. In addition to theme, the context also includes settings and editor state such as `isKey` or `isTyping`.
+Now when you View > Zoom In, the text in your editor changes size. In addition
+to settings, the context also includes the current theme and editor state such
+as `isKey` or `isTyping`.
 
 ## Building Complex Styles
+
+It's a big job to build a complete editor style from scratch. Often a better
+approach is to start with an existing style and make modifications.
 
 ### Style Modifiers
 
@@ -282,10 +297,6 @@ style.layer('row-formatting', (row, run, caret, viewport, include) => {
   include('bike', 'run-formatting')
 })
 ```
-
-### Copy and Modify
-
-Another approach is to start with an existing style, rename it, and make targeted modifications.
 
 ## Resources
 

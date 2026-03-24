@@ -35,16 +35,17 @@
     "permissions": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": ["clipboardRead", "clipboardWrite", "openURL"]
       },
-      "description": "List of permissions the extension requires."
+      "description": "List of permissions the extension requires. Available permissions: clipboardRead (read from system clipboard), clipboardWrite (write to system clipboard), openURL (open URLs in the default browser)."
     },
     "host_permissions": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "List of host-specific permissions (e.g., URLs or domains)."
+      "description": "URL patterns the extension needs access to for fetch() requests (e.g., \"https://api.example.com/*\")."
     },
     "enabled": {
       "type": "boolean",

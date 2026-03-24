@@ -12,17 +12,19 @@ Build tooling and API types for [Bike Outliner](https://www.hogbaysoftware.com/b
 ```sh
 mkdir my-extensions && cd my-extensions
 npm init -y
-npm install --save-dev @bike-outliner/extension-kit
+npm install --save-dev https://github.com/bike-outliner/extension-kit
 npx bike-ext new my-extension
-npx bike-ext build
+npx bike-ext build --install
 ```
+
+You should now see a new extension in Bike named "My Extension".
 
 ## Updating
 
 To update the `extension-kit` dependency in the future run:
 
 ```sh
-npm install @bike-outliner/extension-kit@latest --save-dev
+npm install https://github.com/bike-outliner/extension-kit --save-dev
 ```
 
 ## Commands
@@ -30,16 +32,16 @@ npm install @bike-outliner/extension-kit@latest --save-dev
 | Command | Description |
 |---------|-------------|
 | `npx bike-ext new [id]` | Create a new extension from template (bootstraps project on first run) |
-| `npx bike-ext build [--install]` | Build all extensions for production |
-| `npx bike-ext watch [--install]` | Build and watch for changes during development |
-| `npx bike-ext test [id]` | Build, install, and run tests (optionally for a specific extension) |
-| `npx bike-ext package` | Package built extensions as `.bkext.zip` files |
+| `npx bike-ext build [id] [--install]` | Build extensions for production (all or specific) |
+| `npx bike-ext watch [id] [--install]` | Build and watch for changes during development (all or specific) |
+| `npx bike-ext test [id]` | Build, install, and run tests (all or specific) |
+| `npx bike-ext package [id]` | Package built extensions as `.bkext.zip` files (all or specific) |
 | `npx bike-ext release <id>` | Create a GitHub release for an extension |
 | `npx bike-ext submit <id>` | Submit extension to the registry via pull request |
 
 ## Project structure
 
-After running `npx bike-ext new`, your project will look like:
+After running `npx bike-ext new my-extension` (above), your project will look like:
 
 ```
 my-extensions/
@@ -53,10 +55,16 @@ my-extensions/
     └── my-extension.bkext/
         ├── manifest.json
         ├── app/main.ts
-        ├── dom/hello-world.ts
+        ├── dom/protocols.ts
+        ├── dom/hello-sheet.ts
         ├── style/main.ts
+        ├── theme/example.bktheme
         └── tests/extension.test.ts
 ```
+
+Note: The extension files in `my-extension.bkext` are generated to give a full
+working example. The only file required is `manifest.json`, the rest can be
+deleted. Many extensions might only have a `app/main.ts` file.
 
 ## Extension contexts
 
@@ -68,7 +76,7 @@ my-extensions/
 
 See these projects for example extensions built with this kit:
 
-- [Core Extensions](https://github.com/bike-outliner/core-extensions) (Ship with Bike)
+- [Core Extensions](https://github.com/bike-outliner/core-extensions)
 - [Example Extensions](https://github.com/bike-outliner/example-extensions)
 
 ## Documentation
@@ -77,7 +85,7 @@ See these projects for example extensions built with this kit:
 - [App Context Tutorial](docs/app-context-tutorial.md) — commands, keybindings, outline manipulation
 - [DOM Context Tutorial](docs/dom-context-tutorial.md) — custom UI with sheets and React
 - [Style Context Tutorial](docs/style-context-tutorial.md) — outline styling, decorations, themes
-- [Testing Extensions](docs/testing-extensions.md) — writing and running tests
-- [Sharing Extensions](docs/sharing-extensions.md) — packaging, releasing, and registry submission
+- [Testing Extensions Tutorial](docs/testing-extensions-tutorial.md) — writing and running tests
+- [Sharing Extensions Tutorial](docs/sharing-extensions-tutorial.md) — packaging, releasing, and registry submission
 - [API Reference](api/) — type definitions for all three contexts
 

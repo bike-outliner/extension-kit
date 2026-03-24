@@ -2,9 +2,10 @@
 
 Use the DOM context to display custom UI using HTML and DOM.
 
-You can present a sheet, panel, window, and add custom views to the inspector
-bar. Note, your extension might not need to use the DOM context. Instead, you
-can also use the app context to present alerts and add items to the sidebar. The DOM context is only necessary when you want a fully custom view.
+You can present a sheet, panel, window, and add views to the inspector sidebar.
+Note, your extension might not need to use the DOM context. Instead, you can
+also use the app context to present alerts and pickers. The DOM context is only
+necessary when you want a fully custom view.
 
 - [DOM Context API](../api/dom/)
 - Entry points: `dom/*.ts(x)`
@@ -31,7 +32,9 @@ We will modify the "Archive Done" command to show a sheet with the number of arc
 
 ### Define a Typed Messaging Protocol
 
-App and DOM contexts communicate via `postMessage` and `onmessage`. By default these are untyped — you can send any message shape and the compiler won't catch mistakes. To get compile-time safety, define a **typed protocol**.
+App and DOM contexts communicate via `postMessage` and `onmessage`. To get
+compile-time safety, define a **typed protocol** that describes the message
+types flowing in each direction.
 
 A protocol extends `DOMProtocol` from `bike/core` and declares the message types flowing in each direction:
 
@@ -51,7 +54,9 @@ export interface ArchiveDoneProtocol extends DOMProtocol {
 
 This protocol says the app side will send an `archiveCount` message with a `count`, and the DOM side won't send anything back (`never`).
 
-Protocol files live at `dom/protocols.ts` by convention. This file is typechecked in both the app and DOM contexts, so both sides share a single protocol definition. When you scaffold a new extension with `npx bike-ext new` and select both contexts, this file is created automatically.
+Protocol files should always be placed in `dom/protocols.ts`. This file is
+typechecked in both the app and DOM contexts, so both sides share a single
+protocol definition.
 
 ### Create the DOM Script
 
@@ -64,7 +69,6 @@ import { ArchiveDoneProtocol } from './protocols'
 export async function activate(context: DOMExtensionContext<ArchiveDoneProtocol>) {
   context.element.textContent = 'Loading...'
   context.onmessage = (message) => {
-    // message is typed as { type: 'archiveCount'; count: number }
     context.element.textContent = `Archived ${message.count} rows`
   }
 }
@@ -77,7 +81,11 @@ By passing `ArchiveDoneProtocol` as the type parameter to `DOMExtensionContext`,
 Update `archiveDoneCommand` in `app/main.ts` to present the sheet after archiving:
 
 ```typescript
+...
+
 import { ArchiveDoneProtocol } from '../dom/protocols'
+
+...
 
 function archiveDoneCommand(context: CommandContext): boolean {
   let editor = context.editor

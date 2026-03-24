@@ -9,11 +9,22 @@ Use the app context to add commands, keybindings, and work with system resources
 - Some APIs require appropriate `manifest.json` permissions.
 - Import the API using `import { SYMBOL } from 'bike/app'`.
 
+ The final code for these tutorials is in the
+[example-extensions](https://github.com/bike-outliner/example-extensions)
+repository and then in `src/tutorial.bkext`.
+
 ## Setup
 
-This tutorial assumes that you have [created an extension](creating-extensions.md#create-your-first-extension) and are running `npx bike-ext watch --install`. Your extension should automatically build and install when you save changes.
+This tutorial assumes that you have [created an
+extension](creating-extensions.md) and are running `npx bike-ext watch
+--install`. Your extension should automatically build and install when you save
+changes.
 
 ## Creating Commands
+
+We'll create a command that moves completed items to an "Archive" section. Feel
+free to delete or leave in place the example code generated in `app/main.ts`
+when you created the extension.
 
 ### Basic Command Structure
 
@@ -40,7 +51,10 @@ export async function activate(context: AppExtensionContext) {
 }
 ```
 
-Access commands via Command Palette using `Command-Shift-P`.
+Save your changes and the updated extension should install and you can execute
+the command via Command Palette using `Command-Shift-P`. Search for "Tutorial:
+Archive Done". To see the `console.log` output, open Bike > Logs Explorer and
+make sure your extension is checked in the sidebar.
 
 ## Adding Keybindings
 
@@ -63,7 +77,10 @@ export async function activate(context: AppExtensionContext) {
 }
 ```
 
-Keybindings function only when the outline editor has focus, not other UI elements.
+Keybindings function only when the outline editor has focus, not other UI
+elements. It should be that you can now go to the editor, press "Escape" to
+enter block mode, and then press "a" to execute the command. And see "Archive
+Done!" in the logs.
 
 ## Archive Implementation
 
@@ -117,7 +134,9 @@ function archiveDoneCommand(context: CommandContext): boolean {
 }
 ```
 
-Mark rows complete using the Command Palette and selecting "Bike: Toggle Done". Execute the archive command to move completed items.
+Create some task rows with checkboxes. Check some of them off. And then run the
+"Tutorial: Archive Done" command to see the done items move to the Archive
+section.
 
 ## Next Steps
 
