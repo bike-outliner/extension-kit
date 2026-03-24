@@ -2,14 +2,6 @@
 
 Extend and customize Bike with extensions. They introduce new commands, keybindings, views, styles, and more. Sensitive features are safeguarded by a permission system.
 
-This guide provides an overview and tutorial. For the most up-to-date and detailed API documentation, see the [api/](../api/) directory. If you prefer not to follow the step-by-step instructions, there are also screencasts that cover the same information:
-
-- [Setup & Build](https://vimeo.com/1089520938)
-- [Creating Extensions](https://vimeo.com/1089816472)
-- [App Context Extensions](https://vimeo.com/1089829088)
-- [DOM Context Extensions](https://vimeo.com/1089831661)
-- [Style Context Extensions](https://vimeo.com/1090188813)
-
 ## Install Bike Extension Kit
 
 Use the [Bike Extension Kit](https://github.com/bike-outliner/extension-kit) to create and modify extensions.
