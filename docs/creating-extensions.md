@@ -68,7 +68,7 @@ folder of each unused context.
 - Test files live in the `tests/` subfolder with a `.test.ts` extension.
 - Tests run in the app context (`bike/app` API) and run against a real outline.
 - Run tests with `npx bike-ext test` or from Bike's Logs Explorer.
-- See [Testing Extensions Tutorial](docs/testing-extensions-tutorial.md) for details.
+- See [Testing Extensions Tutorial](testing-extensions-tutorial.md) for details.
 
 The app context and DOM context communicate using the `postMessage` and
 `onmessage` methods. The message protocol is defined in `dom/protocols.ts`. The

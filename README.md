@@ -2,6 +2,8 @@
 
 Build tooling and API types for [Bike Outliner](https://www.hogbaysoftware.com/bike/) extensions.
 
+- [API Reference](api/) — type definitions for all three contexts
+
 ## Requirements
 
 - Node.js 20.11+
