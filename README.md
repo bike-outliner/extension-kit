@@ -4,8 +4,8 @@ Build tooling and API types for [Bike Outliner](https://www.hogbaysoftware.com/b
 
 ## Requirements
 
-- Node.js 20.11+ (uses `import.meta.dirname`)
-- macOS (extension installation targets Bike.app)
+- Node.js 20.11+
+- Bike Outliner 2 for macOS
 
 ## Quick start
 
