@@ -84,7 +84,9 @@ independent of an extension.
 ## Extension Development Process
 
 Open your `my-extensions` folder in Visual Studio Code and follow along with the
-rest of this tutorial to learn about the development process.
+rest of this tutorial to learn about the development process. Make sure to open
+that folder itself, not just the individual extension folder–otherwise type
+checking won't work correctly within VS Code.
 
 ### Open Terminal
 
