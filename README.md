@@ -19,7 +19,7 @@ npx bike-ext build
 
 ## Updating
 
-To update the `extension-kit` dependency again run:
+To update the `extension-kit` dependency in the future run:
 
 ```sh
 npm install @bike-outliner/extension-kit@latest --save-dev
