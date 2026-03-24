@@ -25,7 +25,7 @@ This requires the [`gh` CLI](https://cli.github.com) to be installed and
 authenticated (`gh auth login`).
 
 ```sh
-npx bike-ext release my-extension   # creates release "my-extension-v0.0.0"
+npx bike-ext release my-extension   # creates release "my-extension-v0.1.0"
 ```
 
 You can have multiple extensions in the same repository, but each extension is
