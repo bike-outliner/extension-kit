@@ -1,3 +1,5 @@
+declare module '*.css' {}
+
 interface SFSymbolOptions {
   weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'
   scale?: 'small' | 'medium' | 'large'
