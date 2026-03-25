@@ -1,9 +1,9 @@
-import './common.css'
+import '../api/dom/common.css'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import * as ReactDOMClient from 'react-dom/client'
 import * as ReactJSXRuntime from 'react/jsx-runtime'
-import * as BikeComponents from '../api/dom/components'
+import * as BikeComponents from './components'
 
 // Expose React and ReactDOM globally for use in DOM scripts.
 //
@@ -42,16 +42,3 @@ function symbolURL(name: string, options?: SFSymbolOptions): string {
 
 window.symbolURL = symbolURL
 window.BikeComponents = BikeComponents
-
-declare global {
-  interface Window {
-    React: typeof React
-    ReactDOM: typeof ReactDOM
-    ReactDOMClient: typeof ReactDOMClient
-    ReactJSXRuntime: typeof ReactJSXRuntime
-    BikeComponents: typeof BikeComponents
-    symbolURL(name: string, options?: SFSymbolOptions): string
-  }
-  /** Returns a URL string for the named SF Symbol. */
-  function symbolURL(name: string, options?: SFSymbolOptions): string
-}
