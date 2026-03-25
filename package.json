@@ -1,6 +1,6 @@
 {
   "name": "@bike-outliner/extension-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Build tooling and API types for Bike Outliner extensions",
   "author": "Hog Bay Software",

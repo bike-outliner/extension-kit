@@ -8,12 +8,8 @@
   "properties": {
     "metadata": {
       "type": "object",
-      "description": "Optional metadata about the theme",
+      "description": "Optional metadata about the theme. The theme's display name is derived from the filename (split on '-', each word capitalized), similar to how extension names are derived.",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Theme name"
-        },
         "version": {
           "type": "string",
           "description": "Theme version"
@@ -35,7 +31,7 @@
       "properties": {
         "text": {
           "$ref": "#/$defs/color",
-          "description": "Primary text color",
+          "description": "Base text color",
           "default": "text"
         },
         "accent": {
@@ -45,7 +41,7 @@
         },
         "background": {
           "$ref": "#/$defs/color",
-          "description": "Editor background color",
+          "description": "Semantic background color used for contrast and blending calculations. To change the editor's visual background, use materials.editor instead.",
           "default": "textBackground"
         },
         "caret": {

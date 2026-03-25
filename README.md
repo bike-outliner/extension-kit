@@ -83,6 +83,7 @@ See these projects for example extensions built with this kit:
 
 ## Documentation
 
+- [Creating Themes](docs/creating-themes.md) — create a theme
 - [Creating Extensions](docs/creating-extensions.md) — overview, setup, and first extension
 - [App Context Tutorial](docs/app-context-tutorial.md) — commands, keybindings, outline manipulation
 - [DOM Context Tutorial](docs/dom-context-tutorial.md) — custom UI with sheets and React

@@ -22,15 +22,18 @@ npx bike-ext test              # Build, install, and run all extension tests in 
 npx bike-ext test tutorial     # Build, install, and run tests for a specific extension
 ```
 
-The test command builds and installs extensions into Bike. It then launches Bike
-in a special test mode that runs the tests and prints results to the terminal.
-The process exits with code 0 if all tests pass, or 1 if there are any failures.
+The test command builds and installs the extension to test into Bike. It then
+launches Bike in a special test mode that runs the tests and prints results to
+the terminal. The process exits with code 0 if all tests pass, or 1 if there are
+any failures.
 
-The command finds Bike.app automatically (checking `/Applications/Bike.app` and
-Spotlight). Set the `BIKE_PATH` environment variable to override the location.
+Use `BIKE_PATH` environment variable to specify the exact path to Bike.app if
+the test command is not finding it.
 
 You can also run tests from Bike > Logs Explorer. Click the **Run Tests** button
-and test results are displayed in the log.
+and test results are displayed in the log. Note: The core extensions tests are
+not included with Bike, so if you want to run them you will need to build and
+install the core extensions from source.
 
 ## Writing Tests
 
@@ -69,9 +72,7 @@ describe("My Tests", () => {
     })
 
     it("can create and read rows", () => {
-        outline.transaction({ label: "test" }, () => {
-            outline.insertRows(["Hello", "World"], outline.root)
-        })
+        outline.insertRows(["Hello", "World"], outline.root)
         assert.equal(outline.root.children.length, 2)
         assert.equal(outline.root.firstChild!.text.string, "Hello")
     })

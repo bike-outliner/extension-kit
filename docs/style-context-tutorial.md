@@ -1,8 +1,18 @@
 # Style Context Tutorial
 
-Use the style context to create custom stylesheets for Bike's outline editor.
-Styles are powerful, but also quite complex. Themes are a simpler way to
-customize the look of your editor, see Bike's user guide for more on themes.
+Use the style context to create custom styles for Bike's outline editor.
+Styles are powerful, but also quite complex. [Themes](creating-themes.md) are a
+simpler way to customize the look of your editor. 
+
+If themes are not powerful enough for your needs, then you should consider
+`defineEditorStyleModifier` as a way to insert rules into Bike's default style
+without having to create a full style from scratch. See [heading levels
+example](https://github.com/bike-outliner/example-extensions/tree/main/src/heading-levels.bkext).
+Everything in this tutorial still applies when using style modifiers.
+
+If you are creating a style or style modifier (in addition to these docs) you
+should reading through the source code of the default editor style in the [core
+extensions](https://github.com/bike-outliner/core-extensions/tree/main/src/bike.bkext/style).
 
 - [Style Context API](../api/style/)
 - Entry point: `style/main.ts`
@@ -11,7 +21,8 @@ customize the look of your editor, see Bike's user guide for more on themes.
 
 ## Setup
 
-This tutorial assumes you are running `npx bike-ext watch --install` for automatic building. Start by creating an empty editor style in `style/main.ts`:
+This tutorial assumes you are running `npx bike-ext watch --install` for
+automatic building. Start by creating an empty editor style in `style/main.ts`:
 
 ```typescript
 import { defineEditorStyle } from 'bike/style'
@@ -23,7 +34,9 @@ Save and then select your style:
 
 - Bike > Settings > Appearance > Editor Style > Tutorial.
 
-Notice that your outline editor now shows no indentation or formatting. It also doesn't show selection, etc. Editor styles are responsible for defining the visual state of the outline editor, and this style has no rules.
+Notice that your outline editor now shows no indentation or formatting. It also
+doesn't show selection, etc. Editor styles are responsible for defining the
+visual state of the outline editor, and this style has no rules.
 
 ## Defining Outline Structure
 
@@ -41,7 +54,10 @@ style.layer('base', (row, run, caret, viewport, include) => {
 })
 ```
 
-Save, and you should see your outline structure again. Note that when adding rules we always add them to a layer. This helps to organize them, and makes it possible to modify and include existing styles. Layers are ordered by when they are first used, so the `base` layer will always be processed first.
+Save, and you should see your outline structure again. Note that when adding
+rules we always add them to a layer. This helps to organize them, and makes it
+possible to modify and include existing styles. Layers are ordered by when they
+are first used, so the `base` layer will always be processed first.
 
 ### Visualizing Structure
 
@@ -72,25 +88,39 @@ style.layer('base', (row, run, caret, viewport, include) => {
 })
 ```
 
-The visual structure of your outline is now apparent. Rows (blue border) contain text (green border) and potentially other child rows. The blue and green rectangles are created by attaching decorations to the row and to the row's text.
+The visual structure of your outline is now apparent. Rows (blue border) contain
+text (green border) and potentially other child rows. The blue and green
+rectangles are created by attaching decorations to the row and to the row's
+text.
 
 ### Layers
 
-Styles consist of ordered rules organized into layer groups. Rules match outline paths and receive callbacks to modify style objects. The order that you define your rules is important, because each rule can read the current state of the style object. Generally, you want generic style rules listed first and refinements listed later.
+Styles consist of ordered rules organized into layer groups. Rules match outline
+paths and receive callbacks to modify style objects. The order that you define
+your rules is important, because each rule can read the current state of the
+style object. Generally, you want generic style rules listed first and
+refinements listed later.
 
-The rule callbacks must be pure functions. Given the same editor state and style state, they must always generate the same end style state.
+The rule callbacks must be pure functions. Given the same editor state and style
+state, they must always generate the same end style state.
 
-Styles are not inherited from parents as they are in CSS. Instead, create a generic rule that matches all elements and set defaults there.
+Styles are not inherited from parents as they are in CSS. Instead, create a
+generic rule that matches all elements and set defaults there.
 
-Layer groups organize rules and allow insertion into existing editor styles. Examples include `base`, `selection`, `run-formatting`, and `row-formatting`.
+Layer groups organize rules and allow insertion into existing editor styles.
+Examples include `base`, `selection`, `run-formatting`, and `row-formatting`.
 
 ### Decorations
 
-Decorations attach visual elements without affecting layout. They are attached to the underlying text layout, but they don't affect that layout. Decorations can also be attached to runs of the row's text. If you need to make space for a decoration, add padding to the element you are decorating.
+Decorations attach visual elements without affecting layout. They are attached
+to the underlying text layout, but they don't affect that layout. Decorations
+can also be attached to runs of the row's text. If you need to make space for a
+decoration, add padding to the element you are decorating.
 
 ## Selection
 
-Notice that when you select text in the outline editor, you can't see any selection marks. Let's fix that.
+Notice that when you select text in the outline editor, you can't see any
+selection marks. Let's fix that.
 
 ### Basic Text Selection
 
@@ -104,13 +134,20 @@ style.layer('selection', (row, run, caret, viewport, include) => {
 })
 ```
 
-Save, and now you should see selection marks when you select within a single paragraph.
+Save, and now you should see selection marks when you select within a single
+paragraph.
 
-How would you even know about that `@view-selected-range` attribute? This is where the Outline Path Explorer is useful. Select Bike > Outline Path Explorer. Make sure that "Show View Attributes" is selected. Then make some selections — you should see `@view-selected-range` appear. You can also type `.@view-selected-range` into the explorer's search field to highlight matching elements.
+How would you even know about that `@view-selected-range` attribute? This is
+where the Outline Path Explorer is useful. Select Bike > Outline Path Explorer.
+Make sure that "Show View Attributes" is selected. Then make some selections —
+you should see `@view-selected-range` appear. You can also type
+`.@view-selected-range` into the explorer's search field to highlight matching
+elements.
 
 ### Improving Selection with Decorations
 
-Setting `backgroundColor` works, but decorations are more flexible. Replace the selection layer:
+Setting `backgroundColor` works, but decorations are more flexible. Replace the
+selection layer:
 
 ```typescript
 style.layer('selection', (row, run, caret, viewport, include) => {
@@ -125,7 +162,9 @@ style.layer('selection', (row, run, caret, viewport, include) => {
 
 ### Block Selection
 
-In Bike, there are two selection modes — text selection mode and block selection mode. So far, we are only styling text selections. When you extend the selection beyond a single paragraph, Bike starts using block selection mode.
+In Bike, there are two selection modes — text selection mode and block selection
+mode. So far, we are only styling text selections. When you extend the selection
+beyond a single paragraph, Bike starts using block selection mode.
 
 Extend to handle block selections:
 
@@ -148,7 +187,10 @@ style.layer('selection', (row, run, caret, viewport, include) => {
 })
 ```
 
-The matching outline path calls the `selection()` function — this and other [outline path functions](https://bikeguide.hogbaysoftware.com/using-bike/using-outline-paths) are useful when styling.
+The matching outline path calls the `selection()` function — this and other
+[outline path
+functions](https://bikeguide.hogbaysoftware.com/using-bike/using-outline-paths)
+are useful when styling.
 
 ## Inline Formatting
 
@@ -166,11 +208,15 @@ style.layer('run-formatting', (row, run, caret, viewport, include) => {
 })
 ```
 
-You can also add decorations to text runs, just like you can add them to rows and row text. Try creating a rule to show text with the `@highlight` attribute — you can add/remove that attribute using Format > Highlight.
+You can also add decorations to text runs, just like you can add them to rows
+and row text. Try creating a rule to show text with the `@highlight` attribute —
+you can add/remove that attribute using Format > Highlight.
 
 ## Row Formatting with Decorations
 
-Decorations can do more than simple backgrounds. They can be placed and sized, contain images, symbols, and text, and activate commands when clicked. Let's use decorations to show a checkbox.
+Decorations can do more than simple backgrounds. They can be placed and sized,
+contain images, symbols, and text, and activate commands when clicked. Let's use
+decorations to show a checkbox.
 
 ### Start with a Simple Decoration
 
@@ -236,7 +282,10 @@ style.layer('row-formatting', (row, run, caret, viewport, include) => {
 })
 ```
 
-Decorations have `x`, `y`, `width`, and `height` properties of type `LayoutValue`. You get layout values from the passed-in `layout` parameter. These are logical values that are resolved later in the layout process to position the decoration.
+Decorations have `x`, `y`, `width`, and `height` properties of type
+`LayoutValue`. You get layout values from the passed-in `layout` parameter.
+These are logical values that are resolved later in the layout process to
+position the decoration.
 
 The `commandName` property makes the decoration clickable — clicking it triggers
 the named command. But currently when you click the checkbox, nothing happens.
@@ -265,7 +314,9 @@ the image content.
 
 ## Context Settings and Theme
 
-Outline styles have final say on outline editor styles, but they can read from settings and themes when deciding on styles. This allows your styles to respond to user settings and selected themes.
+Outline styles have final say on outline editor styles, but they can read from
+settings and themes when deciding on styles. This allows your styles to respond
+to user settings and selected themes.
 
 For example in our editor style add these lines in the first rule:
 
@@ -285,7 +336,8 @@ approach is to start with an existing style and make modifications.
 
 ### Style Modifiers
 
-Use `defineEditorStyleModifier` to insert rules into specific layers of existing styles without recreating them entirely.
+Use `defineEditorStyleModifier` to insert rules into specific layers of existing
+styles without recreating them entirely.
 
 ### Including Rules from Existing Styles
 

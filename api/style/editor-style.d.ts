@@ -255,7 +255,13 @@ type CaretBlinkStyle = 'discrete' | 'continuous' | 'none'
 interface ViewportStyle {
   /** The viewport insets  */
   padding: Insets
-  /** The viewport background  */
+  /** 
+   * The viewport semantic background color.
+   * 
+   * This color is used for contrast and blending calculations, but does not
+   * paint the actual background of the viewport. To change the visual
+   * background, use the `materials.editor` property in the theme.
+   */
   backgroundColor: Color
 }
 

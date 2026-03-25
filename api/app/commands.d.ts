@@ -1,4 +1,3 @@
-import { Range, Row } from './outline'
 import { OutlineEditor, Selection } from './outline-editor'
 import { Disposable } from './system'
 
