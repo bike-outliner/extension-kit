@@ -1,4 +1,3 @@
-import { JSONValue } from '../core/json'
 import { JSONStore } from '../core/json'
 import { OutlinePath, OutlinePathValue } from '../core/outline-path'
 import { Disposable, URL } from './system'
