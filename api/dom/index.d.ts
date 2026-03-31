@@ -34,4 +34,14 @@ export interface DOMExtensionContext<P extends DOMProtocol = DOMProtocol>
    * @param message
    */
   postMessage: (message: P['toApp']) => void
+
+  /**
+   * Get a `bike-resource://` URL for a file in this extension's folder.
+   *
+   * Use the returned URL in `<img src>`, CSS `url()`, `fetch()`, etc.
+   *
+   * @param path - Relative path within the extension folder (e.g., "images/icon.png")
+   * @returns A `bike-resource://` URL string.
+   */
+  resourceURL(path: string): string
 }
