@@ -12,5 +12,6 @@
     "paths": {
       "bike/style": ["./index.d.ts"]
     }
-  }
+  },
+  "include": [".", "../core/globals.d.ts"]
 }

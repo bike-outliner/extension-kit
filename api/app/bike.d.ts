@@ -192,38 +192,6 @@ export interface AppExtensionContext extends Record<string, any> {
   readonly permissions: Permissions
   readonly defaults: JSONStore
 
-  /**
-   * Get a `bike-resource://` URL for a file in this extension's folder.
-   *
-   * The returned URL can be used in DOM scripts (e.g., as an `<img src>`)
-   * or passed via `postMessage` to DOM contexts.
-   *
-   * @param path - Relative path within the extension folder (e.g., "images/icon.png")
-   * @returns A `bike-resource://` URL string.
-   */
-  resourceURL(path: string): string
-
-  /**
-   * Read a file from the extension's own folder.
-   *
-   * The path is relative to the extension's root directory (.bkext folder).
-   * Path traversal outside the extension folder is not allowed.
-   *
-   * @param path - Relative path within the extension folder (e.g., "data/config.json")
-   * @param options - Read options. Set encoding to "base64" for binary files.
-   * @returns The file contents as a string (UTF-8 text or base64-encoded binary).
-   * @throws If the path escapes the extension folder or the file cannot be read.
-   */
-  readFile(path: string, options?: ReadFileOptions): string
-}
-
-interface ReadFileOptions {
-  /**
-   * The encoding to use when reading the file.
-   * - `"utf-8"` (default): Read as UTF-8 text, return string.
-   * - `"base64"`: Read as binary, return base64-encoded string.
-   */
-  encoding?: 'utf-8' | 'base64'
 }
 
 /** Interface for managing the clipboard. */
