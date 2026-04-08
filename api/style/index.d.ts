@@ -1,3 +1,5 @@
+/// <reference path="../core/globals.d.ts" />
+
 export * from './geometry'
 export * from './graphics'
 export * from './editor-style'

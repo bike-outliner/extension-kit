@@ -1,3 +1,5 @@
+/// <reference path="../core/globals.d.ts" />
+
 declare module '*.css' {}
 
 interface SFSymbolOptions {

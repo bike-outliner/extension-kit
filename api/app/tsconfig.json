@@ -16,5 +16,5 @@
       "bike/core": ["../core/index.d.ts"]
     }
   },
-  "include": [".", "../core/globals.d.ts"]
+  "include": ["."]
 }

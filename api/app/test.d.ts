@@ -1,3 +1,5 @@
+/// <reference path="../core/globals.d.ts" />
+
 /** Defines a test suite. */
 declare function describe(name: string, fn: () => void): void
 
