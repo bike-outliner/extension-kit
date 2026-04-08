@@ -19,7 +19,7 @@
 .bike-button {
   font: -apple-system-body;
   color: var(--label);
-  background: var(--opaque-fill);
+  background: var(--system-fill);
   border: none;
   border-radius: 6px;
   padding: 3px 11px;
@@ -27,7 +27,7 @@
 }
 
 .bike-button:hover {
-  background: var(--opaque-fill);
+  background: var(--system-fill);
 }
 
 .bike-button:active {
@@ -41,7 +41,7 @@
 }
 
 .bike-button:disabled:hover {
-  background: var(--opaque-fill);
+  background: var(--system-fill);
 }
 
 .bike-button--mini {
@@ -208,7 +208,7 @@
 
 .bike-segmented {
   display: inline-flex;
-  background: var(--opaque-fill);
+  background: var(--system-fill);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -243,7 +243,7 @@
 }
 
 .bike-segmented__item--selected {
-  background: var(--opaque-secondary-fill);
+  background: var(--secondary-background);
 }
 
 /* Mini */

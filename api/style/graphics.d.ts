@@ -208,6 +208,12 @@ export class Color {
   static labelQuaternary(): Color
   static labelQuinary(): Color
 
+  static systemFill(): Color
+  static systemFillSecondary(): Color
+  static systemFillTertiary(): Color
+  static systemFillQuaternary(): Color
+  static systemFillQuinary(): Color
+
   static link(): Color
   static accent(): Color
   static shadow(): Color

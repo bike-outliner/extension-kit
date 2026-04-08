@@ -240,6 +240,12 @@
             "labelQuaternary",
             "labelQuinary",
 
+            "systemFill",
+            "systemFillSecondary",
+            "systemFillTertiary",
+            "systemFillQuaternary",
+            "systemFillQuinary",
+
             "link",
             "accent",
             "shadow",

@@ -70,9 +70,11 @@
  *   --grid                        — grid/table lines
  *
  * Fills:
- *   --tertiary-fill               — subtle background fill
- *   --opaque-fill                 — opaque button/control fill
- *   --opaque-secondary-fill       — hover state fill
+ *   --system-fill                 — system fill (thinnest)
+ *   --secondary-system-fill       — secondary system fill
+ *   --tertiary-system-fill        — tertiary system fill
+ *   --quaternary-system-fill      — quaternary system fill
+ *   --quinary-system-fill         — quinary system fill (thickest)
  *
  * Find:
  *   --find-highlight-background   — search match highlight
