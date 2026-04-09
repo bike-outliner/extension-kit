@@ -24,6 +24,8 @@ declare global {
     readonly keybindings: Keybindings
     /** The interface to read/write to the system clipboard. */
     readonly clipboard: Clipboard
+    /** Extension defaults scoped to the current extension. */
+    readonly defaults: JSONStore
 
     /** All windows. */
     readonly windows: Window[]
@@ -190,7 +192,6 @@ declare global {
  */
 export interface AppExtensionContext extends Record<string, any> {
   readonly permissions: Permissions
-  readonly defaults: JSONStore
 
 }
 
