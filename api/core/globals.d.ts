@@ -10,11 +10,13 @@
 declare function extensionURL(path: string): string
 
 /**
- * The user's macOS system locale as a BCP 47 language tag
- * (e.g. "en-US", "en-JP-u-ca-japanese", "de-DE").
+ * The user's macOS system locale as a BCP 47 language tag (e.g. "en-US",
+ * "en-JP-u-ca-japanese", "de-DE").
  *
- * Includes region and calendar extensions from System Preferences.
- * Pass to JavaScript's built-in formatting APIs:
+ * Includes region and calendar extensions from System Preferences. These
+ * settings aren't otherwise accessible to web content, so this is provided as a
+ * global variable for convenience. Pass to JavaScript's built-in formatting
+ * APIs:
  *
  * @example
  * ```typescript
@@ -24,3 +26,12 @@ declare function extensionURL(path: string): string
  * ```
  */
 declare const systemLocale: string
+
+/**
+ * The user's preferred first day of the week from macOS System Preferences,
+ * as a JavaScript day number (0 = Sunday, 1 = Monday, ..., 6 = Saturday).
+ *
+ * Matches the convention used by `Date.getDay()`.
+ */
+declare const systemFirstWeekday: number
+
