@@ -8,3 +8,19 @@
  * @returns A `bike-extension://` URL string.
  */
 declare function extensionURL(path: string): string
+
+/**
+ * The user's macOS system locale as a BCP 47 language tag
+ * (e.g. "en-US", "en-JP-u-ca-japanese", "de-DE").
+ *
+ * Includes region and calendar extensions from System Preferences.
+ * Pass to JavaScript's built-in formatting APIs:
+ *
+ * @example
+ * ```typescript
+ * new Date().toLocaleDateString(systemLocale)
+ * new Intl.DateTimeFormat(systemLocale, { dateStyle: "long" }).format(new Date())
+ * (1234.56).toLocaleString(systemLocale)
+ * ```
+ */
+declare const systemLocale: string
