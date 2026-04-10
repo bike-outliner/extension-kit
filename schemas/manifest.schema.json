@@ -36,7 +36,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["clipboardRead", "clipboardWrite", "openURL"]
+        "enum": ["clipboardRead", "clipboardWrite", "openURL", "keychain"]
       },
       "description": "List of permissions the extension requires. Available permissions: clipboardRead (read from system clipboard), clipboardWrite (write to system clipboard), openURL (open URLs in the default browser)."
     },

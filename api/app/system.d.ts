@@ -10,7 +10,7 @@ export interface Permissions {
 }
 
 /** Permissions that can be granted through `manifest.json`. */
-export type Permission = 'openURL' | 'clipboardRead' | 'clipboardWrite'
+export type Permission = 'openURL' | 'clipboardRead' | 'clipboardWrite' | 'keychain'
 
 /**
  * Interface for disposables.

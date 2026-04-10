@@ -27,6 +27,8 @@ declare global {
     readonly clipboard: Clipboard
     /** The interface for extension settings UI. */
     readonly settings: Settings
+    /** Secure storage for secrets (API tokens, passwords, etc) */
+    readonly keychain: Keychain
 
     /** All windows. */
     readonly windows: Window[]
@@ -194,6 +196,31 @@ declare global {
 export interface AppExtensionContext extends Record<string, any> {
   readonly permissions: Permissions
 
+}
+
+/**
+ * Secure storage for secrets (API tokens, passwords, OAuth tokens),
+ * backed by the macOS Keychain.
+ *
+ * Each extension has its own isolated keychain namespace.
+ *
+ * @requires `keychain` permission
+ * @example
+ * ```typescript
+ * bike.keychain.set('api-token', 'sk-abc123')
+ * const token = bike.keychain.get('api-token')
+ * bike.keychain.delete('api-token')
+ * ```
+ */
+export interface Keychain {
+  /** List all stored key names for this extension. */
+  keys(): string[]
+  /** Get a secret by key. Returns null if not found. */
+  get(key: string): string | undefined
+  /** Store a secret. Returns true on success. */
+  set(key: string, value: string | undefined): boolean
+  /** Delete a secret. Returns true on success. */
+  delete(key: string): boolean
 }
 
 /** Interface for managing the clipboard. */
