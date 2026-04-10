@@ -1,13 +1,14 @@
 import { Sidebar } from './sidebar'
 import { Inspector } from './inspector'
+import { Settings } from './settings'
 import { Commands } from './commands'
 import { Keybindings } from './keybindings'
 import { OutlineEditor } from './outline-editor'
 import { DOMScript, SheetHandle, PanelHandle } from './dom-script'
 import { URL, Disposable, Permissions } from './system'
 import { DOMProtocol } from '../core/dom-protocol'
-import { JSONStore } from '../core/json'
 import { Outline } from './outline'
+import { JSONStore } from '../core/json'
 
 declare global {
   /** The bike global API. */
@@ -24,8 +25,8 @@ declare global {
     readonly keybindings: Keybindings
     /** The interface to read/write to the system clipboard. */
     readonly clipboard: Clipboard
-    /** Extension defaults scoped to the current extension. */
-    readonly defaults: JSONStore
+    /** The interface for extension settings UI. */
+    readonly settings: Settings
 
     /** All windows. */
     readonly windows: Window[]

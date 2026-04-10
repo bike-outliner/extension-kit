@@ -12,6 +12,7 @@ fs.mkdirSync(outdir, { recursive: true })
 fs.copyFileSync(path.join(runtimeDir, 'panel.html'), path.join(outdir, 'panel.html'))
 fs.copyFileSync(path.join(runtimeDir, 'sheet.html'), path.join(outdir, 'sheet.html'))
 fs.copyFileSync(path.join(runtimeDir, 'inspector.html'), path.join(outdir, 'inspector.html'))
+fs.copyFileSync(path.join(runtimeDir, 'extensions-settings.html'), path.join(outdir, 'extensions-settings.html'))
 
 const prod = process.argv[2] === 'production'
 const context = await esbuild.context({
@@ -19,9 +20,11 @@ const context = await esbuild.context({
   target: 'esnext',
   entryPoints: [
     path.join(runtimeDir, 'common'),
+    path.join(runtimeDir, 'format'),
     path.join(runtimeDir, 'sheet'),
     path.join(runtimeDir, 'panel'),
     path.join(runtimeDir, 'inspector'),
+    path.join(runtimeDir, 'extensions-settings'),
   ],
   external: ['bike/dom'],
   nodePaths: [path.join(runtimeDir, '..', 'node_modules')],
