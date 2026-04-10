@@ -35,3 +35,15 @@ declare const systemLocale: string
  */
 declare const systemFirstWeekday: number
 
+/**
+ * Extension defaults, backed by UserDefaults with the prefix
+ * `bike.ext.<extensionId>.`.
+ *
+ * @example
+ * ```typescript
+ * const value = defaults.get('theme')
+ * defaults.set('theme', 'dark')
+ * defaults.observe('theme', (v) => { console.log('changed:', v) })
+ * ```
+ */
+declare const defaults: import('./json').JSONStore
