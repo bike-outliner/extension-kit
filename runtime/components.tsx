@@ -161,7 +161,7 @@ export function Disclosure({ label, expanded, defaultExpanded = false, onChange,
           <span className="bike-disclosure__label">{label}</span>
           {accessory && accessoryAlignment === 'leading' && <span className="bike-disclosure__accessory bike-disclosure__accessory--leading">{accessory}</span>}
         </button>
-        {accessory && accessoryAlignment === 'trailing' && <span className="bike-disclosure__accessory">{accessory}</span>}
+        {accessory && accessoryAlignment === 'trailing' && <span className="bike-disclosure__accessory bike-disclosure__accessory--trailing">{accessory}</span>}
       </div>
       {isExpanded && children && <div className="bike-disclosure__content">{children}</div>}
     </div>

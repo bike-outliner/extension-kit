@@ -157,6 +157,10 @@ h2 {
   font: -apple-system-tall-body;
 }
 
+a {
+  color: var(--control-accent);
+}
+
 /* Dynamic selection colors — auto-resolve based on window-key state */
 
 :root {
