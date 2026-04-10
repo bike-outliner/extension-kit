@@ -41,5 +41,6 @@ function symbolURL(name: string, options?: SFSymbolOptions): string {
   return `bike-symbol://${name}${query ? '?' + query : ''}`
 }
 
-window.symbolURL = symbolURL
+window.bike = window.bike || {} as any
+window.bike.symbolURL = symbolURL
 window.BikeComponents = BikeComponents

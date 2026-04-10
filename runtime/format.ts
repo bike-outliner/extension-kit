@@ -8,4 +8,5 @@ function formatDate(date: Date, pattern: string): string {
   return format(date, pattern)
 }
 
-globalThis.formatDate = formatDate
+globalThis.bike = globalThis.bike || {} as any
+globalThis.bike.formatDate = formatDate

@@ -15,6 +15,23 @@ declare module 'bike/components' {
     scale?: 'small' | 'medium' | 'large'
   }
 
+  // Checkbox
+
+  /**
+   * A macOS-styled checkbox with label.
+   *
+   * ```tsx
+   * import { Checkbox } from 'bike/components'
+   * <Checkbox checked={value} onChange={setValue}>Show week numbers</Checkbox>
+   * ```
+   */
+  export function Checkbox(props: CheckboxProps): React.JSX.Element
+
+  export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+    /** Label text displayed next to the checkbox */
+    children?: React.ReactNode
+  }
+
   // Button
 
   /** A macOS-styled capsule button in three sizes. */

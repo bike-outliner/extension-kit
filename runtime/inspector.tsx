@@ -114,7 +114,7 @@ function renderTabBar() {
     icon.className = 'icon'
     const meta = tabMeta.get(tabId)
     const symbolName = meta?.symbol || tabId
-    const url = symbolURL(symbolName, { scale: 'large' })
+    const url = bike.symbolURL(symbolName, { scale: 'large' })
     icon.style.maskImage = `url(${url})`
     icon.style.webkitMaskImage = `url(${url})`
     btn.appendChild(icon)

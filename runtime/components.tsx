@@ -13,7 +13,7 @@ import './components.css'
  * ```
  */
 export function SFSymbol({ name, weight, scale, style, className = '', ...rest }: SFSymbolProps) {
-  const url = symbolURL(name, { weight, scale })
+  const url = bike.symbolURL(name, { weight, scale })
   const [size, setSize] = React.useState<{ width: number; height: number } | null>(null)
 
   React.useEffect(() => {
@@ -42,6 +42,31 @@ export interface SFSymbolProps extends React.HTMLAttributes<HTMLSpanElement> {
   weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'
   /** Symbol scale */
   scale?: 'small' | 'medium' | 'large'
+}
+
+// Checkbox
+
+/**
+ * A macOS-styled checkbox with label.
+ *
+ * ```tsx
+ * import { Checkbox } from 'bike/components'
+ * <Checkbox checked={value} onChange={setValue}>Show week numbers</Checkbox>
+ * ```
+ */
+export function Checkbox({ children, className = '', ...rest }: CheckboxProps) {
+  const classes = ['bike-checkbox', className].filter(Boolean).join(' ')
+  return (
+    <label className={classes}>
+      <input type="checkbox" {...rest} />
+      {children && <span className="bike-checkbox__label">{children}</span>}
+    </label>
+  )
+}
+
+export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  /** Label text displayed next to the checkbox */
+  children?: React.ReactNode
 }
 
 // Button
