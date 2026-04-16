@@ -45,10 +45,10 @@ export class Outline {
 
   /**
    * Get the row by id.
-   * @param id - The id of the row to get.
+   * @param id - The numeric Row.ID or PersistentId of the row to get.
    * @returns The row or undefined if not found.
    */
-  getRowById(id: RowId): Row | undefined
+  getRowById(id: number | PersistentId): Row | undefined
 
   /**
    * Insert rows into the outline.
@@ -151,7 +151,7 @@ export type OutlineFormat = 'bike' | 'opml' | 'plaintext'
 export type OutlineChange =
   | { type: 'beginTransaction' }
   | { type: 'metadata' }
-  | { type: 'rowChanged'; rowId: RowId; change: RowChange }
+  | { type: 'rowChanged'; rowId: number; change: RowChange }
   | { type: 'siblingsInserted'; siblings: [Row] }
   | { type: 'siblingsRemoved'; siblings: [Row] }
   | { type: 'siblingsMoved'; oldSiblings: [Row]; newSiblings: [Row] }
@@ -160,8 +160,9 @@ export type OutlineChange =
 
 /** Describes change made to a specific Row. */
 export type RowChange =
+  | { type: 'setPersistentId'; oldPersistentId: PersistentId | null; newPersistentId: PersistentId | null }
   | { type: 'setType'; oldType: RowType; newType: RowType }
-  | { type: 'setAttribute'; name: string; oldValue: string | null; newValue: string | null }
+  | { type: 'setAttribute'; name: RowAttributeName; oldValue: string | null; newValue: string | null }
   | {
       type: 'replacedText'
       at: number
@@ -186,10 +187,14 @@ export type RowChange =
 export interface Row {
   /** Owning outline */
   readonly outline: Outline
-  /** Unique and persistent id within outline */
-  readonly id: RowId
-  /** URL link for this row combining outline and row ids */
+  /** Numeric row id, unique within outline but not persistent across saves */
+  readonly id: number
+  /** URL link for this row combining outline and row persistent ids */
   readonly url: URL
+  /** Persistent id, defaults to undefined */
+  persistentId?: PersistentId
+  /** Persistent id, generating one if needed */
+  readonly ensuredPersistentId: PersistentId
 
   /** Row's type, defaults to body */
   type: RowType
@@ -384,6 +389,9 @@ export class AttributedString {
   toHTML(): string
 }
 
+/** Persistent identifier optionally associated with rows */
+type PersistentId = string
+
 /**
  * Row attributes names can be any valid HTML attribute string. When encoded to
  * HTML they will be prefixed with `data-`.
@@ -426,7 +434,7 @@ export type AttributeValueType = 'string' | 'number' | 'date' // | "array"
 export type Range = [RangeStartIndex, RangeEndIndex]
 export type RangeStartIndex = number
 export type RangeEndIndex = number
-export type RowId = string
+export type RowId = number
 export type RowType =
   | 'body'
   | 'heading'
@@ -467,7 +475,7 @@ export type RowSource =
  * outline creates for you internally.
  */
 export type RowTemplate = {
-  id?: RowId
+  persistentId?: string
   type?: RowType
   attributes?: Record<RowAttributeName, string>
   text?: string | AttributedString
