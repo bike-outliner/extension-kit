@@ -326,6 +326,9 @@ export interface Window {
   readonly currentOutlineEditor?: OutlineEditor
   readonly restorableState: JSONStore
 
+  /** Read / Write subtitle access */
+  subtitle: string
+
   observeCurrentOutlineEditor(handler: (_: OutlineEditor | undefined) => void): Disposable
 
   /**
