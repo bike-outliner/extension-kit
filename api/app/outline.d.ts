@@ -51,6 +51,20 @@ export class Outline {
   getRowById(id: number | PersistentId): Row | undefined
 
   /**
+   * Resolve a link string into a URL.
+   *
+   * `string` may be any absolute URL (e.g. `"https://example.com"`,
+   * `"bike://root/row"`) or a `#ROWID` shorthand (e.g. `"#calendar"`).
+   * `#ROWID` is expanded into `bike://<this-outline-root>/ROWID`. Anything
+   * else is parsed as an absolute URL.
+   *
+   * @param string - The link string to resolve.
+   * @returns A URL, or undefined if the string is malformed or this
+   *   outline's root has no persistent id.
+   */
+  resolveLink(string: string): URL | undefined
+
+  /**
    * Insert rows into the outline.
    *
    * @param rows - The source of the rows to insert. (Always copied)
