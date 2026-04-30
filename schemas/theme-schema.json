@@ -223,6 +223,11 @@
         },
         {
           "type": "string",
+          "pattern": "^light-dark\\(.*\\)$",
+          "description": "Pick a color based on system appearance (light-dark(white, black), light-dark($lightBg, $darkBg)). Resolves to the first argument in light mode and the second in dark mode."
+        },
+        {
+          "type": "string",
           "description": "macOS named colors, these adapt to light/dark mode",
           "enum": [
             "text",

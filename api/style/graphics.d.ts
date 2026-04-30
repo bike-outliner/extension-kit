@@ -269,6 +269,15 @@ export class Color {
   static oklch(l: number, c: number, h: number, alpha?: number): Color
 
   /**
+   * Pick a color based on the current appearance (light vs dark mode).
+   * Resolves to `light` in light appearance and `dark` in dark appearance,
+   * automatically updating when the system appearance changes.
+   * @param light - The color to use in light mode
+   * @param dark - The color to use in dark mode
+   */
+  static lightDark(light: Color, dark: Color): Color
+
+  /**
    * @param image - The image to use as a tile pattern when filling the color
    */
   static pattern(image: Image): Color
