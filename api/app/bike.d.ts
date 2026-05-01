@@ -75,6 +75,13 @@ declare global {
     /** Returns a URL string for the named SF Symbol. */
     symbolURL(name: string, options?: SFSymbolOptions): string
 
+    /**
+     * Bring the bike application to the foreground without changing
+     * which window is key. To also bring a specific window forward,
+     * call `activate()` on that window.
+     */
+    activate(): void
+
     /** The build # of the bike app. */
     readonly build: number
     /** The version of the bike app. */
@@ -314,6 +321,13 @@ export interface Document {
   readonly windows: Window[] // ordered front to back
   readonly frontmostWindow?: Window
   readonly outline: Outline
+
+  /**
+   * Activate the document by bringing its frontmost window to the front
+   * and making it key. Also activates the bike application.
+   * No-op if the document has no windows.
+   */
+  activate(): void
 }
 
 /** Interface for a document window. */
@@ -343,6 +357,12 @@ export interface Window {
    * @see {@link https://github.com/bike-outliner/extension-kit/blob/main/docs/dom-context-tutorial.md#define-a-typed-messaging-protocol | Typed Messaging Protocols}
    */
   presentSheet<P extends DOMProtocol = DOMProtocol>(script: DOMScript, options?: SheetOptions): Promise<SheetHandle<P>>
+
+  /**
+   * Make this window key and order it to the front. Also activates the
+   * bike application.
+   */
+  activate(): void
 
   /*
   presentRowPicker(

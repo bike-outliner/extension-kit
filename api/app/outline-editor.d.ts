@@ -72,6 +72,14 @@ export interface OutlineEditor extends View {
   revealRow(row: Row, revealChildren?: boolean): void
 
   /**
+   * Make this editor the first responder within its window, bring the
+   * window to the front, and activate the bike application. Use when a
+   * window contains multiple split editors and you want a specific one
+   * to receive keyboard input.
+   */
+  activate(): void
+
+  /**
    * Group outline changes into a single view update.
    *
    * You don't need to use this method when making changes to the editor. This

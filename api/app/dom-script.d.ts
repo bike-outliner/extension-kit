@@ -68,4 +68,10 @@ export type SheetHandle<P extends DOMProtocol = DOMProtocol> =
 
 /** A DOMScriptHandle whose receive channel includes panel lifecycle events. */
 export type PanelHandle<P extends DOMProtocol = DOMProtocol> =
-  DOMScriptHandle<{ toDOM: P['toDOM']; toApp: P['toApp'] | PanelEvent }>
+  DOMScriptHandle<{ toDOM: P['toDOM']; toApp: P['toApp'] | PanelEvent }> & {
+    /**
+     * Make the panel window key and order it to the front. Also
+     * activates the bike application.
+     */
+    activate(): void
+  }
