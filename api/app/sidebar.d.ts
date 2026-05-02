@@ -1,5 +1,6 @@
 import { View } from './bike'
 import { CommandName } from './commands'
+import { Row } from './outline'
 import { Disposable } from './system'
 
 /** Sidebar is a view that displays a list of navigation items. */
@@ -25,9 +26,10 @@ export type LocationItem = Readonly<{
   text: string
   /** The SF Symbol name to display. */
   symbol: string
-  /** The persistent row ID this location represents. Provide the expected ID
-   * even if the row doesn't exist yet. */
+  /** The row ID this location represents. (Row may not exist yet) */
   representedRowId: string
-  /** The action to perform when clicked. */
+  /** Returns the row this location targets, creating it if needed. */
+  prepareRow: () => Row
+  /** The action to perform, some form of navigating to the represented row. */
   action: CommandName | (() => void)
 }>
