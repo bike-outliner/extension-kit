@@ -160,33 +160,57 @@ declare global {
     showAlert(options: AlertOptions, window?: Window): Promise<AlertResult>
 
     /**
-     * Show a fuzzy-filtering choice box for selecting from a list of items.
+     * Show a fuzzy-filtering choice box for selecting from one or more sources of items.
      *
-     * @param items - The items to choose from
-     * @param options - The options for the choice box
+     * Pass a single source for the simple case, or an array of sources to enable
+     * prefix-driven mode switching: typing a source's `prefix` at the start of the
+     * search field swaps to that source's items and per-source chrome (placeholder,
+     * default symbol, selection rules) live. Exactly one source must omit `prefix` —
+     * that's the default, shown when no other prefix matches. The rest must have
+     * unique non-empty prefixes.
+     *
+     * @param sources - A single source or an array of sources to choose from
      * @param window - A window to attach the choice box to
-     * @returns A promise that resolves to the selected indices, or null if cancelled.
+     * @returns A promise that resolves to the picked items + their indices and the
+     *   submitted source's prefix, or `null` if the user cancelled.
      * @example
      * ```typescript
-     * const indices = await bike.showChoiceBox(
-     *   [
-     *     { name: "First Option", symbol: "star" },
-     *     { name: "Second Option", container: "Category A" },
-     *     { name: "Third Option" }
+     * // Single source
+     * const result = await bike.showChoiceBox({
+     *   placeholder: "Pick a fruit...",
+     *   defaultSymbol: "circle",
+     *   items: [
+     *     { name: "Apple", symbol: "star" },
+     *     { name: "Banana", container: "Yellow" },
+     *     { name: "Cherry" }
      *   ],
-     *   {
-     *     placeholder: "Choose an option...",
-     *     defaultSymbol: "circle",
-     *     allowsMultipleSelection: false
-     *   }
-     * );
+     * });
      *
-     * if (indices !== null) {
-     *   console.log("Selected index:", indices[0]);
+     * if (result) {
+     *   console.log("Picked", result.items[0].name); // also: result.indices, result.prefix === null
      * }
      * ```
+     * @example
+     * ```typescript
+     * // Multi-source: default + ">" all-rows mode (lazy, only built on activation)
+     * const result = await bike.showChoiceBox([
+     *   {
+     *     placeholder: "Go to...",
+     *     items: sidebarLocations,
+     *   },
+     *   {
+     *     prefix: ">",
+     *     placeholder: "Go to row...",
+     *     defaultSymbol: "doc.text",
+     *     items: () => allRowsInActiveOutline(),
+     *   },
+     * ]);
+     *
+     * if (result?.prefix === ">") goToRow(result.items[0]);
+     * else if (result) goToSidebar(result.items[0]);
+     * ```
      */
-    showChoiceBox(items: ChoiceBoxItem[], options?: ChoiceBoxOptions, window?: Window): Promise<number[] | null>
+    showChoiceBox(sources: ChoiceBoxSource | ChoiceBoxSource[], window?: Window): Promise<ChoiceBoxResult | null>
 
     /**
      * Show a panel or window.
@@ -458,9 +482,15 @@ interface ChoiceBoxItem {
   symbol?: string
 }
 
-/** Options for configuring a choice box. */
-interface ChoiceBoxOptions {
-  /** Placeholder text shown in the search field. */
+/** A single source of items for a choice box. The default source omits `prefix`;
+ *  prefixed sources activate when the search field begins with their prefix. */
+interface ChoiceBoxSource {
+  /** When set, this source activates while the search field text begins with `prefix`.
+   *  The prefix itself is stripped from the fuzzy-match text. Omit on exactly one
+   *  source per choice box to mark it as the default. */
+  prefix?: string
+
+  /** Placeholder text shown in the search field while this source is active. */
   placeholder?: string
   /** Default SF Symbol to use when an item doesn't specify one. */
   defaultSymbol?: string
@@ -468,4 +498,20 @@ interface ChoiceBoxOptions {
   allowsEmptySelection?: boolean
   /** Whether multiple items can be selected (default: false). */
   allowsMultipleSelection?: boolean
+
+  /** Items shown when this source is active. A function is called once on first
+   *  activation and cached for the lifetime of the choice box, so expensive lists
+   *  (e.g. every row in a large outline) only pay their cost if the user actually
+   *  triggers the source. */
+  items: ChoiceBoxItem[] | (() => ChoiceBoxItem[])
+}
+
+/** Result from a successful choice-box submission. */
+interface ChoiceBoxResult {
+  /** The submitted source's prefix, or `null` for the default (no-prefix) source. */
+  prefix: string | null
+  /** Indices into the active source's items array. */
+  indices: number[]
+  /** The picked items, in the same order as `indices`. */
+  items: ChoiceBoxItem[]
 }
