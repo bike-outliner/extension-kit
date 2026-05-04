@@ -213,6 +213,11 @@
         },
         {
           "type": "string",
+          "pattern": "^(rgba?|hsla?|oklab|oklch)\\(\\s*from\\s.*\\)$",
+          "description": "Relative color syntax — see CSS Color Module 5 (https://drafts.csswg.org/css-color-5/#relative-colors). Each channel/alpha slot is one of: the channel keyword (passthrough), a literal value, or `calc(keyword OP N)` / `calc(N * keyword)` with a single op (`*`, `/`, `+`, `-`). Channel keywords by destination — rgb: r g b, hsl: h s l, oklab: l a b, oklch: l c h. Not supported vs the full spec: nested calc, cross-channel references, `min`/`max`/`clamp`, `none`. Examples: rgb(from $blue r g b / 35%), oklch(from $accent calc(l + 0.125) c h / alpha)."
+        },
+        {
+          "type": "string",
           "pattern": "^color-mix\\(.*\\)$",
           "description": "Mix two colors (color-mix(in oklch, red, blue), color-mix(in srgb, $primary 30%, white))"
         },

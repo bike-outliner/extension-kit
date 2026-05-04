@@ -291,31 +291,57 @@ export class Color {
   constructor(red: number, green: number, blue: number, alpha?: number)
 
   /**
-   * @param alpha - The alpha component (0-1)
-   * @returns A new color with the same RGB components and the specified alpha component
+   * Replace alpha with `value` (0-1). Result alpha is clamped to [0, 1].
    */
-  withAlpha(alpha: number): Color
+  alphaSet(value: number): Color
 
   /**
-   * @param factor - The factor to multiply the existing alpha by (0-1)
-   * @returns A new color with the same RGB components and alpha multiplied by factor
+   * Add `amount` to alpha. Positive opacifies, negative fades. Clamped to [0, 1].
    */
-  multipliedAlpha(factor: number): Color
+  alphaOffset(amount: number): Color
 
   /**
-   * Blend this color with another
-   * @param fraction - Blend amount (0 = this, 1 = color)
-   * @param color - The color to blend toward
+   * Multiply alpha by `factor`. Clamped to [0, 1].
+   */
+  alphaMultiplied(factor: number): Color
+
+  /**
+   * Bump oklch lightness by `amount` (typical range 0–1). Negative values darken.
+   */
+  lightened(amount: number): Color
+
+  /**
+   * Drop oklch lightness by `amount`. Equivalent to `lightened(-amount)`.
+   */
+  darkened(amount: number): Color
+
+  /**
+   * Multiply oklch chroma by `factor`. Values > 1 increase saturation.
+   */
+  saturated(factor: number): Color
+
+  /**
+   * Divide oklch chroma by `factor`. Equivalent to `saturated(1 / factor)`.
+   */
+  desaturated(factor: number): Color
+
+  /**
+   * Rotate oklch hue by `degrees`. Wraps modulo 360°.
+   */
+  hueShifted(degrees: number): Color
+
+  /**
+   * Mix this color with another (CSS color-mix).
+   * @param color - The color to mix with
+   * @param fraction - Mix amount (0 = this, 1 = color)
    * @param colorSpace - Optional color space for mixing (default: oklab)
-   * @returns A new color with the specified fraction of the specified color blended in
    */
-  withFraction(fraction: number, color: Color, colorSpace?: ColorSpace): Color
+  mixed(color: Color, fraction: number, colorSpace?: ColorSpace): Color
 
   /**
-   * Select best contrasting color from candidates
+   * Select best contrasting color from candidates (CSS color-contrast).
    * @param candidates - Array of candidate colors
    * @param target - Optional WCAG target or custom ratio
-   * @returns The candidate color with best contrast against this color
    */
   contrasted(candidates: Color[], target?: ContrastTarget): Color
 
