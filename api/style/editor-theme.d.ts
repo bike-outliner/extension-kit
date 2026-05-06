@@ -47,6 +47,9 @@ interface ColorTheme {
   readonly caretMessage: Color
   readonly textBackgroundSelected: Color
   readonly blockBackgroundSelected: Color
+  readonly contentBackgroundSelectedUnemphasized: Color
+
+  // Find matches
   readonly findMatch: Color
   readonly findMatchCurrent: Color
 
