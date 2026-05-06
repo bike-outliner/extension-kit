@@ -99,18 +99,6 @@
         "replacement": {
           "$ref": "#/$defs/color",
           "description": "Text replacement indicator color"
-        },
-        "titlebarSeparator": {
-          "$ref": "#/$defs/color",
-          "description": "Separator below the titlebar"
-        },
-        "sidebarSeparators": {
-          "$ref": "#/$defs/color",
-          "description": "Split view dividers between sidebar, editor, and inspector"
-        },
-        "editorBarSeparators": {
-          "$ref": "#/$defs/color",
-          "description": "Toolbar separator (top) and bottom panel separators (status bar, find, check)"
         }
       },
       "additionalProperties": {
@@ -133,7 +121,16 @@
         "editor": {
           "$ref": "#/$defs/material"
         },
-        "editorBars": {
+        "editorPane": {
+          "$ref": "#/$defs/material"
+        },
+        "editorToolbar": {
+          "$ref": "#/$defs/material"
+        },
+        "editorPanel": {
+          "$ref": "#/$defs/material"
+        },
+        "editorStatusBar": {
           "$ref": "#/$defs/material"
         },
         "inspector": {
@@ -491,7 +488,7 @@
       },
       "additionalProperties": false
     },
-    "material": {
+    "fill": {
       "oneOf": [
         {
           "$ref": "#/$defs/color"
@@ -506,18 +503,18 @@
             "type": {
               "type": "string",
               "const": "glass",
-              "description": "Specifies this is a glass material"
+              "description": "Specifies this is a glass fill"
             },
             "style": {
               "type": "string",
               "enum": ["clear", "regular"],
               "default": "regular",
-              "description": "Style of the glass material"
+              "description": "Style of the glass fill"
             },
             "tintColor": {
               "$ref": "#/$defs/color",
               "default": null,
-              "description": "Tint color for the glass material"
+              "description": "Tint color for the glass fill"
             }
           },
           "additionalProperties": false
@@ -529,20 +526,20 @@
             "type": {
               "type": "string",
               "const": "system",
-              "description": "Specifies this is a system material"
+              "description": "Specifies this is a system fill"
             },
             "style": {
               "type": "string",
               "enum": ["header", "titlebar", "windowBackground"],
               "default": "header",
-              "description": "Style of the system material"
+              "description": "Style of the system fill"
             },
             "opacity": {
               "type": "number",
               "minimum": 0,
               "maximum": 1,
               "default": null,
-              "description": "Opacity of the material, null for default"
+              "description": "Opacity of the fill, null for default"
             },
             "followsActive": {
               "type": "boolean",
@@ -559,21 +556,70 @@
             "type": {
               "type": "string",
               "const": "active",
-              "description": "Selects between two materials based on window key state"
+              "description": "Selects between two fills based on window key state"
             },
             "active": {
-              "$ref": "#/$defs/material",
-              "description": "Material rendered while the host window is key"
+              "$ref": "#/$defs/fill",
+              "description": "Fill rendered while the host window is key"
             },
             "inactive": {
-              "$ref": "#/$defs/material",
-              "description": "Material rendered while the host window is not key"
+              "$ref": "#/$defs/fill",
+              "description": "Fill rendered while the host window is not key"
             }
           },
           "additionalProperties": false
         }
       ],
-      "description": "A visual material (color, gradient, glass, system, or active wrapper)"
+      "description": "A visual fill (color, gradient, glass, system, or active wrapper)"
+    },
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fill": {
+          "$ref": "#/$defs/fill",
+          "description": "The pane's fill (color, gradient, glass, system, or active wrapper). Optional; if omitted, the pane paints nothing — useful for borders-only or cornerRadius-only materials."
+        },
+        "borders": {
+          "$ref": "#/$defs/borders",
+          "description": "Per-edge 1pt border colors. Only one side of a shared edge should set a color, otherwise strokes stack into a 2pt line."
+        },
+        "cornerRadius": {
+          "$ref": "#/$defs/cornerRadius",
+          "description": "Corner radius for the pane's fill. Number applies uniformly; object specifies per-corner radii."
+        }
+      }
+    },
+    "borders": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "top":      { "$ref": "#/$defs/color", "description": "Top edge stroke color" },
+        "bottom":   { "$ref": "#/$defs/color", "description": "Bottom edge stroke color" },
+        "leading":  { "$ref": "#/$defs/color", "description": "Leading edge stroke color (left in LTR, right in RTL)" },
+        "trailing": { "$ref": "#/$defs/color", "description": "Trailing edge stroke color (right in LTR, left in RTL)" }
+      },
+      "description": "Per-edge border colors for a pane material"
+    },
+    "cornerRadius": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": 0,
+          "description": "Uniform radius applied to all four corners"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "topLeading":     { "type": "number", "minimum": 0 },
+            "topTrailing":    { "type": "number", "minimum": 0 },
+            "bottomLeading":  { "type": "number", "minimum": 0 },
+            "bottomTrailing": { "type": "number", "minimum": 0 }
+          },
+          "description": "Per-corner radii. Omitted corners default to 0."
+        }
+      ]
     },
     "textStyle": {
       "type": "object",
