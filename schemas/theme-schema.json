@@ -551,9 +551,29 @@
             }
           },
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["type", "active", "inactive"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "active",
+              "description": "Selects between two materials based on window key state"
+            },
+            "active": {
+              "$ref": "#/$defs/material",
+              "description": "Material rendered while the host window is key"
+            },
+            "inactive": {
+              "$ref": "#/$defs/material",
+              "description": "Material rendered while the host window is not key"
+            }
+          },
+          "additionalProperties": false
         }
       ],
-      "description": "A visual material (color, gradient, glass, or system)"
+      "description": "A visual material (color, gradient, glass, system, or active wrapper)"
     },
     "textStyle": {
       "type": "object",
