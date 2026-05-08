@@ -127,6 +127,14 @@ declare global {
     observeFrontmostOutlineEditor(handler: (_: OutlineEditor | undefined) => void): Disposable
 
     /**
+     * All connected screens. `screens[0]` is the primary (menu bar) screen,
+     * matching `NSScreen.screens` ordering.
+     */
+    readonly screens: Screen[]
+    /** The primary screen (the one with the menu bar). */
+    readonly mainScreen: Screen
+
+    /**
      * Show a window or application modal alert.
      *
      * @param options - The options for the alert
@@ -363,6 +371,8 @@ export interface Window {
   readonly outlineEditors: OutlineEditor[]
   readonly currentOutlineEditor?: OutlineEditor
   readonly restorableState: JSONStore
+  /** The screen this window is currently on, or undefined if not on screen. */
+  readonly screen?: Screen
 
   /** Read / Write subtitle access */
   subtitle: string
@@ -445,6 +455,44 @@ interface PanelOptions {
   canBecomeMain?: boolean
   /** Unique identifier for frame autosave. */
   id?: string
+  /**
+   * Initial x of the panel's bottom-left corner in points (AppKit
+   * bottom-left global coords). When both `x` and `y` are given, this
+   * overrides the default centering. Ignored when an autosaved frame
+   * for `id` already exists.
+   */
+  x?: number
+  /** Initial y of the panel's bottom-left corner in points. See `x`. */
+  y?: number
+  /**
+   * Screen used when `x` and `y` are not both given: the panel is
+   * centered on this screen instead of the primary. When `x` and `y`
+   * are both provided, the panel lands wherever those coords fall and
+   * `screen` is ignored.
+   */
+  screen?: Screen
+}
+
+/** A rectangle in points. */
+export interface Rect {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+/** A connected display. */
+export interface Screen {
+  /** Stable identifier for the duration of the session */
+  readonly id: string
+  /** Localized display name (e.g. "Built-in Retina Display"). */
+  readonly name: string
+  /** Backing scale factor (1 on non-retina, 2 on retina). */
+  readonly scale: number
+  /** Full screen rect in points */
+  readonly frame: Rect
+  /** `frame` minus the menu bar and Dock */
+  readonly visibleFrame: Rect
 }
 
 interface AlertOptions {
