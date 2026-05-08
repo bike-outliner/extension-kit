@@ -175,6 +175,8 @@ interface StyleContext {
   isDarkMode: boolean
   /** True when in full screen mode  */
   isFullScreen: boolean
+  /** True when in full window mode (window chrome hidden, document fills the window) */
+  isFullWindow: boolean
   /** True when dragging selection  */
   isDragSource: boolean
   /** Size of the editor's viewport  */
