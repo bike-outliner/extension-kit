@@ -179,6 +179,8 @@ interface StyleContext {
   isDragSource: boolean
   /** Size of the editor's viewport  */
   viewportSize: Size
+  /** Insets of overlapping chrome (e.g. floating toolbar/status bar) on the viewport. Subtract from `viewportSize` to get the visible content area. */
+  viewportContentInsets: Insets
   /** Editor Settings  */
   settings: EditorSettings
   /** Editor Theme  */
