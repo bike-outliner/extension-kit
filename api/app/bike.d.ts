@@ -5,7 +5,7 @@ import { Commands } from './commands'
 import { Keybindings } from './keybindings'
 import { OutlineEditor } from './outline-editor'
 import { DOMScript, SheetHandle, PanelHandle } from './dom-script'
-import { URL, Disposable, Permissions } from './system'
+import { URL, Disposable, Permissions, Rect } from './system'
 import { DOMProtocol } from '../core/dom-protocol'
 import { Outline } from './outline'
 import { JSONStore } from '../core/json'
@@ -364,6 +364,7 @@ export interface Document {
 
 /** Interface for a document window. */
 export interface Window {
+  readonly screen?: Screen
   readonly title: string
   readonly sidebar: Sidebar
   readonly inspector: Inspector
@@ -371,11 +372,16 @@ export interface Window {
   readonly outlineEditors: OutlineEditor[]
   readonly currentOutlineEditor?: OutlineEditor
   readonly restorableState: JSONStore
-  /** The screen this window is currently on, or undefined if not on screen. */
-  readonly screen?: Screen
 
   /** Read / Write subtitle access */
   subtitle: string
+
+  /**
+   * Window frame in points, AppKit global coordinates (bottom-left origin).
+   * Read returns the current frame; write moves and resizes the window
+   * immediately. Assigning a malformed Rect (missing keys) is a no-op.
+   */
+  frame: Rect
 
   observeCurrentOutlineEditor(handler: (_: OutlineEditor | undefined) => void): Disposable
 
@@ -420,6 +426,21 @@ interface SheetOptions {
   //buttons?: string[];
 }
 
+/**
+ * Panel role that sets default window behavior.
+ *
+ * - `'inspector'` — small, floating, auxiliary. Defaults: floating=true,
+ *   canBecomeMain=false, hidesOnDeactivate=false.
+ * - `'utility'` — medium, tool-like. Defaults: floating=true,
+ *   canBecomeMain=false, hidesOnDeactivate=true.
+ * - `'window'` — full, document-like, non-floating. Uses NSWindow instead
+ *   of NSPanel. Defaults: floating=false, canBecomeMain=true,
+ *   hidesOnDeactivate=false.
+ *
+ * Individual properties (floating, canBecomeMain, hidesOnDeactivate) override
+ * role defaults when specified. If no role is set, current defaults apply
+ * (floating=true, canBecomeMain=false, hidesOnDeactivate=false).
+ */
 type PanelRole = 'inspector' | 'utility' | 'window'
 
 interface PanelOptions {
@@ -427,25 +448,7 @@ interface PanelOptions {
   script: DOMScript
   /** Panel window title. */
   title?: string
-  /** Initial width in points. */
-  width?: number
-  /** Initial height in points. */
-  height?: number
-  /**
-   * Panel role that sets default window behavior.
-   *
-   * - `'inspector'` — small, floating, auxiliary. Defaults: floating=true,
-   *   canBecomeMain=false, hidesOnDeactivate=false.
-   * - `'utility'` — medium, tool-like. Defaults: floating=true,
-   *   canBecomeMain=false, hidesOnDeactivate=true.
-   * - `'window'` — full, document-like, non-floating. Uses NSWindow instead
-   *   of NSPanel. Defaults: floating=false, canBecomeMain=true,
-   *   hidesOnDeactivate=false.
-   *
-   * Individual properties (floating, canBecomeMain, hidesOnDeactivate) override
-   * role defaults when specified. If no role is set, current defaults apply
-   * (floating=true, canBecomeMain=false, hidesOnDeactivate=false).
-   */
+  /** Panel role that sets default window behavior. */
   role?: PanelRole
   /** Whether the panel floats above other windows. Defaults to true. */
   floating?: boolean
@@ -455,31 +458,11 @@ interface PanelOptions {
   canBecomeMain?: boolean
   /** Unique identifier for frame autosave. */
   id?: string
-  /**
-   * Initial x of the panel's bottom-left corner in points (AppKit
-   * bottom-left global coords). When both `x` and `y` are given, this
-   * overrides the default centering. Ignored when an autosaved frame
-   * for `id` already exists.
-   */
-  x?: number
-  /** Initial y of the panel's bottom-left corner in points. See `x`. */
-  y?: number
-  /**
-   * Screen used when `x` and `y` are not both given: the panel is
-   * centered on this screen instead of the primary. When `x` and `y`
-   * are both provided, the panel lands wherever those coords fall and
-   * `screen` is ignored.
-   */
-  screen?: Screen
+  /** Initial frame in AppKit global coordinates (defaults to centered on main screen). */
+  frame?: Rect
 }
 
-/** A rectangle in points. */
-export interface Rect {
-  x: number
-  y: number
-  width: number
-  height: number
-}
+export type { Rect } from './system'
 
 /** A connected display. */
 export interface Screen {

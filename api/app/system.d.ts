@@ -12,6 +12,14 @@ export interface Permissions {
 /** Permissions that can be granted through `manifest.json`. */
 export type Permission = 'openURL' | 'clipboardRead' | 'clipboardWrite' | 'keychain'
 
+/** A rectangle in points. */
+export interface Rect {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 /**
  * Interface for disposables.
  *

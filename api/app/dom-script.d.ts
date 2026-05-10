@@ -23,7 +23,7 @@
  * 6. For security some HTML/DOM APIs (e.g., network access) are disabled.
  */
 
-import { Disposable, URL } from './system'
+import { Disposable, URL, Rect } from './system'
 import { DOMProtocol } from '../core/dom-protocol'
 
 /** Lifecycle events sent by Bike when hosting a sheet. */
@@ -74,4 +74,12 @@ export type PanelHandle<P extends DOMProtocol = DOMProtocol> =
      * activates the bike application.
      */
     activate(): void
+
+    /**
+     * Panel frame in points, AppKit global coordinates (bottom-left
+     * origin). Read returns the current frame; write moves and resizes
+     * the panel immediately. Assigning a malformed Rect (missing keys)
+     * is a no-op.
+     */
+    frame: Rect
   }
