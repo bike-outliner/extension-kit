@@ -189,20 +189,12 @@ interface StyleContext {
   theme: EditorTheme
   /** Cache for values derived from this editor state */
   userCache: Map<string, any>
-
-  /** Ordered row index being styled  */
-  orderedIndex?: number
-
-  /** Get counter value */
-  //getCounter(name: string): number
-  /** Get nested counter values */
-  //getCounters(name: string): number[]
-  /** Create a new counter (default initialValue is 0) */
-  //createCounter(name: string, initialValue?: number): void
-  /** Increment existing counter (default byValue is 1) */
-  //incrementCounter(name: string, byValue?: number): void
-  /** Set the value of existing counter, create if doesn't */
-  //setCounter(name: string, value: number): void
+  /**
+   * Consecutive-sibling counts of same-type ancestor down to this row The last
+   * entry is this row's own count. Empty body rows do not break the run.
+   * IMPORTANT: Set only for headings and ordered rows
+   */
+  consecutivePath?: number[]
 }
 
 interface EditorSettings {
