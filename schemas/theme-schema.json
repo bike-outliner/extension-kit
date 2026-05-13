@@ -118,13 +118,13 @@
         "sidebar": {
           "$ref": "#/$defs/material"
         },
-        "editor": {
-          "$ref": "#/$defs/material"
-        },
         "editorPane": {
           "$ref": "#/$defs/material"
         },
         "editorToolbar": {
+          "$ref": "#/$defs/material"
+        },
+        "editor": {
           "$ref": "#/$defs/material"
         },
         "editorPanel": {
