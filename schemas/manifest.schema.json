@@ -47,20 +47,6 @@
       },
       "description": "URL patterns the extension needs access to for fetch() requests (e.g., \"https://api.example.com/*\")."
     },
-    "approved_permissions": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Permissions that the user has approved. Managed by Bike, not set by extension authors."
-    },
-    "approved_host_permissions": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Host permissions that the user has approved. Managed by Bike, not set by extension authors."
-    },
     "url": {
       "type": "string",
       "format": "uri",
