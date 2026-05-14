@@ -47,10 +47,6 @@
       },
       "description": "URL patterns the extension needs access to for fetch() requests (e.g., \"https://api.example.com/*\")."
     },
-    "enabled": {
-      "type": "boolean",
-      "description": "Indicates if the extension is currently enabled."
-    },
     "approved_permissions": {
       "type": "array",
       "items": {
