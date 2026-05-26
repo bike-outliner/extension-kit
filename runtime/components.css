@@ -224,6 +224,31 @@
   margin: 0;
 }
 
+/* Box */
+
+.bike-box {
+  background: var(--quaternary-system-fill);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.bike-box__label {
+  font: -apple-system-subheadline;
+  font-weight: 600;
+  color: var(--secondary-label);
+  margin-bottom: 6px;
+}
+
+.bike-box__content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bike-box__content > * {
+  margin: 0;
+}
+
 /* Separator */
 
 .bike-separator {

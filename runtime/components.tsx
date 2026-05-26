@@ -224,6 +224,37 @@ export function FormGroup({ className = '', ...rest }: FormGroupProps) {
 
 export interface FormGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
 
+// Box
+
+/**
+ * A grouped container ("box") matching macOS grouped content — a filled,
+ * hairline-bordered rounded rectangle for visually grouping related controls.
+ * An optional `label` renders a header above the content.
+ *
+ * ```tsx
+ * import { Box, FormGroup, FormRow } from 'bike/components'
+ * <Box label="Row templates">
+ *   <FormGroup>
+ *     <FormRow label="Year"><input type="text" /></FormRow>
+ *   </FormGroup>
+ * </Box>
+ * ```
+ */
+export function Box({ label, children, className = '', ...rest }: BoxProps) {
+  const classes = ['bike-box', className].filter(Boolean).join(' ')
+  return (
+    <div className={classes} {...rest}>
+      {label && <div className="bike-box__label">{label}</div>}
+      <div className="bike-box__content">{children}</div>
+    </div>
+  )
+}
+
+export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Optional header shown above the box content */
+  label?: React.ReactNode
+}
+
 // Separator
 
 /**

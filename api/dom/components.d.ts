@@ -76,6 +76,29 @@ declare module 'bike/components' {
 
   export interface FormGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
 
+  // Box
+
+  /**
+   * A grouped container ("box") matching macOS grouped content — a filled,
+   * hairline-bordered rounded rectangle for visually grouping related controls.
+   * An optional `label` renders a header above the content.
+   *
+   * ```tsx
+   * import { Box, FormGroup, FormRow } from 'bike/components'
+   * <Box label="Row templates">
+   *   <FormGroup>
+   *     <FormRow label="Year"><input type="text" /></FormRow>
+   *   </FormGroup>
+   * </Box>
+   * ```
+   */
+  export function Box(props: BoxProps): React.JSX.Element
+
+  export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
+    /** Optional header shown above the box content */
+    label?: React.ReactNode
+  }
+
   // Disclosure
 
   /**
