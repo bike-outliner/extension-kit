@@ -1,8 +1,29 @@
 import { OutlineEditor, Selection } from './outline-editor'
 import { Disposable } from './system'
 
-/** Command definition */
-type CommandDefinition = CommandAction
+/**
+ * Command definition. Either a bare action closure, or an object that pairs the
+ * action with optional metadata such as a default {@link CommandButton}.
+ */
+type CommandDefinition =
+  | CommandAction
+  | {
+      /** Default button placement for this command. */
+      button?: CommandButton
+      /** The action to perform when the command is triggered. */
+      action: CommandAction
+    }
+
+/** Where a {@link CommandButton} is placed by default. */
+type CommandButtonLocation = 'titlebar' | 'toolbar' | 'statusbar'
+
+/** A default button an extension contributes for one of its commands. */
+type CommandButton = {
+  /** SF Symbol name shown on the button (e.g. `'star'`, `'bolt'`). */
+  symbol: string
+  /** The bar the button is placed in by default. */
+  location: CommandButtonLocation
+}
 
 /** Interface for managing commands. */
 interface Commands {

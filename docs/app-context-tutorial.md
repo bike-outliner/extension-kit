@@ -82,6 +82,32 @@ elements. It should be that you can now go to the editor, press "Escape" to
 enter block mode, and then press "a" to execute the command. And see "Archive
 Done!" in the logs.
 
+## Adding a Toolbar Button
+
+A command can suggest a default button by giving its definition a `button` with
+an SF Symbol `symbol` and a `location` of `'titlebar'`, `'toolbar'`, or
+`'statusbar'`:
+
+```typescript
+export async function activate(context: AppExtensionContext) {
+  bike.commands.addCommands({
+    commands: {
+      'tutorial:archive-done': {
+        button: { symbol: 'archivebox', location: 'toolbar' },
+        action: archiveDoneCommand,
+      },
+    },
+  })
+}
+```
+
+The button is a suggestion, not a fixed placement. The first time the command is
+seen Bike adds the button to the requested location; from there the user owns it.
+In **Interface Explorer** they can move it to another bar, change its symbol, or
+remove it, and that choice persists across reloads — a removed button is not
+re-added. The button shows a "from \<extension>" label there, and right-clicking
+it offers **Reset to Extension Default** to restore the placement declared here.
+
 ## Archive Implementation
 
 The complete working code combines imports and command logic:
