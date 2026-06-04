@@ -21,6 +21,12 @@
  * 4. Must be located in the extension's `src/dom` folder and loaded by name.
  * 5. Communicate with extension code via `postMessage` and `onmessage`.
  * 6. For security some HTML/DOM APIs (e.g., network access) are disabled.
+ *
+ * DOMScripts created with a window relationship — inspector items, sheets,
+ * and panels shown with an explicit window — are bound to that host window:
+ * their `bike.session` calls default omitted `outline`/`editor` params to the
+ * host window's outline/editor (stable as windows reorder) instead of the
+ * app-frontmost one. See `bike.session` docs in `bike/dom`.
  */
 
 import { Disposable, URL, Rect } from './system'
