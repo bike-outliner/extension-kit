@@ -135,9 +135,8 @@ interface BikeSession {
   updateEditor(params: {
     outline?: string
     focus?: RowRef
-    /** Set the filter — a contains-text string or an OutlinePath. Empty string clears it. */
     filter?: string
-    selectRow?: RowRef
+    select?: RowRef
     selectHead?: RowRef
     expand?: RowRef[]
     collapse?: RowRef[]
