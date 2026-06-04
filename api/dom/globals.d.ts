@@ -106,7 +106,7 @@ interface SessionRow {
 }
 
 /** A whole outline in the session format, with source-identifying fields. */
-interface SessionDocument {
+interface SessionOutline {
   persistentId?: string
   displayName?: string
   fileURL?: string | null
@@ -160,7 +160,7 @@ interface BikeSession {
     rowRefs?: RowRef[]
     shape?: 'tree' | 'flat'
     rows?: boolean
-  }): Promise<SessionDocument>
+  }): Promise<SessionOutline>
   getEditors(): Promise<EditorSummary[]>
   getEditor(params?: { editor?: string }): Promise<unknown>
   getCommands(params?: { editor?: string }): Promise<CommandInfo[]>
@@ -222,7 +222,7 @@ interface BikeSession {
   /** Stream session snapshots of rows matching `path` (default "//*"). */
   observeOutline(
     params: { outline?: string; path?: string; shape?: 'tree' | 'flat'; rows?: boolean },
-    onSnapshot: (doc: SessionDocument) => void,
+    onSnapshot: (doc: SessionOutline) => void,
     options?: ObserveOptions
   ): Promise<SessionSubscription>
   /** Stream the set of open outlines as they open / close / reorder. */
