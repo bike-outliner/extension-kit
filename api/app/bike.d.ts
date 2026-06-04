@@ -296,7 +296,6 @@ declare global {
  */
 export interface AppExtensionContext extends Record<string, any> {
   readonly permissions: Permissions
-
 }
 
 /**

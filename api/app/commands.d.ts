@@ -15,7 +15,13 @@ type CommandDefinition =
     }
 
 /** Where a {@link CommandButton} is placed by default. */
-type CommandButtonLocation = 'titlebar' | 'toolbar' | 'statusbar'
+type CommandButtonLocation = 
+  /** Adds menu item to the trailing view popup in window titlebar. */
+  'titlebar' | 
+  /** Adds button to the editor's top toolbar. */
+  'toolbar' | 
+  /** Adds button to the editor's bottom status bar. */
+  'statusbar'
 
 /** A default button an extension contributes for one of its commands. */
 type CommandButton = {
