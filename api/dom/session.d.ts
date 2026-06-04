@@ -85,7 +85,6 @@ interface CommandInfo {
   source: string | null
 }
 
-/** Per-row result of `updateRows`: the updated row, plus any per-field errors. */
 interface RowUpdateResult {
   row: SessionRow
   fieldErrors?: { field: string; message: string }[]
@@ -161,13 +160,12 @@ interface BikeSession {
     collapse?: RowRef[]
   }): Promise<SessionEditor>
   performCommands(params: { editor?: EditorId; ids: CommandId[] }): Promise<{ id: CommandId; performed: boolean }[]>
-  /** The script's return value as JSON — objects/arrays structured, other values as a string. */
   evaluateScript(params: { script: string; input?: string; editor?: EditorId }): Promise<import('../core/json').JSONValue>
 
   // Streaming
   observeOutline(
     params: { outline?: OutlineId; path?: OutlinePath; shape?: 'tree' | 'flat' },
-    onSnapshot: (doc: SessionOutline) => void,
+    onSnapshot: (doc: SessionOutline | null) => void,
     options?: ObserveOptions
   ): Promise<SessionSubscription>
   observeOutlines(
