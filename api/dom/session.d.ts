@@ -1,7 +1,9 @@
 /**
- * Types for `bike.session` — programmatic access to the same outline/editor
- * automation the `bike` CLI / MCP server expose. Params and results use the
- * session serialization format; payloads that are dynamic are typed `unknown`.
+ * Types for `bike.session` DOM API.
+ *
+ * Read/write access using `bike` CLI model. The DOM doesn't have direct access
+ * to Bike's internal data structures, so this API (like the CLI) uses a
+ * serialization format for outlines, rows, and editors.
  */
 
 /** Row type in the session serialization format. */
@@ -133,7 +135,9 @@ interface BikeSession {
   updateEditor(params: {
     outline?: string
     focus?: RowRef
-    select?: RowRef
+    /** Set the filter — a contains-text string or an OutlinePath. Empty string clears it. */
+    filter?: string
+    selectRow?: RowRef
     selectHead?: RowRef
     expand?: RowRef[]
     collapse?: RowRef[]
