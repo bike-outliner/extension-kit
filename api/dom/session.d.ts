@@ -32,7 +32,7 @@ type OutlineId = string
 type EditorId = string
 /** Sentinel bindings for app/window outline/editor resolution. */
 type ContextSentinel =
-  /** This context's host window's outline/editor, stable as windows reorder. */
+  /** This context's host window's outline/editor, stable as windows reorder; falls back to `'@app'` when the context has no live host window. */
   '@host' |
   /** The app-frontmost outline/editor, resolved at call time. */
   '@app'
@@ -183,11 +183,11 @@ interface BikeSession {
 
   // Streaming
   /**
-   * With an explicit `outline` id — or any host binding (`'@host'` or an
-   * omitted `outline` in a window-bound context) — the subscription is pinned
-   * to that outline and ends with `onClose('outlineClosed')` when it closes.
-   * Only an omitted/`'@app'` `outline` in a non-window-bound context follows
-   * the app-frontmost outline, retargeting as windows reorder.
+   * With an explicit `outline` id — or `'@host'`/an omitted `outline` in a
+   * window-bound context — the subscription is pinned to that outline and
+   * ends with `onClose('outlineClosed')` when it closes. Otherwise (`'@app'`,
+   * or `'@host'`/omitted without a host window) the subscription follows the
+   * app-frontmost outline, retargeting as windows reorder.
    */
   observeOutline(
     params: { outline?: OutlineRef; path?: OutlinePath; shape?: 'tree' | 'flat' },
