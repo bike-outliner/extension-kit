@@ -12,7 +12,7 @@
  *
  * These methods and types can save a lot of work.
  *
- * ## Defaults: host window vs app frontmost
+ * ## Defaults: @host window vs @app frontmost
  *
  * DOM contexts with a strong window relationship — inspector items, sheets,
  * and panels created with an explicit window — are bound to that host window.
@@ -20,11 +20,6 @@
  * window's outline/editor, stable as windows reorder. Other DOM contexts
  * (panels created without a window) default to the app-frontmost
  * outline/editor, resolved at call time.
- *
- * Access is never narrowed: explicit ids reach any open outline/editor, and
- * the `'@app'` sentinel requests the app-frontmost default from a
- * window-bound context. `'@host'` is the explicit spelling of the host
- * default and rejects when the context has no (live) host window.
  */
 
 /** A row's live session id — a number, stable while the outline is open (not across runs). */
@@ -35,15 +30,16 @@ type PersistentId = string
 type OutlineId = string
 /** An open editor's id (a UUID string). */
 type EditorId = string
-/**
- * Outline reference accepted by `outline` params: a persistent id, `'@host'`
- * (this DOM context's host window's outline — the default when this context
- * is window-bound), or `'@app'` (the app-frontmost outline — the default
- * otherwise).
- */
-type OutlineRef = OutlineId | '@host' | '@app'
-/** Editor reference accepted by `editor` params; sentinels as in `OutlineRef`. */
-type EditorRef = EditorId | '@host' | '@app'
+/** Sentinel bindings for app/window outline/editor resolution. */
+type ContextSentinel =
+  /** This context's host window's outline/editor, stable as windows reorder. */
+  '@host' |
+  /** The app-frontmost outline/editor, resolved at call time. */
+  '@app'
+/** Outline reference accepted by `outline` params; sentinels as in `ContextSentinel`. */
+type OutlineRef = OutlineId | ContextSentinel
+/** Editor reference accepted by `editor` params; sentinels as in `ContextSentinel`. */
+type EditorRef = EditorId | ContextSentinel
 /** A command id, e.g. `"edit:text-paste"`. */
 type CommandId = string
 /** An OutlinePath query expression, e.g. `"//heading"` or `"//task not @done"`. */
