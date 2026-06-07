@@ -1,5 +1,3 @@
-import { JSONValue } from '../core/json'
-
 /**
  * Permissions are used to control access to sensitive APIs such as the
  * clipboard and web requests. They are set in the extension manifest and
@@ -84,47 +82,5 @@ declare global {
     warn(...data: any[]): void
     error(...data: any[]): void
     debug(...data: any[]): void
-  }
-
-  /**
-   * Fetch a URL.
-   *
-   * Goal is to make this fully compatible with the Fetch API. It is not that
-   * now. Let me know if you need something that is not yet supported.
-   *
-   * The fetch API requires host permissions in the manifest.json file:
-   *
-   * - `host_permissions` with a pattern matching the URL you want to fetch.
-   *   Pattern should follow
-   *   https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns
-   *
-   * Here are some example host patterns:
-   *
-   *  - `https://example.com/*` - matches all URLs on example.com
-   *  - `https://*.example.com/*` - matches all subdomains of example.com
-   *  - `http://example.com/*` - matches all URLs on example.com
-   *  - `*://example.com/*` - matches all URLs on example.com
-   *
-   * @requires `host_permissions` match URL
-   * @param input - The URL to fetch.
-   * @param options - The options for the fetch request.
-   * @returns A promise that resolves to the response.
-   */
-  function fetch(input: string, options?: Options): Promise<Response>
-
-  interface Options {
-    readonly method?: string
-    readonly headers?: Record<string, string>
-    readonly body?: string
-  }
-
-  interface Response {
-    readonly ok: boolean
-    readonly status: number
-    readonly url: string
-    /** Returns a promise with response body text. */
-    text(): Promise<string>
-    /** Returns a promise with response body parsed as JSON object. */
-    json(): Promise<JSONValue | any>
   }
 }
