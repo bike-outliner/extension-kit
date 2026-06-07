@@ -178,7 +178,18 @@ interface BikeSession {
     expand?: RowRef[]
     collapse?: RowRef[]
   }): Promise<SessionEditor>
-  performCommands(params: { editor?: EditorRef; ids: CommandId[] }): Promise<{ id: CommandId; performed: boolean }[]>
+  /**
+   * Perform commands in order against `editor`. By default each command acts
+   * on the editor's live selection. Pass `rows` — one session id, or two for an
+   * anchor…head range — to target the commands at those rows as a contiguous
+   * block selection, without disturbing the editor's selection. Rejects if an
+   * id isn't a row in the outline.
+   */
+  performCommands(params: {
+    editor?: EditorRef
+    ids: CommandId[]
+    rows?: [SessionId] | [SessionId, SessionId]
+  }): Promise<{ id: CommandId; performed: boolean }[]>
   evaluateScript(params: { script: string; input?: string; editor?: EditorRef }): Promise<import('../core/json').JSONValue>
 
   // Streaming
