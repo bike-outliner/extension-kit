@@ -359,6 +359,14 @@ export interface Document {
    * No-op if the document has no windows.
    */
   activate(): void
+
+  /**
+   * Register a handler called once, when this document closes.
+   *
+   * @param handler - Called once when the document closes.
+   * @returns A Disposable that unregisters the handler.
+   */
+  onClose(handler: () => void): Disposable
 }
 
 /** Interface for a document window. */
@@ -383,6 +391,14 @@ export interface Window {
   frame: Rect
 
   observeCurrentOutlineEditor(handler: (_: OutlineEditor | undefined) => void): Disposable
+
+  /**
+   * Register a handler called once, when this window closes.
+   *
+   * @param handler - Called once when the window closes.
+   * @returns A Disposable that unregisters the handler.
+   */
+  onClose(handler: () => void): Disposable
 
   /**
    * Present a WebView based sheet.

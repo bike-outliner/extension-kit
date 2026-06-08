@@ -149,6 +149,15 @@ export class Outline {
    * @returns A Disposable to cancel the handler.
    */
   observeChanges(handler: (change: OutlineChange) => void): Disposable
+
+  /**
+   * Register a handler called once, when this outline's document closes —
+   * immediately before the document's `onClose`.
+   *
+   * @param handler - Called once when the outline closes.
+   * @returns A Disposable that unregisters the handler.
+   */
+  onClose(handler: () => void): Disposable
 }
 
 export type OutlineArchive = { data: string; format: OutlineFormat }
