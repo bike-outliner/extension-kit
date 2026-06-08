@@ -76,7 +76,7 @@ export class SymbolConfiguration {
   withFont(font: Font): SymbolConfiguration
   withSymbolScale(scale: SymbolScale): SymbolConfiguration
   withHierarchicalColor(color: Color): SymbolConfiguration
-  withPaletteColors(colors: [Color]): SymbolConfiguration
+  withPaletteColors(colors: Color[]): SymbolConfiguration
   preferingMonochrome(): SymbolConfiguration
   preferingMulticolor(): SymbolConfiguration
   preferingHierarchical(): SymbolConfiguration
