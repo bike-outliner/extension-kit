@@ -1,4 +1,4 @@
-# Bike Automation Reference
+# Bike Session Automation Reference
 
 This document covers one of Bike's automation APIs — the session API — which is
 exposed through three surfaces:
@@ -12,7 +12,7 @@ exposed through three surfaces:
 
 All three speak the same wire (JSON-RPC to the running Bike app), so commands,
 parameters, and payloads correspond one-to-one. This document covers the shared
-concepts once and lists each operation with both spellings.
+concepts once.
 
 Bike has other automation surfaces not covered here: **extensions** (the full
 app/dom/style context APIs — see [Creating Extensions](creating-extensions.md)
@@ -21,8 +21,8 @@ Intents** (Shortcuts).
 
 ## Targets and defaults
 
-Commands target an **outline** (the document) or an **editor** (one window's
-view of an outline). Every target is optional and defaults to the frontmost:
+Commands target an **outline** (the document) or an **editor** (one view of an
+outline). Every target is optional and defaults to the frontmost:
 
 - CLI: `--outline` / `--editor` default to `@frontmost` (the app-frontmost
   outline/editor, resolved at call time).
@@ -39,14 +39,13 @@ CLI `--outline` accepts a persistent id **or a file path**. Resolution:
   are seen (reads) and never clobbered (mutations).
 - Otherwise, for `get`/`create`/`update rows`/`delete`/`move`: a file path is
   read/written in place, and a persistent id is Spotlight-resolved to its file
-  on disk (via the `kMDItemIdentifier` xattr Bike stamps on save — the CLI is
-  unsandboxed, so the query sees the whole disk). Headless mutations load the
-  file in-process, mutate, and write back atomically through
+  on disk (via the `kMDItemIdentifier` xattr Bike stamps on save. Headless
+  mutations load the file in-process, mutate, and write back atomically through
   `NSFileCoordinator`, re-encoding in the file's own format and re-stamping the
   xattr. Headless targets require explicit row refs (persistent ids or
   OutlinePaths — session ids and `@selection`/`@focused` need the running app),
   and reads default to `-o json` (`session` is rejected unless open).
-- Live commands — `observe`, `close outline`, `update editor` — require the
+- Live commands — `observe`, `close outline`, `update editor`, etc — require the
   outline to be open ("Outline not open in Bike" otherwise).
 
 ## Ids
@@ -100,9 +99,10 @@ positions must return a row set — scalar expressions (`count(...)`) are
 rejected.
 
 Validate an expression without executing it with `bike check path '<expr>'` /
-`checkOutlinePath({ path })`: returns the parse tree, or a partial tree plus
-the error. Bare `bike check path` prints the full syntax cookbook. See the
-Bike User's Guide for the language reference.
+`checkOutlinePath({ path })`: returns the parse tree, or a partial tree plus the
+error. Bare `bike check path` prints the full syntax cookbook. See the Bike
+User's Guide for the language reference. Intended for LLMs that are
+trying to construct valid queries.
 
 ## Output formats (CLI)
 
@@ -174,7 +174,8 @@ session: getOutline({ outline?, rowRefs?, shape? }) → SessionOutline
 ```
 Frontmatter plus the rows matched by the refs (default `//*`). `tree` nests
 matched rows under their nearest matched ancestor; `flat` emits every match at
-top level.
+top level. Each row carries `created` / `modified` timestamps as ISO 8601
+strings; outline change events carry the same `modified` stamp.
 
 ```
 CLI:     bike get editor [--editor <id>]
@@ -194,7 +195,8 @@ CLI:     bike get commands
 session: getCommands() → CommandInfo[]
 ```
 The public command set (`{id, source}`) for `evaluate commands` /
-`performCommands`.
+`performCommands`. Command ids are namespaced, e.g. `edit:text-paste` or
+`row:toggle-done`.
 
 ### Mutations
 
@@ -288,6 +290,7 @@ and hands callbacks typed payloads.
 | `editor.snapshot` | `SessionEditor` — or `{editor, outline}` in sync mode | editor observers' seed |
 | `editor.change` | `SessionEditorChange[]` — or `{outline, editor}` in sync mode | `observe editor changes` |
 | `documents.changed` | `OutlineSummary[]` (frontmost first) | `observe outlines` |
+| `editors.changed` | `EditorSummary[]` (frontmost first; one entry per editor) | `observe editors` |
 | `subscription.closed` | `{reason}` | stream termination |
 
 Change payload shapes (`rowsInserted`, `rowsMoved`, `replacedText` with its
@@ -323,11 +326,18 @@ the snapshot at that row and translate moves across the branch boundary into
 
 ### Editor + outline in sync
 
-`observe editor changes --outline` / `observeEditor({ outline: true })` carries
-the editor's outline in the same feed: the seed is `{editor, outline}` and each
-batch is `{outline, editor}` with outline changes ordered first — so editor
-row-id references (selection, focus) are always valid against the outline
-state, even mid-edit.
+The editor's outline can ride along in the same feed: the seed carries both
+`{outline, editor}` and each batch is `{outline, editor}` with outline changes
+ordered first — so editor row-id references (selection, focus) are always valid
+against the outline state, even mid-edit.
+
+- CLI: `observe editor changes --outline` (a flag on the editor-changes stream).
+- session: dedicated methods — `observeOutlineEditor` (maintained) and
+  `observeOutlineEditorChanges` (raw) — rather than a flag on `observeEditor`.
+  The maintained callback is `(outline, editor, changes)`.
+
+The session method names diverge from the CLI flag deliberately; the underlying
+wire stream (`editor.observeChanges` with `outline: true`) is identical.
 
 ### Lifecycle
 
@@ -343,9 +353,17 @@ The CLI prints raw feeds; the session API additionally offers maintained forms
 that apply changes for you and call back with current state:
 
 - `observeOutline(params, (outline, changes) => …)` — a live `SessionOutline`.
-- `observeEditor(params, (editor, changes) => …)` — a live `SessionEditor`;
-  with `{ outline: true }`, `(editor, outline, changes)` both in sync.
+- `observeEditor(params, (editor, changes) => …)` — a live `SessionEditor`.
+- `observeOutlineEditor(params, (outline, editor, changes) => …)` — a live
+  `SessionOutline` and `SessionEditor` maintained in sync.
 
 The raw feeds (`observeOutlineChanges`, `observeEditorChanges`,
-`observeOutlineQuery` snapshots, `observeOutlines`) match the CLI streams
-one-to-one.
+`observeOutlineEditorChanges`, `observeOutlineQuery` snapshots, `observeOutlines`,
+`observeEditors`) match the CLI streams one-to-one.
+
+`observeOutlines` / `observeEditors` re-send the full list on every open/close
+and frontmost change. The editor list is one entry per *editor* view, so an
+outline open in two windows appears twice; it can briefly lag when an editor
+opens or closes without a document add/remove or frontmost change (e.g. closing
+a non-frontmost window, or — once a window can host more than one editor — a
+split within the frontmost window).

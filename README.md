@@ -90,6 +90,6 @@ See these projects for example extensions built with this kit:
 - [Style Context Tutorial](docs/style-context-tutorial.md) — outline styling, decorations, themes
 - [Testing Extensions Tutorial](docs/testing-extensions-tutorial.md) — writing and running tests
 - [Sharing Extensions Tutorial](docs/sharing-extensions-tutorial.md) — packaging, releasing, and registry submission
-- [Automation Reference](docs/automation.md) — the `bike` CLI and `bike.session` DOM API: ids, row refs, operations, streaming
+- [Session Automation Reference](docs/session-automation.md) — the `bike` CLI and `bike.session` DOM API: ids, row refs, operations, streaming
 - [API Reference](api/) — type definitions for all three contexts
 
