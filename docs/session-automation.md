@@ -3,8 +3,8 @@
 This document covers the session automation API — which is
 exposed through three surfaces:
 
-- **`bike` CLI** — shell scripts and agents.
-- **`bike mcp` MCP** — Model Context Protocol server for agents.
+- **`bike` CLI** — shell scripts.
+- **`bike mcp` MCP** — server for agents.
 - **`bike.session`** — the [DOM-extension API](../api/dom/session.d.ts).
 
 All three speak the same wire (JSON-RPC to the running Bike app), so most commands,
