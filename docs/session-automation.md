@@ -1,72 +1,48 @@
-# Bike Session Automation Reference
+# Bike Session Automation
 
-This document covers the session automation API — which is
-exposed through three surfaces:
+The session automation API is exposed through three surfaces:
 
-- **`bike` CLI** — shell scripts.
-- **`bike mcp` MCP** — server for AI agents.
-- **`bike.session`** — the [DOM-extension API](../api/dom/session.d.ts).
+- `bike` — CLI for shell scripts.
+- `bike mcp` — MCP server for AI agents.
+- `bike.session` — DOM context typescript [API](../api/dom/session.d.ts).
 
-All three speak the same wire (JSON-RPC to the running Bike app), so most commands,
-parameters, and payloads correspond one-to-one. This document covers the shared
-concepts once.
+All three speak the same wire (JSON-RPC to the running Bike app), so most commands, parameters, and payloads correspond to one another. This document covers the shared concepts.
 
-**Note:** Bike has other automation surfaces not covered here: extensions (the full
-app/dom/style context APIs — see [Creating Extensions](creating-extensions.md), AppleScript, and App
-Intents (Shortcuts).
+Bike also has other automation surfaces not covered here: App Context Extensions, AppleScript, and App Intents (Shortcuts).
 
 ## Targets and defaults
 
-Commands target an **outline** (the document) or an **editor** (one view of an
-outline). Every target is optional and defaults to the frontmost:
+Commands target an outline or an editor:
 
 - CLI: `--outline` / `--editor` default to `@frontmost`.
-- session: omitted `outline` / `editor` params resolve to `@host`, the DOM
-  context's host window's current outline/editor. Falls
-  back to `@app` frontmost when the context has no live host window. (for example when showing panel without associated window).
-  Pass `'@app'` or `'@host'` explicitly to override.
+- session: `outline` / `editor` default to `@host`. That binds to the current outline/editor in the window that the script is associated with, and doesn't retarget when another window becomes frontmost. If there is no host (e.g. a panel with no associated window) then fallback is frontmost in app. Use `@app` to always target the frontmost in app.
 
-### CLI file targets
+### CLI outline targets
 
-CLI `--outline` accepts a persistent id **or a file path**. Resolution:
+CLI `--outline` accepts a persistent id or a file path.
 
-- An outline **open in Bike** always routes through the app, so unsaved edits
-  are seen (reads) and never clobbered (mutations).
-- Otherwise, for `get`/`create`/`update rows`/`delete`/`move`: a file path is
-  read/written in place, and a persistent id is Spotlight-resolved to its file
-  on disk (via the `kMDItemIdentifier` xattr Bike stamps on save. Headless
-  mutations load the file in-process, mutate, and write back atomically through
-  `NSFileCoordinator`, re-encoding in the file's own format and re-stamping the
-  xattr. Headless targets require explicit row refs (persistent ids or
-  OutlinePaths — session ids and `@selection`/`@focused` need the running app),
-  and reads default to `-o json` (`session` is rejected unless open).
-- Live commands — `observe`, `close outline`, `update editor`, etc — require the
-  outline to be open ("Outline not open in Bike" otherwise).
+- Access to an open outline always routes through Bike, so unsaved edits are seen.
+- Otherwise, for `get`/`create`/`update rows`/`delete`/`move`: the outline is read/written in place, without going through Bike.app.
+- Live commands — `observe`, `close outline`, `update editor`, etc — require the outline to be open ("Outline not open in Bike" otherwise).
+
+Certain commands that take row refs (e.g. `update rows`) also accept `@selection`/`@focused`/`@root` — but only with an open outline, since they need the session ids that Bike assigns on open. When you access an outline by ID, if it is not already open in Bike then a Spotlight search for `kMDItemIdentifier` is used to find its file and read or apply modifications.
 
 ## Ids
 
-Each row has a **session id** and may have a **persistent id**. The `id` field
-is overloaded by output format: in `session` output it carries the session id
-(with `persistentId` as a separate field); in every file format (`json`,
-`markdown`, `bike`, `opml`) `id` carries the persistent id.
+Each row has a session id and may have a persistent id.
 
-- **Session ids** (numeric, UInt32) are stable while the outline remains open
-  and reset when it closes. Every row has one. Session id `0` is the outline
-  root. Editor view-state fields (focus, selection, collapsed) are row session
-  ids. Use them to chain reads with follow-up mutations in one session.
-- **Persistent ids** (strings) are stable cross-session handles stored in the
-  outline file. For rows they are optional and assignable (assigning an
-  existing id transfers it to the new row). Use them for references that must
-  survive closes and saves.
-- **Editor ids** are UUIDs, stable while the editor exists. The same outline
-  open in two windows has two editors with distinct ids. Discover them with
-  `bike get editors` / `getEditors()`.
-- **Outline ids** are the outline root row's persistent id. Discover them with
-  `bike get outlines` / `getOutlines()`.
+The `id` field is overloaded by output format: in `session` output it carries the session id as `id` (with `persistentId` as a separate field); in every other output format (`json`, `markdown`, `bike`, `opml`) `id` carries the persistent id and session ids are not included at all. 
+
+- **Session ids** (numeric, UInt32) are stable while the outline remains open and reset when it closes. Every row has one. Session id `0` is the outline root.
+- **Persistent ids** (strings) are stable cross-session handles stored in the outline file. For rows they are optional and assignable (assigning an existing id transfers it to the new row). Use them for references that must survive closes and saves.
+- **Editor ids** are UUIDs, stable while the editor exists. The same outline open in two windows has two editors with distinct ids. Discover them with `bike get editors` / `getEditors()`.
+- **Outline ids** are the outline root row's persistent id. Discover them with `bike get outlines` / `getOutlines()`.
 
 ## Row refs
 
-A row ref identifies which rows a command targets. One of:
+A row ref identifies which rows a command targets.
+
+One of:
 
 | Form | Meaning |
 |---|---|
@@ -77,27 +53,13 @@ A row ref identifies which rows a command targets. One of:
 | `@focused` | the focused-in row, or the root |
 | `@root` | the outline root row (the whole outline as a branch) |
 
-Row-mutating commands default their refs to `@selection`. Headless (off-app)
-targets accept only persistent ids and OutlinePaths.
+Row-mutating commands default their refs to `@selection`.
 
-`updateRows` / `update rows` can also assign persistent ids: pass a literal id
-(exactly one row), or **`@ensure`** to assign fresh unique ids only to rows
-that lack one (multi-row safe, idempotent).
+`updateRows` / `update rows` can also assign persistent ids: pass a literal id (exactly one row), or `@ensure` to assign fresh unique ids only to rows that lack one (multi-row safe, idempotent).
 
 ## OutlinePath
 
-OutlinePath is Bike's query language for selecting rows — XPath-like, with
-bare predicates (`//task @done`) and slice brackets (`[0]`). It's accepted as
-a row ref by any command that takes refs, as `observe outline query`'s path,
-and as an editor filter. The default query is `//*` (every row). Query
-positions must return a row set — scalar expressions (`count(...)`) are
-rejected.
-
-Validate an expression without executing it with `bike check path '<expr>'` /
-`checkOutlinePath({ path })`: returns the parse tree, or a partial tree plus the
-error. Bare `bike check path` prints the full syntax cookbook. See the Bike
-User's Guide for the language reference. Intended for LLMs that are
-trying to construct valid queries.
+OutlinePath is Bike's query language for selecting rows — XPath-like, with bare predicates (`//task @done`) and slice brackets (`[0]`). It's accepted as a row ref by any command that takes refs, as `observe outline query`'s path, and as an editor filter.
 
 ## Output formats (CLI)
 
@@ -106,59 +68,42 @@ CLI reads and snapshot streams take `-o`/`--output`:
 | Format | Notes | `id` field |
 |---|---|---|
 | `session` | runtime/API JSON (default) | session id (+ separate `persistentId`) |
-| `json` | portable file JSON shape | persistent id (omitted when unassigned) |
+| `json` | portable file JSON shape | persistent id (optional) |
 | `markdown` | Bike-flavored markdown | persistent id (optional) |
 | `bike` | XML-conforming `.bike` HTML | persistent id (optional) |
 | `opml` | OPML XML | persistent id (optional) |
 | `txt` | plain text, one row per line | none |
 
-`session` and `json` share the same `{metadata, root}` wrapper with rows nested
-under `root.children`; they differ only in id semantics. Use `session` to chain
-reads with mutations; use `json` to export an outline you'll load back later.
-The session API always uses the `session` shape (`SessionOutline`).
+`session` and `json` share the same `{metadata, root}` wrapper with rows nested under `root.children`; they differ only in id semantics. Use `session` to chain reads with mutations; use `json` to export an outline you'll load back later. The session API always uses the `session` shape (`SessionOutline`).
 
 ## Text and runs
 
-A row's `text` is an array of styled runs — `[{string, attrs?}, ...]` (see
-`SessionTextRun`). Runs tile the row's text in order; concatenating each run's
-`string` reproduces the plain text; empty text is `[]`. Standard `attrs` keys:
-`strong`, `em`, `code`, `s`, `mark` (all value `""`), `a` (value is the URL),
-`base` (`"sub"` or `"sup"`); arbitrary key/value attributes round-trip too.
+A row's `text` is an array of styled runs — `[{string, attrs?}, ...]` (see `SessionTextRun`). Runs tile the row's text in order; concatenating each run's `string` reproduces the plain text; empty text is `[]`. Standard `attrs` keys: `strong`, `em`, `code`, `s`, `mark` (all value `""`), `a` (value is the URL), `base` (`"sub"` or `"sup"`); arbitrary key/value attributes round-trip too.
 
-Text **input** (`--text`/`--append`/`--prepend`, `createRow`'s `markdown`,
-`updateRows`' `text`) accepts either Bike-flavored markdown (a leading marker
-sets the row type, inline markdown is applied) or the same run array — use the
-run form for attributes markdown can't express.
+Text input (`--text`/`--append`/`--prepend`, `createRow`'s `markdown`, `updateRows`' `text`) accepts either Bike-flavored markdown (a leading marker sets the row type, inline markdown is applied) or the same run array.
 
 ## Operations
 
-Payload types in parentheses are defined in
-[`session.d.ts`](../api/dom/session.d.ts).
+Payload types in parentheses are defined in [`session.d.ts`](../api/dom/session.d.ts).
 
 ### Outlines
 
-```
-CLI:     bike open outline <path | id:OUTLINE-ID> [--timeout <s>]
-```
-CLI-only. Opens (or brings to front) the outline at a path or by persistent id.
+CLI:
 
-```
-CLI:     bike create outline [<path>] [-f bike|markdown|opml|txt|json]
-session: newOutline({ format? }) → OutlineSummary
-```
-No path: a new Untitled outline in Bike. CLI with a path: writes a new empty
-file there and opens it (`--format` wins; else the path's extension; else txt).
-
-```
-CLI:     bike close outline [--outline <id-or-path>] [--discard]
-session: closeOutline({ outline?, discard? }) → { closed }
+```sh
+bike get outlines
+bike open outline <id-or-path> [--timeout <s>] # open or bring to front
+bike create outline [<path>] [-f bike|markdown|opml|txt|json] # new path creates untitled
+bike close outline [--outline <id-or-path>] [--discard]
 ```
 
+DOM Context:
+
+```ts
+bike.session.getOutlines() → OutlineSummary[]
+bike.session.newOutline({ format? }) → OutlineSummary
+bike.session.closeOutline({ outline?, discard? }) → { closed }
 ```
-CLI:     bike get outlines
-session: getOutlines() → OutlineSummary[]
-```
-Open outlines, frontmost first — `{persistentId, displayName, fileURL}`.
 
 ### Reads
 
@@ -273,10 +218,7 @@ seed, then events as things change.
 
 ### Envelope and event kinds
 
-The CLI prints NDJSON — one event per line, each
-`{subscriptionId, outline, kind, data}` (non-`session` output formats print
-snapshots separated by `---` instead). The session API unwraps the envelope
-and hands callbacks typed payloads.
+The CLI prints one NDJSON event per line: `{subscriptionId, outline, kind, data}` for `session` output. For other formats snapshots separated by `---` are printed.
 
 | kind | data | emitted by |
 |---|---|---|
@@ -288,9 +230,7 @@ and hands callbacks typed payloads.
 | `editors.changed` | `EditorSummary[]` (frontmost first; one entry per editor) | `observe editors` |
 | `subscription.closed` | `{reason}` | stream termination |
 
-Change payload shapes (`rowsInserted`, `rowsMoved`, `replacedText` with its
-character offset `at`, editor `focus`/`selection`/`collapsed`/`filter` slices,
-…) are typed in `session.d.ts`.
+Change payload shapes (`rowsInserted`, `rowsMoved`, `replacedText` with its character offset `at`, editor `focus`/`selection`/`collapsed`/`filter` slices,…) are typed in `session.d.ts`.
 
 ### Debounce
 
