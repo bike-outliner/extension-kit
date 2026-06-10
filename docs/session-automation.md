@@ -4,28 +4,26 @@ This document covers the session automation API — which is
 exposed through three surfaces:
 
 - **`bike` CLI** — shell scripts.
-- **`bike mcp` MCP** — server for agents.
+- **`bike mcp` MCP** — server for AI agents.
 - **`bike.session`** — the [DOM-extension API](../api/dom/session.d.ts).
 
 All three speak the same wire (JSON-RPC to the running Bike app), so most commands,
 parameters, and payloads correspond one-to-one. This document covers the shared
 concepts once.
 
-Bike has other automation surfaces not covered here: **extensions** (the full
-app/dom/style context APIs — see [Creating Extensions](creating-extensions.md)
-and the typed surface in [`api/`](../api/)), **AppleScript**, and **App
-Intents** (Shortcuts).
+**Note:** Bike has other automation surfaces not covered here: extensions (the full
+app/dom/style context APIs — see [Creating Extensions](creating-extensions.md), AppleScript, and App
+Intents (Shortcuts).
 
 ## Targets and defaults
 
 Commands target an **outline** (the document) or an **editor** (one view of an
 outline). Every target is optional and defaults to the frontmost:
 
-- CLI: `--outline` / `--editor` default to `@frontmost` (the app-frontmost
-  outline/editor, resolved at call time).
-- session: omitted `outline` / `editor` params resolve to `@host` — the DOM
-  context's host window's outline/editor, stable as windows reorder — falling
-  back to `@app` (app-frontmost) when the context has no live host window.
+- CLI: `--outline` / `--editor` default to `@frontmost`.
+- session: omitted `outline` / `editor` params resolve to `@host`, the DOM
+  context's host window's current outline/editor. Falls
+  back to `@app` frontmost when the context has no live host window. (for example when showing panel without associated window).
   Pass `'@app'` or `'@host'` explicitly to override.
 
 ### CLI file targets
