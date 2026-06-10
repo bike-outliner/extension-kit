@@ -445,7 +445,10 @@ interface SheetOptions {
  * Panel role that sets default window behavior.
  *
  * - `'inspector'` — small, floating, auxiliary. Defaults: floating=true,
- *   canBecomeMain=false, hidesOnDeactivate=false.
+ *   canBecomeMain=false, hidesOnDeactivate=true. (Floating panels float above
+ *   other apps' windows when left visible in the background, so they hide on
+ *   deactivate like the Color/Font panels; pass hidesOnDeactivate=false to opt
+ *   out.)
  * - `'utility'` — medium, tool-like. Defaults: floating=true,
  *   canBecomeMain=false, hidesOnDeactivate=true.
  * - `'window'` — full, document-like, non-floating. Uses NSWindow instead
@@ -453,8 +456,8 @@ interface SheetOptions {
  *   hidesOnDeactivate=false.
  *
  * Individual properties (floating, canBecomeMain, hidesOnDeactivate) override
- * role defaults when specified. If no role is set, current defaults apply
- * (floating=true, canBecomeMain=false, hidesOnDeactivate=false).
+ * role defaults when specified. If no role is set, the `'inspector'` defaults
+ * apply (floating=true, canBecomeMain=false, hidesOnDeactivate=true).
  */
 type PanelRole = 'inspector' | 'utility' | 'window'
 
