@@ -1,16 +1,15 @@
 # Bike Session Automation Reference
 
-This document covers one of Bike's automation APIs — the session API — which is
+This document covers the session automation API — which is
 exposed through three surfaces:
 
-- **`bike` CLI** — shell and scripts. Ships in `Bike.app/Contents/Helpers`.
+- **`bike` CLI** — shell and scripts.
 - **`bike.session`** — the DOM-extension API. Typed in
-  [`api/dom/session.d.ts`](../api/dom/session.d.ts), which is the authoritative
-  reference for payload shapes; this document defers to it.
+  [`api/dom/session.d.ts`](../api/dom/session.d.ts)
 - **MCP** — `bike mcp` runs a Model Context Protocol server over stdio for AI
   agents (tools mirror the operations below).
 
-All three speak the same wire (JSON-RPC to the running Bike app), so commands,
+All three speak the same wire (JSON-RPC to the running Bike app), so most commands,
 parameters, and payloads correspond one-to-one. This document covers the shared
 concepts once.
 
