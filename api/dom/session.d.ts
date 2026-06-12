@@ -3,7 +3,7 @@
  * working with Bike outlines and editors from DOM extensions.
  *
  * These types are the payload reference. Behavior — targets and defaults
- * (`@host`/`@app`), ids, row refs, sentinels, streaming, debounce — is
+ * (`@window`/`@frontmost`), ids, row refs, sentinels, streaming, debounce — is
  * documented together with the `bike` CLI in the session automation reference:
  * https://github.com/bike-outliner/extension-kit/blob/main/docs/session-automation.md
  */
@@ -12,8 +12,10 @@ type SessionId = number
 type PersistentId = string
 type OutlineId = string
 type EditorId = string
-type ContextSentinel = '@host' | '@app'
-type OutlineRef = OutlineId | ContextSentinel
+type ContextSentinel = '@window' | '@frontmost'
+/** Absolute file path of an outline that is currently open in Bike. */
+type FilePath = string
+type OutlineRef = OutlineId | FilePath | ContextSentinel
 type EditorRef = EditorId | ContextSentinel
 type CommandId = string
 type OutlinePath = string
@@ -196,9 +198,7 @@ interface BikeSession {
   
   getCommands(): Promise<CommandInfo[]>
 
-  checkOutlinePath(params: { path: OutlinePath }): Promise<string>
-
-  newOutline(params?: { format?: 'bike' | 'markdown' | 'opml' | 'txt' | 'json' }): Promise<OutlineSummary>
+  createOutline(params?: { format?: 'bike' | 'markdown' | 'opml' | 'txt' | 'json' }): Promise<OutlineSummary>
   
   closeOutline(params?: { outline?: OutlineRef; discard?: boolean }): Promise<{ closed: boolean }>
   
@@ -228,7 +228,7 @@ interface BikeSession {
     prepend?: Markdown | SessionTextRun[]
     type?: SessionRowType
     attributes?: Record<string, string | null>
-    persistentId?: PersistentId | '@ensure'
+    persistentId?: PersistentId | '@ensure' // `@ensure` assign id only if needed.
   }): Promise<RowUpdateResult[]>
   
   deleteRows(params: { outline?: OutlineRef; rows: RowRef[] }): Promise<{ deleted: number }>
@@ -252,7 +252,7 @@ interface BikeSession {
     collapse?: RowRef[]
   }): Promise<SessionEditor>
   
-  performCommands(params: {
+  evaluateCommands(params: {
     editor?: EditorRef
     ids: CommandId[]
     rows?: [SessionId] | [SessionId, SessionId]
