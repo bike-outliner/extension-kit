@@ -1,8 +1,9 @@
 # Creating Themes
 
 Themes customize the colors, materials, and typography of Bike's interface. They
-are JSON files with the `.bktheme` extension. Themes are configuration files for
-the more complex [editor styles](style-context-tutorial.md).
+are JSON files with the `.bktheme` extension. `//` and `/* ... */` comments are
+allowed. Themes are configuration files for the more complex
+[editor styles](style-context-tutorial.md).
 
 - [Theme Schema](../schemas/theme-schema.json) — full feature reference
 
@@ -22,7 +23,7 @@ Create a file called `my-theme.bktheme`:
     "background": "#fafafa"
   },
   "materials": {
-    "editor": "$background"
+    "editor": { "fill": "$background" }
   }
 }
 ```
@@ -165,10 +166,21 @@ Themes support multiple color formats and functions:
 | OKLCH | `oklch(0.7 0.15 180)` |
 | color-mix | `color-mix(in oklch, red, blue)` |
 | color-contrast | `color-contrast($background vs black, white)` |
+| light-dark | `light-dark(#fafafa, #222222)` |
+| Relative colors | `rgb(from $accent r g b / calc(alpha * 0.5))` |
 | macOS named | `text`, `accent`, `systemBlue`, `labelSecondary` |
 | CSS named | `red`, `cornflowerblue`, `transparent` |
 
 The macOS named colors adapt automatically to light and dark mode.
+
+The `light-dark` function picks the first color in light mode and the second in
+dark mode.
+
+Relative color syntax (`rgb(from ...)`, also `hsl`, `oklab`, `oklch`) derives a
+new color from a base color. Each channel and the alpha slot accepts the
+channel keyword (passthrough), a literal value, or a simple calc like
+`calc(alpha * 0.5)`. Dynamic base colors stay dynamic — the transform is
+applied per appearance.
 
 The `color-mix` function blends two colors together. You can reference custom
 colors in the mix:
@@ -196,25 +208,45 @@ against a base color, useful for ensuring readability:
 
 ## Materials
 
-Materials control the visual surface of different areas of the window. Each
-material can be a color, gradient, glass effect, or system material.
-
-### Solid Colors
-
-The simplest material is a color:
+Materials control the visual surface of different areas of the window. A
+material is an object with an optional `fill`, `borders`, and `cornerRadius`.
+If `fill` is omitted the area paints nothing — useful for borders-only
+materials, or to let the area behind show through.
 
 ```json
 {
   "materials": {
-    "window": "#fdf6e3",
-    "editor": "$background",
-    "titlebar": "#eee8d5",
-    "sidebar": "#eee8d5"
+    "editorPane": {
+      "fill": "textBackground",
+      "cornerRadius": { "topLeading": 8 },
+      "borders": {
+        "top": "separator",
+        "leading": "separator"
+      }
+    }
   }
 }
 ```
 
-### Gradients
+### Fills
+
+A fill is a color, gradient, glass effect, system material, or active/inactive
+pair.
+
+#### Colors
+
+The simplest fill is a color:
+
+```json
+{
+  "materials": {
+    "window": { "fill": "#fdf6e3" },
+    "editor": { "fill": "$background" }
+  }
+}
+```
+
+#### Gradients
 
 Linear and radial gradients use color stops positioned from 0 to 1:
 
@@ -222,40 +254,26 @@ Linear and radial gradients use color stops positioned from 0 to 1:
 {
   "materials": {
     "editor": {
-      "type": "linear",
-      "angle": 180,
-      "stops": [
-        { "color": "white", "position": 0 },
-        { "color": "$primary", "position": 1 }
-      ]
+      "fill": {
+        "type": "linear",
+        "angle": 180,
+        "stops": [
+          { "color": "white", "position": 0 },
+          { "color": "$primary", "position": 1 }
+        ]
+      }
     }
   }
 }
 ```
 
 For linear gradients, `angle` specifies the direction in degrees (0 = top to
-bottom, 90 = left to right). For radial gradients, use `centerX` and `centerY`
-(0 to 1) to position the center:
+bottom, 90 = left to right). For radial gradients, use `"type": "radial"` with
+`centerX` and `centerY` (0 to 1) to position the center.
 
-```json
-{
-  "materials": {
-    "editorBars": {
-      "type": "radial",
-      "centerX": 0.5,
-      "centerY": 0.5,
-      "stops": [
-        { "color": "white", "position": 0 },
-        { "color": "$primary", "position": 1 }
-      ]
-    }
-  }
-}
-```
+#### Glass
 
-### Glass Materials
-
-Glass materials create a translucent, blurred effect. Use `"clear"` for more
+Glass fills create a translucent, blurred effect. Use `"clear"` for more
 transparency or `"regular"` for a more opaque look. An optional `tintColor`
 shifts the hue:
 
@@ -263,25 +281,29 @@ shifts the hue:
 {
   "materials": {
     "sidebar": {
-      "type": "glass",
-      "style": "regular",
-      "tintColor": "$accent"
+      "fill": {
+        "type": "glass",
+        "style": "regular",
+        "tintColor": "$accent"
+      }
     }
   }
 }
 ```
 
-### System Materials
+#### System
 
-System materials use macOS native appearances:
+System fills use macOS native appearances:
 
 ```json
 {
   "materials": {
     "titlebar": {
-      "type": "system",
-      "style": "titlebar",
-      "followsActive": true
+      "fill": {
+        "type": "system",
+        "style": "titlebar",
+        "followsActive": true
+      }
     }
   }
 }
@@ -291,6 +313,39 @@ The `style` can be `"header"`, `"titlebar"`, or `"windowBackground"`. Set
 `followsActive` to `true` if the material should change when the window becomes
 inactive. Use `opacity` (0 to 1) to adjust the material's opacity.
 
+#### Active
+
+An active fill selects between two fills based on window state:
+
+```json
+{
+  "materials": {
+    "window": {
+      "fill": {
+        "type": "active",
+        "active": "$panel",
+        "inactive": "$inactivePanel"
+      }
+    }
+  }
+}
+```
+
+### Borders
+
+Per-edge 1pt border colors: `top`, `bottom`, `leading`, `trailing`. Only one
+side of a shared edge should set a color, otherwise the strokes stack into a
+2pt line.
+
+### Corner Radius
+
+A number applies to all four corners. An object sets per-corner radii using
+`topLeading`, `topTrailing`, `bottomLeading`, and `bottomTrailing` (omitted
+corners are 0). Borders follow the rounded corners.
+
+Borders and corners on edges that sit at the window's outer boundary are
+suppressed automatically.
+
 ### Material Targets
 
 You can set materials for these window areas:
@@ -298,8 +353,11 @@ You can set materials for these window areas:
 - `window` — the overall window background
 - `titlebar` — the title bar area
 - `sidebar` — the sidebar panel
-- `editor` — the main editor area
-- `editorBars` — toolbar and bottom panels (status bar, find bar)
+- `editorPane` — the pane containing the editor toolbar, editor, panel, and status bar
+- `editorToolbar` — the toolbar at the top of the editor pane
+- `editor` — the editor text area
+- `editorPanel` — the bottom panel (find, spell check)
+- `editorStatusBar` — the status bar
 - `inspector` — the inspector panel
 
 ## Rows
