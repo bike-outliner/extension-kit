@@ -182,10 +182,11 @@ To enable Safari's debugger:
 In that window, it will show all of Bike's JavaScript contexts. Click on a
 context to open it. Then you can set breakpoints, examine variables, etc.
 
-#### Evaluate with AppleScript
+#### Probe & Evaluate with Automation Tools
 
-You can execute JavaScript in Bike's app context using AppleScript, which is
-useful for inspecting runtime state and testing API calls without rebuilding:
+Bike offers multiple ways to inspect editor and outline state. Run commands. And even run app context scripts: `bike` CLI, `bike mcp` MCP sever for AI agents, AppleScript, and App Intents (Shortcuts). For example from the command line you can perform a command that your extension declares and then inspect editor/outline state.
+
+The following example shows how to do these thigns in AppleScript, but the new `bike` CLI is another good option with similar capabilities.
 
 ```sh
 # Check Bike version
