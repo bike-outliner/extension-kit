@@ -54,6 +54,7 @@ folder of each unused context.
 - Code runs in web views embedded in Bike's UI.
 - Web views are sandboxed and have no network access.
 - These views are loaded dynamically using app context APIs.
+- Indirect access to outline/editor via session API or message protocol.
 - Import the API using `import { SYMBOL } from 'bike/dom'`.
 
 ### Style Context (Outline Editor Styles)
