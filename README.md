@@ -60,7 +60,7 @@ my-extensions/
         ├── dom/protocols.ts
         ├── dom/hello-sheet.ts
         ├── style/main.ts
-        ├── theme/example.bktheme
+        ├── theme/default.bktheme
         └── tests/extension.test.ts
 ```
 

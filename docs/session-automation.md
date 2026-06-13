@@ -7,11 +7,31 @@ The session automation API is exposed through two surfaces:
 
 They share the same underlying implementation, concepts, and payload shapes. This document covers those shared concepts. 
 
-There is also `bike mcp`, an MCP server through which AI agents can interact with Bike. And AppleScript, App Intents (Shortcuts), and App Context Extensions, which are not covered here.
+There is also `bike mcp`, an MCP server through which AI agents can interact with Bike. And there's more! Bike can also be automated using AppleScript, App Intents (Shortcuts), and App Context Extensions. These are all covered elsewhere.
+
+## Examples
+
+This document is intended as high-level overview of the session API concepts, but just to get you oriented, here are some example commands you can run in the CLI and example extensions that use the session API:
+
+CLI:
+
+```bash
+# Get frontmost outline
+bike get outline
+# Add new row to frontmost outline
+bike create row --text "- [ ] Buy **milk**"
+# Stream remaining todos in Markdown
+bike observe outline query --path '//task not @done' --rows --output markdown
+```
+
+Session API:
+
+- [Todos](https://github.com/bike-outliner/example-extensions/tree/main/src/todos.bkext) – Shows remaining todos in inspector and allows you to check them off.
+- [D3](https://github.com/bike-outliner/example-extensions/tree/main/src/d3.bkext) – Demonstrates integration with D3.js for data visualization. Keeps d3 visualization synced with your outline as you edit.
 
 ## Targets
 
-Commands target an outline or an editor.
+Now to concepts: commands target an outline or an editor.
 
 In the CLI the default is the `@frontmost` window. In DOM Context the default is `@window`, the window the script is associated with. You can also target outlines by persistent id or file path (editors by id).
 

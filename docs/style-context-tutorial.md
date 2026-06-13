@@ -154,7 +154,7 @@ style.layer('selection', (row, run, caret, viewport, include) => {
   run(`.@view-selected-range`, (context, run) => {
     run.decoration('selection', (selection, layout) => {
       selection.zPosition = -1
-      selection.color = Color.textBackgroundSelected().withAlpha(0.5)
+      selection.color = Color.textBackgroundSelected().alphaSet(0.5)
     })
   })
 })
@@ -173,7 +173,7 @@ style.layer('selection', (row, run, caret, viewport, include) => {
   run(`.@view-selected-range`, (context, run) => {
     run.decoration('selection', (selection, layout) => {
       selection.zPosition = -1
-      selection.color = Color.textBackgroundSelected().withAlpha(0.5)
+      selection.color = Color.textBackgroundSelected().alphaSet(0.5)
     })
   })
 
@@ -198,7 +198,7 @@ Support bold and italic text:
 
 ```typescript
 style.layer('run-formatting', (row, run, caret, viewport, include) => {
-  run('.@emphasized', (context, text) => {
+  run('.@em', (context, text) => {
     text.font = text.font.withItalics()
   })
 
@@ -209,7 +209,7 @@ style.layer('run-formatting', (row, run, caret, viewport, include) => {
 ```
 
 You can also add decorations to text runs, just like you can add them to rows
-and row text. Try creating a rule to show text with the `@highlight` attribute —
+and row text. Try creating a rule to show text with the `@mark` attribute —
 you can add/remove that attribute using Format > Highlight.
 
 ## Row Formatting with Decorations

@@ -1,11 +1,9 @@
 # Creating Themes
 
 Themes customize the colors, materials, and typography of Bike's interface. They
-are JSON files with the `.bktheme` extension. `//` and `/* ... */` comments are
-allowed. Themes are configuration files for the more complex
-[editor styles](style-context-tutorial.md).
+are JSON files with the `.bktheme` extension. Themes are configuration files for the more complex [editor styles](style-context-tutorial.md).
 
-- [Theme Schema](../schemas/theme-schema.json) — full feature reference
+- [Theme Schema](../schemas/theme-schema.json) — full schema reference
 
 ## Quick Start
 
@@ -491,14 +489,10 @@ my-extension.bkext
 │   └── my-dark-theme.bktheme
 ```
 
-Themes are loaded directly from extension bundles — they are not copied. In
-Bike's theme menus, extension themes appear prefixed with the extension name.
-For example, `solarized-light.bktheme` in `bike.bkext` appears as "Bike
-Solarized Light". See [Creating Extensions](creating-extensions.md) for more on
-building and installing extensions.
+Themes are loaded directly from extension bundles. In Bike's theme menus, extension themes appear prefixed with the extension name. For example, `solarized.bktheme` in `bike.bkext` appears as "Bike: Solarized". See [Creating Extensions](creating-extensions.md) for more on building and installing extensions.
 
 ## Resources
 
+- [Solarized](https://github.com/bike-outliner/core-extensions/blob/main/src/bike.bkext/theme/solarized.bktheme) — a complete theme example
 - [Theme Schema](../schemas/theme-schema.json) — full property reference
 - [Style Context Tutorial](style-context-tutorial.md) — for more advanced styling with code
-- [Solarized Light](https://github.com/bike-outliner/core-extensions/blob/main/src/bike.bkext/theme/solarized-light.bktheme) — a complete theme example

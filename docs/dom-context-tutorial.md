@@ -12,8 +12,11 @@ necessary when you want a fully custom view.
 - Code runs in web views embedded in Bike's UI.
 - Web views are sandboxed with no network access.
 - These views are loaded dynamically using app context APIs.
+- Indirect access to outline/editor via session API.
 - Communicate with the originating app context using `postMessage` and `onmessage`.
 - Import the API using `import { SYMBOL } from 'bike/dom'`.
+
+**Note** This tutorial uses `postMessage` and `onmessage` for communication between the app and DOM contexts. A simpler by less flexible alternative is to use the session API. See the [Todos](../../example-extensions/src/todos.bkext/) example for that approach.
 
 ## Setup
 
@@ -101,7 +104,7 @@ function archiveDoneCommand(context: CommandContext): boolean {
       archiveRow = outline.insertRows(
         [
           {
-            id: 'archive',
+            persistentId: 'archive',
             text: 'Archive',
           },
         ],
