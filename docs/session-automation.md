@@ -5,7 +5,7 @@ The session automation API is exposed through two surfaces:
 - `bike` — CLI for shell scripts.
 - `bike.session` — DOM context typescript [API](../api/dom/session.d.ts).
 
-They share the same underlying API, concepts, and payload shapes. This document covers those shared concepts. 
+They share the same underlying implementation, concepts, and payload shapes. This document covers those shared concepts. 
 
 There is also `bike mcp`, an MCP server through which AI agents can interact with Bike. And AppleScript, App Intents (Shortcuts), and App Context Extensions, which are not covered here.
 
