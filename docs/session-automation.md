@@ -1,17 +1,13 @@
 # Bike Session Automation
 
-The session automation API is exposed through two surfaces:
+The session automation API is exposed in two places:
 
-- `bike` — CLI for shell scripts.
-- `bike.session` — DOM context typescript [API](../api/dom/session.d.ts).
+- `bike` — Command line interface (CLI) for shell scripts.
+- `bike.session` — DOM context TypeScript [API](../api/dom/session.d.ts).
 
-They share the same underlying implementation, concepts, and payload shapes. This document covers those shared concepts. 
+They share the same underlying implementation, concepts, and payload shapes. This document covers those shared concepts. There is also the related `bike mcp`, an MCP server through which AI agents can interact with Bike.
 
-There is also `bike mcp`, an MCP server through which AI agents can interact with Bike. And there's more! Bike can also be automated using AppleScript, App Intents (Shortcuts), and App Context Extensions. These are all covered elsewhere.
-
-## Examples
-
-This document is intended as high-level overview of the session API concepts, but just to get you oriented, here are some example commands you can run in the CLI and example extensions that use the session API:
+**Example Usage:**
 
 CLI:
 
@@ -26,8 +22,8 @@ bike observe outline query --path '//task not @done' --rows --output markdown
 
 Session API:
 
-- [Todos](https://github.com/bike-outliner/example-extensions/tree/main/src/todos.bkext) – Shows remaining todos in inspector and allows you to check them off.
-- [D3](https://github.com/bike-outliner/example-extensions/tree/main/src/d3.bkext) – Demonstrates integration with D3.js for data visualization. Keeps d3 visualization synced with your outline as you edit.
+- [Todos](https://github.com/bike-outliner/example-extensions/tree/main/src/todos.bkext) – Interactive todos inspector.
+- [D3](https://github.com/bike-outliner/example-extensions/tree/main/src/d3.bkext) – Sync D3.js layouts with your outline.
 
 ## Targets
 
