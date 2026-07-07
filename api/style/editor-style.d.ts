@@ -165,6 +165,8 @@ type RulesLayerName =
  * Anytime this context changes the `userCache` is also invalidated.
  */
 interface StyleContext {
+  /** Host platform the editor is running on */
+  os: 'macOS' | 'iOS'
   /** True when editor has keyboard focus  */
   isKey: boolean
   /** True when editor is typing (mouse hidden)  */
