@@ -10,7 +10,10 @@ export interface Permissions {
 /** Permissions that can be granted through `manifest.json`. */
 export type Permission = 'openURL' | 'clipboardRead' | 'clipboardWrite' | 'keychain'
 
-/** A rectangle in points. */
+/**
+ * A rectangle in points. (A plain data object used by app-context window and
+ * screen APIs — distinct from the style context's `Rect` class in `bike/style`.)
+ */
 export interface Rect {
   x: number
   y: number
@@ -69,18 +72,3 @@ type URLOpenConfiguration = {
   promptsUserIfNeeded?: boolean
 }
 
-declare global {
-  function setTimeout(callback: (...args: any[]) => void, ms: number, ...args: any[]): number
-  function clearTimeout(timeoutId: number): void
-  function setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): number
-  function clearInterval(intervalId: number): void
-
-  const console: {
-    trace(...data: any[]): void
-    log(...data: any[]): void
-    info(...data: any[]): void
-    warn(...data: any[]): void
-    error(...data: any[]): void
-    debug(...data: any[]): void
-  }
-}

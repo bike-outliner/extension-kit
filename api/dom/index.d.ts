@@ -12,7 +12,7 @@ export { Message, DOMProtocol } from '../core/dom-protocol'
  * Example:
  *
  * ```ts
- * import { DOMExtensionContext } from "bike";
+ * import { DOMExtensionContext } from "bike/dom";
  * export async function activate(context: DOMExtensionContext) {
  *   context.element.textContent = "Hello World!";
  * }

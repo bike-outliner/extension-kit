@@ -3,6 +3,7 @@
     "target": "esnext",
     "jsx": "preserve",
     "lib": ["dom", "esnext"],
+    "strict": true,
     "noPropertyAccessFromIndexSignature": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitThis": true,

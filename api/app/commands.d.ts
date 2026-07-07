@@ -5,7 +5,7 @@ import { Disposable } from './system'
  * Command definition. Either a bare action closure, or an object that pairs the
  * action with optional metadata such as a default {@link CommandButton}.
  */
-type CommandDefinition =
+export type CommandDefinition =
   | CommandAction
   | {
       /** Default button placement for this command. */
@@ -15,7 +15,7 @@ type CommandDefinition =
     }
 
 /** Where a {@link CommandButton} is placed by default. */
-type CommandButtonLocation = 
+export type CommandButtonLocation =
   /** Adds menu item to the trailing view popup in window titlebar. */
   'titlebar' | 
   /** Adds button to the editor's top toolbar. */
@@ -24,7 +24,7 @@ type CommandButtonLocation =
   'statusbar'
 
 /** A default button an extension contributes for one of its commands. */
-type CommandButton = {
+export type CommandButton = {
   /** SF Symbol name shown on the button (e.g. `'star'`, `'bolt'`). */
   symbol: string
   /** The bar the button is placed in by default. */
@@ -32,13 +32,15 @@ type CommandButton = {
 }
 
 /** Interface for managing commands. */
-interface Commands {
+export interface Commands {
   /**
    * Adds commands to the app.
-   * @param commands - The commands to add.
+   * @param commands - The commands to add, with optional priority. When
+   * multiple commands share a CommandName, higher priority commands are
+   * tried first (see {@link CommandAction}). Default priority is 0.
    * @returns Disposable removes added commands.
    */
-  addCommands(commands: { commands: Record<CommandName, CommandDefinition> }): Disposable
+  addCommands(commands: { commands: Record<CommandName, CommandDefinition>; priority?: number }): Disposable
 
   /**
    * Performs the named command.
@@ -48,18 +50,18 @@ interface Commands {
    * was found and returned true when performed. False if the command was
    * found but returned false when performed.
    */
-  performCommand(command: CommandName, options?: { editor?: OutlineEditor; selection?: Selection }): boolean | undefined
+  performCommand(command: CommandName, options?: CommandContext): boolean | undefined
 
   /** Debugging function to list all commands. */
   toString(): string
 }
 
 /**
- * The name of the command in the form `catagory:name-of-command`. If don't want
- * the command to show in the command palette then use a name that starts with
- * a period, such as `bike:.click-handle` for the full command name.
+ * The name of the command in the form `category:name-of-command`. If you don't
+ * want the command to show in the command palette then use a name that starts
+ * with a period, such as `bike:.click-handle` for the full command name.
  */
-type CommandName = string
+export type CommandName = string
 
 /**
  * Context passed to command action.
@@ -83,4 +85,4 @@ export type CommandContext = {
  * the command is considered handled (as if it returned true) and the chain
  * stops. The resolved value is for the command's internal use.
  */
-type CommandAction = (context: CommandContext) => boolean | Promise<boolean>
+export type CommandAction = (context: CommandContext) => boolean | Promise<boolean>

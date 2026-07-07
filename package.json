@@ -1,6 +1,6 @@
 {
   "name": "@bike-outliner/extension-kit",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "type": "module",
   "description": "Build tooling and API types for Bike Outliner extensions",
   "author": "Hog Bay Software",
@@ -17,8 +17,8 @@
     "template/"
   ],
   "scripts": {
-    "build-runtime": "node runtime/build.mjs production",
-    "watch-runtime": "node runtime/build.mjs"
+    "build-runtime": "node bin/bike-ext.mjs build-runtime",
+    "watch-runtime": "node bin/bike-ext.mjs watch-runtime"
   },
   "dependencies": {
     "@types/react": "^19.2.14",

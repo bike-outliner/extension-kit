@@ -9,9 +9,11 @@ npm install                    # Install dependencies
 npx bike-ext build             # Production build (typecheck + bundle + validate)
 npx bike-ext watch             # Development mode with file watching
 npx bike-ext new <id>          # Scaffold a new extension
+npx bike-ext test              # Build, install, and run extension tests
 npx bike-ext package           # Package extensions as .bkext.zip
 npx bike-ext release <id>      # Create GitHub release
-npx bike-ext submit <id>      # Submit extension to registry via PR
+npx bike-ext submit <id>       # Submit extension to registry via PR
+npx bike-ext clean             # Remove build output
 npm run build-runtime          # Build React runtime (runtime/)
 npm run watch-runtime          # Watch React runtime
 ```
@@ -26,7 +28,7 @@ extension-kit/
 │   ├── app/                #   App context (commands, keybindings, outline API)
 │   ├── dom/                #   DOM context (React UI, components)
 │   ├── style/              #   Style context (editor styling, decorations)
-│   └── core/               #   Shared types (Json, OutlinePath)
+│   └── core/               #   Shared types (Json, OutlinePath, DOMProtocol, bike globals)
 ├── docs/                   # Extension development guides and tutorials
 ├── bin/bike-ext.mjs        # CLI dispatcher
 ├── lib/                    # Build tooling
@@ -40,9 +42,13 @@ extension-kit/
 │   └── submit.mjs          #   Registry PR submission (uses gh CLI)
 ├── runtime/                # React runtime bundled into Bike.app
 │   ├── common.ts           #   Exposes React/ReactDOM as window globals
-│   ├── sheet.tsx            #   Sheet UI template
-│   └── inspector.tsx        #   Inspector UI template
-├── schemas/manifest.schema.json
+│   ├── components.tsx      #   bike/components implementations
+│   ├── format.ts           #   Shared formatting helpers
+│   ├── sheet.tsx           #   Sheet UI template
+│   ├── inspector.tsx       #   Inspector UI template
+│   ├── panel.tsx           #   Panel UI template (+ panel.html)
+│   └── extensions-settings.tsx  # Extensions settings UI
+├── schemas/                # manifest.schema.json, theme-schema.json
 └── template/               # Scaffolded by `bike-ext new`
 ```
 
@@ -53,7 +59,7 @@ Extensions have up to three contexts, each with separate TypeScript configs and 
 | Context | Entry point | API import | Purpose |
 |---------|-------------|------------|---------|
 | **App** | `app/main.ts` | `bike/app` | Commands, keybindings, sidebar, outline manipulation |
-| **DOM** | `dom/*.ts\|tsx` | `bike/dom` | React UI (sheets, inspector panels) |
+| **DOM** | `dom/*.ts\|tsx` | `bike/dom` | React UI (sheets, panels, inspector items) |
 | **Style** | `style/main.ts` | `bike/style` | Editor styling via declarative rule layers |
 
 Each context is typechecked independently using its own tsconfig from `api/{context}/tsconfig.json`. Consumer projects get three configs in `configs/` that extend these.
@@ -65,9 +71,9 @@ App and DOM communicate via `postMessage`/`onmessage` on `DOMScriptHandle` (app 
 `build.mjs` creates an esbuild context with four plugins from `plugins.mjs`:
 
 1. **externalGlobalPlugin** — Maps `react`, `react-dom`, `bike/components` to `window.*` globals
-2. **copyAndValidatePlugin** — Copies `manifest.json` files, validates `.bktheme` files against JSON schema
+2. **copyAndValidatePlugin** — Copies `manifest.json` and `.bktheme` files, validating both against their JSON schemas
 3. **typecheckPlugin** — Runs `typecheckContexts()` for all three contexts plus any per-extension tsconfigs
-4. **installExtensionPlugin** — Copies built extensions to Bike.app's Extensions directory when `manifest.install === true`
+4. **installExtensionPlugin** — Copies built extensions to Bike's Extensions directory; only added to the build when the `--install` flag is passed
 
 Output format is IIFE bundles. Production uses external sourcemaps + minification; dev uses inline sourcemaps.
 

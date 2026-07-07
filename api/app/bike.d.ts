@@ -8,74 +8,13 @@ import { OutlineEditor } from './outline-editor'
 import { DOMScript, SheetHandle, PanelHandle } from './dom-script'
 import { URL, Disposable, Permissions, Rect } from './system'
 import { DOMProtocol } from '../core/dom-protocol'
+import { BikeUtilityGlobals } from '../core/bike-globals'
 import { Outline } from './outline'
 import { JSONStore } from '../core/json'
 
-interface SFSymbolOptions {
-  weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'
-  scale?: 'small' | 'medium' | 'large'
-}
-
 declare global {
   /** The bike global API. */
-  const bike: {
-    /**
-     * The user's macOS system locale as a BCP 47 language tag (e.g. "en-US",
-     * "en-JP-u-ca-japanese", "de-DE").
-     *
-     * Includes region and calendar extensions from System Preferences.
-     *
-     * @example
-     * ```typescript
-     * new Date().toLocaleDateString(bike.systemLocale)
-     * new Intl.DateTimeFormat(bike.systemLocale, { dateStyle: "long" }).format(new Date())
-     * ```
-     */
-    readonly systemLocale: string
-
-    /**
-     * The user's preferred first day of the week from macOS System Preferences,
-     * as a JavaScript day number (0 = Sunday, 1 = Monday, ..., 6 = Saturday).
-     */
-    readonly systemFirstWeekday: number
-
-    /**
-     * Extension defaults, backed by UserDefaults with the prefix
-     * `bike.ext.<extensionId>.`.
-     *
-     * @example
-     * ```typescript
-     * const value = bike.defaults.get('theme')
-     * bike.defaults.set('theme', 'dark')
-     * bike.defaults.observe('theme', (v) => { console.log('changed:', v) })
-     * ```
-     */
-    readonly defaults: JSONStore
-
-    /**
-     * Returns a `bike-extension://` URL for a file in this extension's folder.
-     *
-     * @param path - Relative path within the extension folder (e.g., "images/icon.png")
-     * @returns A `bike-extension://` URL string.
-     */
-    extensionURL(path: string): string
-
-    /**
-     * Formats a Date object using a pattern string (date-fns / CLDR-inspired).
-     *
-     * @see https://date-fns.org/docs/format
-     *
-     * @example
-     * ```typescript
-     * bike.formatDate(new Date(), 'yyyy-MM-dd')       // "2026-04-09"
-     * bike.formatDate(new Date(), 'MMMM d, yyyy')     // "April 9, 2026"
-     * ```
-     */
-    formatDate(date: Date, pattern: string): string
-
-    /** Returns a URL string for the named SF Symbol. */
-    symbolURL(name: string, options?: SFSymbolOptions): string
-
+  const bike: BikeUtilityGlobals & {
     /**
      * Bring the bike application to the foreground without changing
      * which window is key. To also bring a specific window forward,
@@ -124,8 +63,6 @@ declare global {
     readonly outlineEditors: OutlineEditor[]
     /** Frontmost outline editor */
     readonly frontmostOutlineEditor?: OutlineEditor
-    /** Observer called for all current and future outline editors. */
-    //observeOutlineEditors(handler: (_: OutlineEditor) => void): Disposable;
     /** Observer called current and future frontmost outline editors. */
     observeFrontmostOutlineEditor(handler: (_: OutlineEditor | undefined) => void): Disposable
 
@@ -141,7 +78,7 @@ declare global {
      * Show a window or application modal alert.
      *
      * @param options - The options for the alert
-     * @param window - A window to attatch the alert to
+     * @param window - A window to attach the alert to
      * @returns A promise that resolves to the result of the alert.
      * @example
      * ```typescript
@@ -234,7 +171,7 @@ declare global {
      *
      * @param options - The options for the panel
      * @param window - A window to associate the panel with
-     * @returns A promise that resolves to a PaneHandle<P>.
+     * @returns A promise that resolves to a PanelHandle<P>.
      * @see
      * {@link https://github.com/bike-outliner/extension-kit/blob/main/docs/dom-context-tutorial.md#define-a-typed-messaging-protocol | Typed Messaging Protocols}
      * @example
@@ -284,12 +221,12 @@ declare global {
 }
 
 /**
- * ExtensionContext provides access to extension specific API. It is passed
+ * AppExtensionContext provides access to extension specific API. It is passed
  * through the extension's activate function.
  *
  * ```ts
- * import { ExtensionContext } from "bike";
- * export async function activate(context: ExtensionContext) {
+ * import { AppExtensionContext } from "bike/app";
+ * export async function activate(context: AppExtensionContext) {
  *     // extension code here
  * }
  * ```
@@ -319,7 +256,7 @@ export interface Keychain {
   /** List all stored key names for this extension. */
   keys(): string[]
   /** Get a secret by key. Returns null if not found. */
-  get(key: string): string | undefined
+  get(key: string): string | null
   /** Store a secret. Returns true on success. */
   set(key: string, value: string | undefined): boolean
   /** Delete a secret. Returns true on success. */
@@ -406,7 +343,7 @@ export interface Window {
   /**
    * Present a WebView based sheet.
    *
-   * Use the name parameter to load the DOMScript `src/dom/<name>` into
+   * Use the script parameter to load the DOMScript `src/dom/<script>` into
    * the WebView. The script should configure the DOM elements for display.
    *
    * @param script - The script to run.
@@ -421,18 +358,6 @@ export interface Window {
    * bike application.
    */
   activate(): void
-
-  /*
-  presentRowPicker(
-    outline: Outline,
-    options?: {
-      title?: string
-      path: OutlinePath
-      allowsMultipleSelection?: boolean
-      initialSelection?: string[]
-    }
-  ): Promise<Row[] | null>
-  */
 }
 
 /** Interface for a view in the UI. */
@@ -441,7 +366,6 @@ export interface View {}
 interface SheetOptions {
   width?: number
   height?: number
-  //buttons?: string[];
 }
 
 /**
@@ -471,11 +395,14 @@ interface PanelOptions {
   title?: string
   /** Panel role that sets default window behavior. */
   role?: PanelRole
-  /** Whether the panel floats above other windows. Defaults to true. */
+  /** Whether the panel floats above other windows. Defaults to the role's
+   *  value (true unless role is 'window'). */
   floating?: boolean
-  /** Whether the panel hides when the app deactivates. Defaults to false. */
+  /** Whether the panel hides when the app deactivates. Defaults to the role's
+   *  value (true unless role is 'window'). */
   hidesOnDeactivate?: boolean
-  /** Whether the panel can become the main window. Defaults to false. */
+  /** Whether the panel can become the main window. Defaults to the role's
+   *  value (false unless role is 'window'). */
   canBecomeMain?: boolean
   /** Unique identifier for frame autosave. */
   id?: string

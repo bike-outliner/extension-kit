@@ -1,6 +1,7 @@
 import { Insets, Size, Path, LineCap, LineJoin, FillRule } from './geometry'
 
-interface Cache {}
+/** Opaque cache passed to `resolve()` methods by the styling system. */
+export interface Cache {}
 
 /** Image - Used for Decoration content */
 export class Image {
@@ -31,7 +32,7 @@ export class Text {
   font: Font
   color: Color
   string: string
-  constructor(string: String, font?: Font, color?: Color)
+  constructor(string: string, font?: Font, color?: Color)
 }
 
 /**
@@ -46,21 +47,21 @@ export class Shape {
   constructor(path: Path)
 }
 
-interface ShapeLine {
+export interface ShapeLine {
   cap: LineCap
-  dashPattern?: [number]
+  dashPattern?: number[]
   dashPhase: number
   join: LineJoin
   width: number
   miterLimit: number
 }
 
-interface ShapeFill {
+export interface ShapeFill {
   color: Color
   rule: FillRule
 }
 
-interface ShapeStroke {
+export interface ShapeStroke {
   color: Color
   start: number
   end: number
@@ -77,13 +78,19 @@ export class SymbolConfiguration {
   withSymbolScale(scale: SymbolScale): SymbolConfiguration
   withHierarchicalColor(color: Color): SymbolConfiguration
   withPaletteColors(colors: Color[]): SymbolConfiguration
+  preferringMonochrome(): SymbolConfiguration
+  preferringMulticolor(): SymbolConfiguration
+  preferringHierarchical(): SymbolConfiguration
+  /** @deprecated Misspelling kept for compatibility — use `preferringMonochrome`. */
   preferingMonochrome(): SymbolConfiguration
+  /** @deprecated Misspelling kept for compatibility — use `preferringMulticolor`. */
   preferingMulticolor(): SymbolConfiguration
-  preferingHierarchical(): SymbolConfiguration
+  /** @deprecated Misspelling kept for compatibility — use `preferringHierarchical`. */
+  preferingHierachical(): SymbolConfiguration
 }
 
-/** SymbolConfigurationScale – Use font for symbol size, then adjust with symbol scale */
-type SymbolScale = 'small' | 'medium' | 'large'
+/** SymbolScale – Use font for symbol size, then adjust with symbol scale */
+export type SymbolScale = 'small' | 'medium' | 'large'
 
 /**
  * Font - Wraps a `NSFontDescriptor`.
@@ -123,15 +130,15 @@ export class Font {
   constructor(name: string, pointSize: number)
 
   /** @returns A new font with family */
-  withFamily(family: String): Font
+  withFamily(family: string): Font
 
   /** @returns A new font with face */
-  withFace(face: String): Font
+  withFace(face: string): Font
 
   /** @returns A new font with point size */
   withPointSize(pointSize: number): Font
 
-  /** @returns A new font with weigth */
+  /** @returns A new font with weight */
   withWeight(weight: FontWeight): Font
 
   /** @returns A new font with bold trait */
@@ -159,8 +166,8 @@ export class Font {
   resolve(cache: Cache): FontAttributes
 }
 
-type FontAttributes = {
-  name: String
+export type FontAttributes = {
+  name: string
   pointSize: number
   ascender: number
   descender: number
@@ -170,7 +177,7 @@ type FontAttributes = {
 }
 
 /** FontWeight */
-type FontWeight =
+export type FontWeight =
   | 'ultraLight'
   | 'thin'
   | 'light'
@@ -182,12 +189,12 @@ type FontWeight =
   | 'black'
 
 /** Color space for mixing operations */
-type ColorSpace = 'srgb' | 'hsl' | 'oklab' | 'oklch'
+export type ColorSpace = 'srgb' | 'hsl' | 'oklab' | 'oklch'
 
 /** WCAG contrast targets */
-type ContrastTarget = 'aa' | 'aaLarge' | 'aaa' | 'aaaLarge' | number
+export type ContrastTarget = 'aa' | 'aaLarge' | 'aaa' | 'aaaLarge' | number
 
-/** Color - Wraps an unerlying CGColor. */
+/** Color - Wraps an underlying CGColor. */
 export class Color {
   static none(): Color
   static black(): Color

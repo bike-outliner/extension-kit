@@ -40,6 +40,7 @@ npm install https://github.com/bike-outliner/extension-kit --save-dev
 | `npx bike-ext package [id]` | Package built extensions as `.bkext.zip` files (all or specific) |
 | `npx bike-ext release <id>` | Create a GitHub release for an extension |
 | `npx bike-ext submit <id>` | Submit extension to the registry via pull request |
+| `npx bike-ext clean` | Remove build output |
 
 ## Project structure
 

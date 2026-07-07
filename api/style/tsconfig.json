@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "lib": ["esnext"],
+    "strict": true,
     "noPropertyAccessFromIndexSignature": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitThis": true,
@@ -11,7 +12,8 @@
     "resolveJsonModule": true,
     "noEmit": true,
     "paths": {
-      "bike/style": ["./index.d.ts"]
+      "bike/style": ["./index.d.ts"],
+      "bike/core": ["../core/index.d.ts"]
     }
   },
   "include": ["."]

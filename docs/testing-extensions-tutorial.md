@@ -4,8 +4,8 @@ Write tests for your extensions using the built-in test harness.
 
 - Entry points: `tests/*.test.ts`
 - Tests run in the app context (`bike/app` API)
-- And can also test APIs defined in `bike/app/test`
-- `describe`, `it`, and `assert` functions are provided by the test harness
+- `describe`, `it`, and `assert` are ambient globals provided by the test
+  harness (typed by the extension kit — no import needed)
 
 ## Setup
 
@@ -120,7 +120,7 @@ describe("Archive Done Command", () => {
     })
 
     it("leaves undone tasks in place", () => {
-        let topLevelRows = outline.root.children.filter(r => r.id !== "archive")
+        let topLevelRows = outline.root.children.filter(r => r.persistentId !== "archive")
         assert.equal(topLevelRows.length, 1, "Expected 1 undone task remaining")
         assert.equal(topLevelRows[0].text.string, "Task 2")
     })

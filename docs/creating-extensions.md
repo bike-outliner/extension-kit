@@ -33,8 +33,10 @@ extension.bkext
 │   └── theme2.bktheme
 ```
 
-Each extension has a `manifest.json` file which contains the name, permissions,
-and other metadata. Properties are documented in the extension kit:
+Each extension has a `manifest.json` file which contains the version,
+permissions, and other metadata. (The extension's id and display name aren't in
+the manifest — both are derived from the `.bkext` folder name.) Properties are
+documented in the extension kit:
 [schemas/manifest.schema.json](../schemas/manifest.schema.json).
 
 Each subfolder corresponds to a different context where the extension code can
@@ -46,7 +48,7 @@ folder of each unused context.
 
 - Code runs in Bike's native app environment.
 - Interact with outlines, clipboard, networking, etc.
-- Some APIs require appropriate `manifest.json` permissions (e.g. `"clipboardRead"`, `"clipboardWrite"`)
+- Some APIs require appropriate `manifest.json` permissions (`"clipboardRead"`, `"clipboardWrite"`, `"openURL"`, `"keychain"`)
 - Import the API using `import { SYMBOL } from 'bike/app'`.
 
 ### DOM Context (DOM/HTML Views)

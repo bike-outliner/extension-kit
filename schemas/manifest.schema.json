@@ -30,7 +30,7 @@
     "api_version": {
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "The API version this extension is compatible with."
+      "description": "The minimum Bike extension API version this extension requires (see bike.apiVersion; the extension kit's package version tracks it). Copied to the registry entry's min_api_version on submit."
     },
     "permissions": {
       "type": "array",
@@ -38,7 +38,7 @@
         "type": "string",
         "enum": ["clipboardRead", "clipboardWrite", "openURL", "keychain"]
       },
-      "description": "List of permissions the extension requires. Available permissions: clipboardRead (read from system clipboard), clipboardWrite (write to system clipboard), openURL (open URLs in the default browser)."
+      "description": "List of permissions the extension requires. Available permissions: clipboardRead (read from system clipboard), clipboardWrite (write to system clipboard), openURL (open URLs in the default browser), keychain (store secrets in the macOS Keychain)."
     },
     "host_permissions": {
       "type": "array",

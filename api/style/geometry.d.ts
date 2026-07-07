@@ -1,4 +1,4 @@
-/** Path - Wraps an unerlying CGPath. */
+/** Path - Wraps an underlying CGPath. */
 export class Path {
   static rect(rect: Rect, transform?: AffineTransform): Path
   static roundedRect(
@@ -7,6 +7,8 @@ export class Path {
     cornerHeight: number,
     transform?: AffineTransform
   ): Path
+  static ellipseInRect(rect: Rect, transform?: AffineTransform): Path
+  /** @deprecated Misspelling kept for compatibility — use `ellipseInRect`. */
   static elipseInRect(rect: Rect, transform?: AffineTransform): Path
 
   constructor()
@@ -21,13 +23,15 @@ export class Path {
     transform?: AffineTransform
   ): Path
 
-  componentsSeparated(using?: FillRule): [Path]
-  flattened(threshhold: number): Path
+  componentsSeparated(using?: FillRule): Path[]
+  flattened(threshold: number): Path
   intersection(other: Path, using?: FillRule): Path
   lineIntersection(other: Path, using?: FillRule): Path
   lineSubtracting(other: Path, using?: FillRule): Path
   normalized(using?: FillRule): Path
   subtracting(other: Path, using?: FillRule): Path
+  symmetricDifference(other: Path, using?: FillRule): Path
+  /** @deprecated Misspelling kept for compatibility — use `symmetricDifference`. */
   symetricDifference(other: Path, using?: FillRule): Path
   union(other: Path, using?: FillRule): Path
 
@@ -67,7 +71,7 @@ type LineCap = 'butt' | 'round' | 'square'
 type LineJoin = 'miter' | 'round' | 'bevel'
 type FillRule = 'evenOdd' | 'winding'
 
-/** AffineTransform - Wraps an unerlying CGAffineTransform. */
+/** AffineTransform - Wraps an underlying CGAffineTransform. */
 export class AffineTransform {
   constructor()
 
@@ -108,7 +112,10 @@ export class Insets {
   scaled(scale: number): Insets
 }
 
-/** Rect - Wraps an unerlying CGRect. */
+/**
+ * Rect - Wraps an underlying CGRect. (A class used by style-context drawing
+ * APIs — distinct from the app context's plain `Rect` interface in `bike/app`.)
+ */
 export class Rect {
   static zero(): Rect
 
@@ -120,7 +127,7 @@ export class Rect {
   height: number
 }
 
-/** Point - Wraps an unerlying CGPoint. */
+/** Point - Wraps an underlying CGPoint. */
 export class Point {
   static zero(): Point
 
@@ -130,7 +137,7 @@ export class Point {
   y: number
 }
 
-/** Size - Wraps an unerlying CGSize. */
+/** Size - Wraps an underlying CGSize. */
 export class Size {
   static zero(): Size
 

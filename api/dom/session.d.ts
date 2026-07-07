@@ -6,10 +6,17 @@
  * (`@window`/`@frontmost`), ids, row refs, sentinels, streaming, debounce — is
  * documented together with the `bike` CLI in the session automation reference:
  * https://github.com/bike-outliner/extension-kit/blob/main/docs/session-automation.md
+ *
+ * NOTE: These Session* types mirror the wire format shared with the `bike`
+ * CLI and MCP server, which uses compact field names. They intentionally
+ * differ from the richer app-context types in `bike/app`:
+ * `SessionRowChange` uses `old`/`new` where `RowChange` uses
+ * `oldType`/`newType` etc., and `SessionTextRun` uses `string`/`attrs`
+ * where `RowRun` uses `runString`/`runAttributes`.
  */
 
 type SessionId = number
-type PersistentId = string
+type PersistentId = import('../app/outline').PersistentId
 type OutlineId = string
 type EditorId = string
 type ContextSentinel = '@window' | '@frontmost'
@@ -18,7 +25,7 @@ type FilePath = string
 type OutlineRef = OutlineId | FilePath | ContextSentinel
 type EditorRef = EditorId | ContextSentinel
 type CommandId = string
-type OutlinePath = string
+type OutlinePath = import('../core/outline-path').OutlinePath
 type RowSentinel = '@selection' | '@focused' | '@root'
 type Markdown = string
 
@@ -68,7 +75,7 @@ interface SessionEditor {
   outlineId: OutlineId
   focused: SessionId[]
   collapsed: SessionId[]
-  filter: string | OutlinePath | null
+  filter: OutlinePath | null
   selection: { anchor: SessionId; head: SessionId; rows: SessionId[]; text: string } | null
 }
 
@@ -174,6 +181,12 @@ interface SessionOutlineEditorChanges {
   editor: SessionEditorChange[]
 }
 
+/**
+ * Handle for an active `observe*` stream. Unlike the app context's
+ * synchronous `Disposable`, disposal crosses the WebView/app bridge, so
+ * `dispose()` is async and resolves once the stream has actually stopped.
+ * Subscriptions are also auto-disposed when the DOM script unloads.
+ */
 interface SessionSubscription {
   dispose(): Promise<void>
 }
@@ -245,7 +258,7 @@ interface BikeSession {
   updateEditor(params: {
     outline?: OutlineRef
     focus?: RowRef
-    filter?: string | OutlinePath
+    filter?: OutlinePath
     select?: RowRef
     selectHead?: RowRef
     expand?: RowRef[]

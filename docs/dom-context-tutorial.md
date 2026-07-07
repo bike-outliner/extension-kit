@@ -2,7 +2,7 @@
 
 Use the DOM context to display custom UI using HTML and DOM.
 
-You can present a sheet, panel, window, and add views to the inspector sidebar.
+You can present a sheet, panel, window, and add views to the inspector panel.
 Note, your extension might not need to use the DOM context. Instead, you can
 also use the app context to present alerts and pickers. The DOM context is only
 necessary when you want a fully custom view.

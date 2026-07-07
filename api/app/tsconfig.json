@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["ESNext"],
+    "lib": ["esnext"],
     "strict": true,
-    "strictNullChecks": true,
     "noPropertyAccessFromIndexSignature": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitThis": true,

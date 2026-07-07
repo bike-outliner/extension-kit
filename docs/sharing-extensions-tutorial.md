@@ -4,7 +4,7 @@ Once your extension is working, you can package it for distribution and list it
 in the Bike extensions registry so other users can install it from Settings >
 Extensions > Browse.
 
-## Package Extesion
+## Package Extension
 
 Build your extensions, then create ZIP files ready for distribution:
 

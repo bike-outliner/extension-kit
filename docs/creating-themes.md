@@ -69,7 +69,7 @@ The theme's display name is derived from its filename. The filename (without
 
 When a theme is included in an extension, its display name is prefixed with the
 extension name. For example, `solarized-light.bktheme` in `bike.bkext` appears
-as "Bike Solarized Light".
+as "Bike: Solarized Light".
 
 ## Theme Metadata
 

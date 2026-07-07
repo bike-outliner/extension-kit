@@ -2,7 +2,7 @@ import { CommandName } from './commands'
 import { Disposable } from './system'
 
 /** Interface to manage outline editor Keybindings. */
-interface Keybindings {
+export interface Keybindings {
   /** True when activeModifiers contains 'Command'. */
   isCommandPressed: boolean
 
@@ -48,12 +48,12 @@ interface Keybindings {
  * selection is of type caret or range. The block-mode keymap is used when
  * the selection is of type block.
  */
-type KeymapName = 'text-mode' | 'block-mode'
+export type KeymapName = 'text-mode' | 'block-mode'
 
 /**
  * Set of possible modifiers.
  */
-type Modifiers =
+export type Modifiers =
   | 'Command'
   | 'LeftCommand'
   | 'RightCommand'
@@ -140,7 +140,7 @@ type Modifiers =
  * - cmd-s
  * - ctrl-x ctrl-s
  */
-type KeySequence = string
+export type KeySequence = string
 
 /** Typed key such as `a` or `;`. */
-type Key = string
+export type Key = string

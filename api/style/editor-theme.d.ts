@@ -19,7 +19,7 @@ import { TextStyle, TextRunStyle } from './editor-style'
  * })
  * ```
  */
-interface EditorTheme {
+export interface EditorTheme {
   /** Colors defined in the theme's "colors" section */
   readonly colors: ColorTheme
 
@@ -35,7 +35,7 @@ interface EditorTheme {
  *
  * All colors have sensible defaults if not specified in the theme.
  */
-interface ColorTheme {
+export interface ColorTheme {
   // Core colors
   readonly text: Color
   readonly accent: Color
@@ -74,7 +74,7 @@ interface ColorTheme {
  * Each row type has a TextContainerTheme that can be applied to row text styling.
  * All row themes have sensible defaults.
  */
-interface RowThemes {
+export interface RowThemes {
   readonly body: TextContainerTheme
   readonly heading: TextContainerTheme
   readonly note: TextContainerTheme
@@ -92,7 +92,7 @@ interface RowThemes {
  * Each run type has a TextContainerTheme that can be applied to run text styling.
  * All run themes have sensible defaults.
  */
-interface RunThemes {
+export interface RunThemes {
   readonly strong: TextContainerTheme
   readonly emphasis: TextContainerTheme
   readonly strikethrough: TextContainerTheme
@@ -108,7 +108,7 @@ interface RunThemes {
  * should generally not apply a value. Use the `apply()` method to
  * conveniently apply all defined properties to a text style.
  */
-interface TextContainerTheme {
+export interface TextContainerTheme {
   /** Text color */
   readonly color?: Color
   /** Background color behind text */
@@ -142,9 +142,11 @@ interface TextContainerTheme {
  * TextLineTheme - Styling properties for underline and strikethrough.
  *
  * All properties are optional. When a property is undefined, the style
- * should generally not apply a value.
+ * should generally not apply a value. (This is the sparse theme-side
+ * counterpart of the resolved `TextLineStyle` in `editor-style`, whose
+ * properties are all required.)
  */
-interface TextLineTheme {
+export interface TextLineTheme {
   /** Line color */
   readonly color?: Color
   /** Single line style */
@@ -166,4 +168,4 @@ interface TextLineTheme {
 }
 
 /** Font traits that can be applied to text */
-type FontTrait = 'italic' | 'bold' | 'expanded' | 'condensed' | 'monospace'
+export type FontTrait = 'italic' | 'bold' | 'expanded' | 'condensed' | 'monospace'

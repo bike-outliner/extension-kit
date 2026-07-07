@@ -48,7 +48,7 @@ export class Outline {
    * @param id - The numeric Row.ID or PersistentId of the row to get.
    * @returns The row or undefined if not found.
    */
-  getRowById(id: number | PersistentId): Row | undefined
+  getRowById(id: RowId | PersistentId): Row | undefined
 
   /**
    * Resolve a link string into a URL.
@@ -74,7 +74,7 @@ export class Outline {
   insertRows(rows: RowSource, parent?: Row, before?: Row): Row[]
 
   /**
-   * Move rows within the outline. These rows must allready be in the
+   * Move rows within the outline. These rows must already be in the
    * outline.
    *
    * @param rows - The existing rows to move.
@@ -90,7 +90,7 @@ export class Outline {
   removeRows(rows: Row[]): void
 
   /**
-   * Query the outline immediatly.
+   * Query the outline immediately.
    * @param path - The outline path to query.
    * @returns The result value of the query.
    */
@@ -115,6 +115,9 @@ export class Outline {
    * @param handler - The handler to call when a result value is ready.
    * @returns A Disposable to cancel the query.
    */
+  observeQuery(path: OutlinePath, handler: (value: OutlinePathValue) => void): Disposable
+
+  /** @deprecated Old name kept for compatibility — use `observeQuery`. */
   streamQuery(path: OutlinePath, handler: (value: OutlinePathValue) => void): Disposable
 
   /**
@@ -174,10 +177,10 @@ export type OutlineFormat = 'bike' | 'opml' | 'plaintext'
 export type OutlineChange =
   | { type: 'beginTransaction' }
   | { type: 'metadata' }
-  | { type: 'rowChanged'; rowId: number; change: RowChange }
-  | { type: 'siblingsInserted'; siblings: [Row] }
-  | { type: 'siblingsRemoved'; siblings: [Row] }
-  | { type: 'siblingsMoved'; oldSiblings: [Row]; newSiblings: [Row] }
+  | { type: 'rowChanged'; rowId: RowId; change: RowChange }
+  | { type: 'siblingsInserted'; siblings: Row[] }
+  | { type: 'siblingsRemoved'; siblings: Row[] }
+  | { type: 'siblingsMoved'; oldSiblings: Row[]; newSiblings: Row[] }
   | { type: 'reload'; oldOutline: Outline; newOutline: Outline }
   | { type: 'endTransaction' }
 
@@ -211,7 +214,7 @@ export interface Row {
   /** Owning outline */
   readonly outline: Outline
   /** Numeric row id, unique within outline but not persistent across saves */
-  readonly id: number
+  readonly id: RowId
   /** URL link for this row combining outline and row persistent ids */
   readonly url: URL
   /** Persistent id, defaults to undefined */
@@ -292,7 +295,7 @@ export interface Row {
  * Many commonly used attributes are "marker" attributes. They are used to
  * mark up text with semantic meaning, and just used empty string for
  * associated value. For example, "strong" is used to mark up text that
- * should be displayed as bold, but the acutal font is determined by the
+ * should be displayed as bold, but the actual font is determined by the
  * editor's stylesheets.
  */
 export class AttributedString {
@@ -413,7 +416,7 @@ export class AttributedString {
 }
 
 /** Persistent identifier optionally associated with rows */
-type PersistentId = string
+export type PersistentId = string
 
 /**
  * Row attributes names can be any valid HTML attribute string. When encoded to
@@ -427,13 +430,13 @@ export type RowAttributeName = string
  * Custom attributes in spans.
  */
 export type TextAttributeName =
-  | 'em' // was emphasize
+  | 'em'
   | 'strong'
   | 'code'
-  | 'mark' // was highlight
-  | 's' // was strikethough
-  | 'a' // was link
-  | 'base' // was baseline
+  | 'mark'
+  | 's'
+  | 'a'
+  | 'base'
   | string
 
 /**
@@ -441,14 +444,14 @@ export type TextAttributeName =
  * types. They are stored as strings in the outline in a format that can be
  * converted back to the original type.
  */
-export type AttributeValue = string | number | Date // | AttributeValue[]
+export type AttributeValue = string | number | Date
 
 /**
  * Attribute values are stored as strings. This type is used when accessing
  * an attribute to convert it in a standard way to one of the supported
- * attribte types.
+ * attribute types.
  */
-export type AttributeValueType = 'string' | 'number' | 'date' // | "array"
+export type AttributeValueType = 'string' | 'number' | 'date'
 
 /**
  * Range is a tuple of start and end indexes. The start index is inclusive
@@ -467,7 +470,6 @@ export type RowType =
   | 'unordered'
   | 'ordered'
   | 'task'
-  //| "page" TODO?
   | 'hr'
 
 /**
@@ -506,10 +508,10 @@ export type RowTemplate = {
 }
 
 /**
- * TransationOptions determine how the view updates when changes are made to
+ * TransactionOptions determine how the view updates when changes are made to
  * the outline.
  */
-type TransactionOptions =
+export type TransactionOptions =
   | 'default'
   | {
       /** Label for the transaction, used in undo history. */
@@ -527,7 +529,7 @@ type TransactionOptions =
     }
 
 /** Spring timing functions. */
-type Spring =
+export type Spring =
   /** Spring timing used when typing */
   | 'char'
   /** Spring timing used when moving rows up/down etc (default) */
@@ -538,15 +540,15 @@ type Spring =
   | 'navigation'
 
 /** Caret animation behavior */
-type CaretAnimation =
+export type CaretAnimation =
   /** Caret slides from current position to new position */
   | 'slide'
   /**
-   * Caret immediatly jumps to new position in row and then animates with that
+   * Caret immediately jumps to new position in row and then animates with that
    * row to final position (default)
    */
   | 'slideWithRow'
-  /** Caret immediatly jumps to final position and bounces */
+  /** Caret immediately jumps to final position and bounces */
   | 'bounce'
-  /** Caret immediatly jumps to final position and large bounces */
+  /** Caret immediately jumps to final position and large bounces */
   | 'largeBounce'

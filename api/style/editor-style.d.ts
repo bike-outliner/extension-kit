@@ -40,7 +40,7 @@ import { EditorTheme } from './editor-theme'
  * @param id - Editor style id
  * @param displayName - User visible editor style name
  */
-declare function defineEditorStyle(id: string, displayName: string): EditorStyle
+export declare function defineEditorStyle(id: EditorStyleId, displayName: string): EditorStyle
 
 /**
  * EditorStyleModifier – Insert rules into existing EditorStyles.
@@ -55,9 +55,9 @@ declare function defineEditorStyle(id: string, displayName: string): EditorStyle
  *   ids that this modifier should be applied to. If not set then this modifier
  *   is applied to all editor styles.
  */
-declare function defineEditorStyleModifier(
+export declare function defineEditorStyleModifier(
   id: EditorStyleId,
-  name: string,
+  displayName: string,
   matchingEditorStyleIds?: RegExp
 ): EditorStyle
 
@@ -137,7 +137,7 @@ export interface EditorStyle {
   ): void
 }
 
-type EditorStyleId = string
+export type EditorStyleId = string
 
 /**
  * RulesLayerName - The name of a rules layer.
@@ -145,7 +145,7 @@ type EditorStyleId = string
  * The name is used to identify the layer when defining rules. The name is also
  * used to identify the layer when modifying existing styles.
  */
-type RulesLayerName =
+export type RulesLayerName =
   | 'base' // Default rows/runs (*) formatting
   | 'row-formatting' // Row type formatting
   | 'run-formatting' // Inline text formatting
@@ -164,7 +164,7 @@ type RulesLayerName =
  * values derived from this context in `userCache` to avoid recomputing them.
  * Anytime this context changes the `userCache` is also invalidated.
  */
-interface StyleContext {
+export interface StyleContext {
   /** Host platform the editor is running on */
   os: 'macOS' | 'iOS'
   /** True when editor has keyboard focus  */
@@ -199,7 +199,7 @@ interface StyleContext {
   consecutivePath?: number[]
 }
 
-interface EditorSettings {
+export interface EditorSettings {
   /** Show caret line  */
   showCaretLine: boolean
   /** Show guide lines  */
@@ -224,10 +224,10 @@ interface EditorSettings {
   rowSpacingMultiple: number
 }
 
-type WritingFocusMode = 'paragraph' | 'sentence' | 'word'
+export type WritingFocusMode = 'paragraph' | 'sentence' | 'word'
 
 /** CaretStyle – The global text caret style */
-interface CaretStyle {
+export interface CaretStyle {
   /** The caret color  */
   color: Color
   /** The caret width  */
@@ -247,10 +247,10 @@ interface CaretStyle {
 }
 
 /** CaretBlinkStyle - Caret blink style */
-type CaretBlinkStyle = 'discrete' | 'continuous' | 'none'
+export type CaretBlinkStyle = 'discrete' | 'continuous' | 'none'
 
 /** ViewportStyle – The global viewport style */
-interface ViewportStyle {
+export interface ViewportStyle {
   /** The viewport insets  */
   padding: Insets
   /** 
@@ -269,29 +269,21 @@ interface ViewportStyle {
  * Row style only applies to an individual row, not to the rows contained by
  * this row.
  */
-interface RowStyle extends DecorationContainer {
+export interface RowStyle extends DecorationContainer {
   /** Opacity (0-1) */
   opacity: number
   /** The row padding. Generally used to create outline indentation */
   padding: Insets
-  /** The row's text style, effects only the matched rows text, not contained rows */
+  /** The row's text style, affects only the matched row's text, not contained rows */
   text: TextStyle
 }
-
-//either move opacity to textstyle (best I think) or move scale to RowStyle
 
 /**
  * TextStyle - The style for row text.
  */
-interface TextStyle extends TextContainer {
+export interface TextStyle extends TextContainer {
   /** Text scale */
   scale: number
-  /*
-  NOT IMPLEMENTED: CTParagraphStyle
-  headIndent: number
-  tailIndent: number
-  alignment: 'left' | 'right' | 'center' | 'justified' | 'natural'
-  */
   /** The line height multiple */
   lineHeightMultiple: number
 }
@@ -299,7 +291,7 @@ interface TextStyle extends TextContainer {
 /**
  * TextRunStyle – The style for text runs.
  */
-interface TextRunStyle extends TextContainer {
+export interface TextRunStyle extends TextContainer {
   /** Enclosing text's scale */
   readonly scale: number
   /**
@@ -316,10 +308,10 @@ interface TextRunStyle extends TextContainer {
 }
 
 /** Ligature - Text ligature style */
-type Ligature = 'default' | 'none' | 'all'
+export type Ligature = 'default' | 'none' | 'all'
 
-/** TextLine - Wrapps a NSUnderlineStyle. */
-interface TextLineStyle {
+/** TextLineStyle - Wraps an NSUnderlineStyle. */
+export interface TextLineStyle {
   /** The color of the line. */
   color: Color
   /** True enables the single line flag. */
@@ -328,7 +320,7 @@ interface TextLineStyle {
   thick: boolean
   /** True enables the double line flag. */
   double: boolean
-  /** True enables the patternSolid flag. */
+  /** True enables the patternDot flag. */
   patternDot: boolean
   /** True enables the patternDash flag. */
   patternDash: boolean
@@ -343,7 +335,7 @@ interface TextLineStyle {
 /**
  * TextContainer - Common text style properties shared by TextStyle and TextRunStyle
  */
-interface TextContainer extends DecorationContainer {
+export interface TextContainer extends DecorationContainer {
   /** Text font */
   font: Font
   /** The run kerning (default 0) */
@@ -369,13 +361,13 @@ interface TextContainer extends DecorationContainer {
 }
 
 /**
- * DecorationContainer - And object to which visual decorations are attatched.
+ * DecorationContainer - An object to which visual decorations are attached.
  * Row, Row text, and Row text runs are all decoration containers. Decoration
  * containers provide methods to add and modify decorations and provide the
  * layout object that's used to position the decorations relative to the
  * container.
  */
-interface DecorationContainer {
+export interface DecorationContainer {
   /**
    * Add/Modify decoration by id.
    *
@@ -397,7 +389,7 @@ interface DecorationContainer {
  *
  * Decorations are attached to rows, row texts, or row text runs. They can have
  * a background color, border, and corner radius. They can also have image
- * content. Decorations do not effect layout, you need to make space for them
+ * content. Decorations do not affect layout, you need to make space for them
  * using row and text padding and margins.
  *
  * Decorations can be marked `mergable`. Similar mergable decorations may be
@@ -410,7 +402,7 @@ interface DecorationContainer {
  *   The frames of the merged decorations are combined into a single shape that
  *   is the union of all the individual run decoration frames. This shapes
  *   corners will be rounded via the `corners.radius` property. See text
- *   selection for intented use/behavior.
+ *   selection for intended use/behavior.
  *
  * - Row and text decorations are merged when they appear in consecutive rows,
  *   have equal styling, and touching/close frames.
@@ -424,7 +416,7 @@ interface DecorationContainer {
  * Decorations closely wrap a `CAShapeLayer`. Look into the `CAShapeLayer`
  * documentation for more information on the possibilities.
  */
-interface Decoration {
+export interface Decoration {
   /** Hidden (default false) */
   hidden: boolean
   /** Opacity (0-1) */
@@ -476,8 +468,6 @@ interface Decoration {
   }
 }
 
-type DecorationPropertyTransition = {}
-
 /**
  * Layout - Decorations are positioned with layouts.
  *
@@ -491,7 +481,7 @@ type DecorationPropertyTransition = {}
  * context `layout.bottom` would give the layout value for the bottom of the
  * row.
  */
-interface Layout {
+export interface Layout {
   text: Layout
   firstLine: Layout
   lastLine: Layout
@@ -513,7 +503,7 @@ interface Layout {
  * layout process and then used to set a Decoration's x, y, width, and height
  * properties.
  */
-interface LayoutValue {
+export interface LayoutValue {
   /** Construct a new LayoutValue that is the min between the this and the value parameter. */
   min(value: number | LayoutValue): LayoutValue
   /** Construct a new LayoutValue that is the max between the this and the value parameter. */
@@ -527,7 +517,7 @@ interface LayoutValue {
 }
 
 /** DecorationBorder - Wraps CALayer border */
-interface DecorationBorder {
+export interface DecorationBorder {
   /** Line color */
   color: Color
   /** Line width */
@@ -535,7 +525,7 @@ interface DecorationBorder {
 }
 
 /** DecorationShadow - Wraps CALayer shadow */
-interface DecorationShadow {
+export interface DecorationShadow {
   /** Shadow color */
   color: Color
   /** Shadow opacity */
@@ -552,7 +542,7 @@ interface DecorationShadow {
 }
 
 /** DecorationCorners - Wraps CALayer corner */
-interface DecorationCorners {
+export interface DecorationCorners {
   /** Corner radius */
   radius: number
   /** Apply radius to top right corner (default true) */
@@ -571,7 +561,7 @@ interface DecorationCorners {
  * Decoration content is eventually an bitmap image, but you can construct that
  * image from text, shapes, and symbols. In addition to standard images.
  */
-interface DecorationContents {
+export interface DecorationContents {
   /** Contents Image */
   image: Image
   /** Contents Rect, portion of contents to use */
@@ -583,7 +573,7 @@ interface DecorationContents {
 }
 
 /** ContentsGravity - Wraps CALayerContentsGravity */
-type ContentsGravity =
+export type ContentsGravity =
   | 'bottom'
   | 'bottomLeft'
   | 'bottomRight'
