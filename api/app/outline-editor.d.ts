@@ -100,14 +100,6 @@ export interface OutlineEditor extends View {
   breakUndoCoalescing(): void
 
   /**
-   * Arm the next tag-chip selection to open the tag card active on its
-   * Value field (the `@name=` completion flow). Call inside a transaction
-   * right before selecting the chip; the flag is consumed by the next
-   * selection change.
-   */
-  prepareTagValueEdit(): void
-
-  /**
    * Show a message in the editor's status bar.
    *
    * If a timeout is provided the message auto-dismisses after that duration.
