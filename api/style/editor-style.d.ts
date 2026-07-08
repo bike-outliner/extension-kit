@@ -206,6 +206,8 @@ export interface EditorSettings {
   showGuideLines: boolean
   /** Show focus arrows  */
   showFocusArrows: boolean
+  /** Show row attributes button  */
+  showAttributesButton: boolean
   /** Allow font scaling to better fit viewport  */
   allowFontScaling: boolean
   /** Hide controls when typing  */
