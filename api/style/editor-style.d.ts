@@ -449,6 +449,10 @@ export interface Decoration {
   mergable: boolean
   /** Which line fragment(s) to show the decoration on when text wraps (default 'all') */
   fragmentPlacement: 'all' | 'first' | 'last'
+  /** Flow with other decoration after the row's last text line (x, y ignored when set) */
+  flow?: 'trailing'
+  /** Flow ordering (default 0). */
+  order?: number
   /** Optional command name to perform when activated (clicked) */
   commandName?: string
   /** Optional interaction capabilities */
