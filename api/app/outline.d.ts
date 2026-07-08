@@ -147,6 +147,11 @@ export class Outline {
   transaction(options: TransactionOptions, update: () => any): any
 
   /**
+   * Prevent the next edit from coalescing with the previous in undo stack
+   */
+  breakUndoCoalescing(): void
+
+  /**
    * Observe changes.
    * @param handler - The handler to call when the outline changes.
    * @returns A Disposable to cancel the handler.

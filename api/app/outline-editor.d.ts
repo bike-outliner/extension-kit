@@ -94,12 +94,6 @@ export interface OutlineEditor extends View {
   transaction(options: TransactionOptions, update: () => any): any
 
   /**
-   * Prevent the next edit from coalescing with the previous one in the undo
-   * stack.
-   */
-  breakUndoCoalescing(): void
-
-  /**
    * Show a message in the editor's status bar.
    *
    * If a timeout is provided the message auto-dismisses after that duration.
