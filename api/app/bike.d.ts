@@ -3,7 +3,7 @@ import { Inspector } from './inspector'
 import { Settings } from './settings'
 import { Commands } from './commands'
 import { Keybindings } from './keybindings'
-import { TextInput } from './text-input'
+import { Input } from './input'
 import { OutlineEditor } from './outline-editor'
 import { DOMScript, SheetHandle, PanelHandle } from './dom-script'
 import { URL, Disposable, Permissions, Rect } from './system'
@@ -33,7 +33,7 @@ declare global {
     /** The interface for adding keybindings. */
     readonly keybindings: Keybindings
     /** The interface for adding text input handlers. */
-    readonly textInput: TextInput
+    readonly input: Input
     /** The interface to read/write to the system clipboard. */
     readonly clipboard: Clipboard
     /** The interface for extension settings UI. */

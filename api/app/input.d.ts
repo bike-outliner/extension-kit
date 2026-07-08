@@ -11,7 +11,7 @@ import { Disposable } from './system'
  * is the old caret — the split point at the end of that row's text. For
  * ordinary characters `caret` is the position after the typed character.
  */
-export interface TextInputContext {
+export interface InputContext {
   readonly editor: OutlineEditor
   readonly row: Row
   readonly caret: number
@@ -63,8 +63,8 @@ export interface CompletionResult {
  * combining the typed-text hook with a completion provider. Both members
  * are optional, but at least one must be present.
  */
-export type TextInputHandler =
-  | ((context: TextInputContext) => boolean)
+export type InputHandler =
+  | ((context: InputContext) => boolean)
   | {
       /** Higher priority handlers/providers run first. Defaults to 0. */
       priority?: number
@@ -75,7 +75,7 @@ export type TextInputHandler =
        * smart quotes, …) for that keystroke. Perform edits via
        * `editor.transaction`.
        */
-      handle?(context: TextInputContext): boolean
+      handle?(context: InputContext): boolean
       /**
        * Offer completions at the caret, or `undefined` to pass. Called
        * after each typed character; the first provider (by priority)
@@ -85,11 +85,11 @@ export type TextInputHandler =
     }
 
 /** Interface for reacting to typed text and offering completions. */
-export interface TextInput {
+export interface Input {
   /**
    * Adds a text input handler.
    * @param handler - A `handle` function, or `{ priority?, handle?, provideCompletions? }`.
    * @returns Disposable removes the handler.
    */
-  addHandler(handler: TextInputHandler): Disposable
+  addHandler(handler: InputHandler): Disposable
 }
