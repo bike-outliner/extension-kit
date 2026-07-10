@@ -20,14 +20,14 @@ bike create row --text "- [ ] Buy **milk**"
 bike observe outline query --path '//task not @done' --rows --output markdown
 ```
 
-Session API:
+Session API Examples:
 
 - [Todos](https://github.com/bike-outliner/example-extensions/tree/main/src/todos.bkext) – Interactive todos inspector.
 - [D3](https://github.com/bike-outliner/example-extensions/tree/main/src/d3.bkext) – Sync D3.js layouts with your outline.
 
 ## Targets
 
-Now to concepts: commands target an outline or an editor.
+Concept: commands target an outline or an editor.
 
 In the CLI the default is the `@frontmost` window. In DOM Context the default is `@window`, the window the script is associated with. You can also target outlines by persistent id or file path (editors by id).
 
