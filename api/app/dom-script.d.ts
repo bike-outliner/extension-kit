@@ -29,7 +29,8 @@
  * app-frontmost one. See `bike.session` docs in `bike/dom`.
  */
 
-import { Disposable, URL, Rect } from './system'
+import { Disposable, URL } from './system'
+import { Rect } from '../core/geometry'
 import { DOMProtocol } from '../core/dom-protocol'
 
 /** Lifecycle events sent by Bike when hosting a sheet. */

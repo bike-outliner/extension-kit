@@ -1,4 +1,4 @@
-import { Color, Font, FontWeight } from './graphics'
+import { Color, Font, FontWeight } from '../core/graphics'
 import { TextStyle, TextRunStyle } from './editor-style'
 
 /**

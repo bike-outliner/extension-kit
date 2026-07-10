@@ -1,6 +1,6 @@
 import { RelativeOutlinePath } from '../core/outline-path'
-import { Image, Font, Color } from './graphics'
-import { Insets, Rect, Point, Size } from './geometry'
+import { Image, Font, Color } from '../core/graphics'
+import { Insets, Rect, Point, Size } from '../core/geometry'
 import { EditorTheme } from './editor-theme'
 
 /**

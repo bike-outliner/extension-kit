@@ -3,10 +3,13 @@ import { Inspector } from './inspector'
 import { Settings } from './settings'
 import { Commands } from './commands'
 import { Keybindings } from './keybindings'
+import { BadgeConfig } from './badge'
+import { SummaryConfig } from './summary'
 import { Input } from './input'
 import { OutlineEditor } from './outline-editor'
 import { DOMScript, SheetHandle, PanelHandle } from './dom-script'
-import { URL, Disposable, Permissions, Rect } from './system'
+import { URL, Disposable, Permissions } from './system'
+import { Rect } from '../core/geometry'
 import { DOMProtocol } from '../core/dom-protocol'
 import { BikeUtilityGlobals } from '../core/bike-globals'
 import { Outline } from './outline'
@@ -15,11 +18,7 @@ import { JSONStore } from '../core/json'
 declare global {
   /** The bike global API. */
   const bike: BikeUtilityGlobals & {
-    /**
-     * Bring the bike application to the foreground without changing
-     * which window is key. To also bring a specific window forward,
-     * call `activate()` on that window.
-     */
+    /** Bring the bike application to the foreground */
     activate(): void
 
     /** The build # of the bike app. */
@@ -32,6 +31,7 @@ declare global {
     readonly commands: Commands
     /** The interface for adding keybindings. */
     readonly keybindings: Keybindings
+
     /** The interface for adding text input handlers. */
     readonly input: Input
     /** The interface to read/write to the system clipboard. */
@@ -40,6 +40,11 @@ declare global {
     readonly settings: Settings
     /** Secure storage for secrets (API tokens, passwords, etc) */
     readonly keychain: Keychain
+
+    /** Register a row badge. See `BadgeConfig`. */
+    badge(name: string, config: BadgeConfig): Disposable
+    /** Register a subtree summary, readable as `summary("name")`. See `SummaryConfig`. */
+    summary(name: string, config: SummaryConfig): Disposable
 
     /** All windows. */
     readonly windows: Window[]
@@ -409,8 +414,6 @@ interface PanelOptions {
   /** Initial frame in AppKit global coordinates (defaults to centered on main screen). */
   frame?: Rect
 }
-
-export type { Rect } from './system'
 
 /** A connected display. */
 export interface Screen {

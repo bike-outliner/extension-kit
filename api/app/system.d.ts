@@ -11,17 +11,6 @@ export interface Permissions {
 export type Permission = 'openURL' | 'clipboardRead' | 'clipboardWrite' | 'keychain'
 
 /**
- * A rectangle in points. (A plain data object used by app-context window and
- * screen APIs — distinct from the style context's `Rect` class in `bike/style`.)
- */
-export interface Rect {
-  x: number
-  y: number
-  width: number
-  height: number
-}
-
-/**
  * Interface for disposables.
  *
  * Disposables are used throughout the API to allow for the cleanup of
