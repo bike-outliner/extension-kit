@@ -21,11 +21,15 @@ import { Row } from './outline'
  * doubles as a lightweight inline control.
  */
 
-/** The row's inherited text presentation, passed to `render`. */
+/** The presentation context passed to `render`. */
 export interface BadgeEnvironment {
-  /** The row's inherited text font. */
+  /**
+   * The outline's BASE text font (the stylesheet's `viewport.font`), not the
+   * row's — the same badge renders identically on a bold heading and a body
+   * row.
+   */
   readonly font: Font
-  /** The row's inherited text color. */
+  /** The row's inherited text color, so the glyph tints with its text. */
   readonly color: Color
   /** Epoch seconds; present only for `tick: true` badges. */
   readonly now?: number
@@ -48,6 +52,12 @@ export type BadgeItemState = 'on' | 'off' | 'mixed'
  * `onAction`/`onChange` callbacks. Valued kinds (`field`, `radio`, `toggle`,
  * `date`, `color`) commit through `onChange` with string-serialized values;
  * future kinds (submenus, sliders) extend the union the same way.
+ *
+ * Every visible kind (and each radio option) accepts an optional `filter`:
+ * an outline path query (`//@priority = 1`). The item then reserves
+ * trailing space for a filter affordance — clicking it filters the outline
+ * to the query and dismisses the card. That keeps "act on this row" and
+ * "find rows like this" on one card row instead of doubling the item list.
  */
 export type BadgeItem =
   | BadgeCommandItem
@@ -74,6 +84,12 @@ export interface BadgeCommandItem {
   /** SF Symbol name shown leading the title. */
   symbol?: string
   state?: BadgeItemState
+  /**
+   * Outline path query (`//@priority = 1`). Reserves trailing space on this
+   * item for a filter affordance; clicking it filters the outline to the
+   * query and dismisses the card.
+   */
+  filter?: string
 }
 
 /** A choice handled by the badge's `onAction(id, context)`. */
@@ -86,6 +102,12 @@ export interface BadgeActionItem {
   state?: BadgeItemState
   /** Render as destructive (red), e.g. Remove. */
   destructive?: boolean
+  /**
+   * Outline path query (`//@priority = 1`). Reserves trailing space on this
+   * item for a filter affordance; clicking it filters the outline to the
+   * query and dismisses the card.
+   */
+  filter?: string
 }
 
 /**
@@ -98,6 +120,12 @@ export interface BadgeFieldItem {
   label: string
   value: string
   placeholder?: string
+  /**
+   * Outline path query (`//@priority = 1`). Reserves trailing space on this
+   * item for a filter affordance; clicking it filters the outline to the
+   * query and dismisses the card.
+   */
+  filter?: string
 }
 
 /**
@@ -119,6 +147,12 @@ export interface BadgeRadioOption {
   label: string
   /** SF Symbol name shown leading the label. */
   symbol?: string
+  /**
+   * Outline path query (`//@priority = 1`). Reserves trailing space on this
+   * item for a filter affordance; clicking it filters the outline to the
+   * query and dismisses the card.
+   */
+  filter?: string
 }
 
 /**
@@ -132,6 +166,12 @@ export interface BadgeToggleItem {
   /** SF Symbol name shown leading the title. */
   symbol?: string
   value: boolean
+  /**
+   * Outline path query (`//@priority = 1`). Reserves trailing space on this
+   * item for a filter affordance; clicking it filters the outline to the
+   * query and dismisses the card.
+   */
+  filter?: string
 }
 
 /**
@@ -152,6 +192,12 @@ export interface BadgeDateItem {
    * `time`), always visible in the card.
    */
   display?: 'compact' | 'calendar'
+  /**
+   * Outline path query (`//@priority = 1`). Reserves trailing space on this
+   * item for a filter affordance; clicking it filters the outline to the
+   * query and dismisses the card.
+   */
+  filter?: string
 }
 
 /**
@@ -167,6 +213,12 @@ export interface BadgeDurationItem {
   label: string
   /** Initial duration in whole seconds (decimal string); empty/omitted = 0. */
   value?: string
+  /**
+   * Outline path query (`//@priority = 1`). Reserves trailing space on this
+   * item for a filter affordance; clicking it filters the outline to the
+   * query and dismisses the card.
+   */
+  filter?: string
 }
 
 /**
@@ -182,11 +234,23 @@ export interface BadgeColorItem {
   swatches?: string[]
   /** Current value; the matching swatch shows a selection ring. */
   value?: string
+  /**
+   * Outline path query (`//@priority = 1`). Reserves trailing space on this
+   * item for a filter affordance; clicking it filters the outline to the
+   * query and dismisses the card.
+   */
+  filter?: string
 }
 
 export interface BadgeHeaderItem {
   kind: 'header'
   title: string
+  /**
+   * Outline path query (`//@priority = 1`). Reserves trailing space on this
+   * item for a filter affordance; clicking it filters the outline to the
+   * query and dismisses the card.
+   */
+  filter?: string
 }
 
 export interface BadgeSeparatorItem {

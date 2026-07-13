@@ -255,14 +255,21 @@ export type CaretBlinkStyle = 'discrete' | 'continuous' | 'none'
 export interface ViewportStyle {
   /** The viewport insets  */
   padding: Insets
-  /** 
+  /**
    * The viewport semantic background color.
-   * 
+   *
    * This color is used for contrast and blending calculations, but does not
    * paint the actual background of the viewport. To change the visual
    * background, use the `materials.editor` property in the theme.
    */
   backgroundColor: Color
+  /**
+   * The outline's base text font — the settings-derived font before any row
+   * rule (heading bold, note size) diverges from it. Row-independent chrome
+   * (value-aware badges) renders with this font, so set it whenever your
+   * stylesheet computes its own base font.
+   */
+  font: Font
 }
 
 /**
