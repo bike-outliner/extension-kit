@@ -1,6 +1,6 @@
 # Summary & Badges Tutorial
 
-Use badges to render value-aware glyphs trailing a row's text, and summaries to efficiently aggregate values up from a row's subtree (to be displayed in badge).
+Use badges to render value-aware glyphs trailing a row's text. Use summaries to efficiently aggregate values up from a row's subtree to be displayed in badge (or used in any outline path).
 
 - [App Context API](../api/app/)
 - Entry point: `app/main.ts`
