@@ -18,11 +18,35 @@ export class Image {
   withScale(scale: number): Image
   /** @returns A new image by compositing this image with parameter */
   withComposite(image: Image): Image
+  /**
+   * @returns A new image drawn over a rounded-rect backdrop sized to this
+   * image plus the background's padding
+   */
+  withBackground(background: ImageBackground): Image
   /** @returns Resolved image attributes */
   resolve(cache: Cache): {
     width: number
     height: number
   }
+}
+
+/**
+ * A rounded-rect fill/border drawn behind an image by
+ * {@link Image.withBackground}, sized to the image plus `padding` — so
+ * content that can't be measured in the extension (text, symbols) never
+ * needs explicit backdrop dimensions.
+ */
+export interface ImageBackground {
+  /** Backdrop fill color. */
+  fill?: Color
+  /** Border color. */
+  stroke?: Color
+  /** Border line width, drawn inside the backdrop bounds (default 1). */
+  strokeWidth?: number
+  /** Corner radius, clamped to half the smaller dimension (default 0). */
+  cornerRadius?: number
+  /** Space around the image: one number for all edges, or per-edge Insets (default 0). */
+  padding?: number | Insets
 }
 
 /**
@@ -137,6 +161,14 @@ export class Font {
 
   /** @returns A new font with point size */
   withPointSize(pointSize: number): Font
+
+  /**
+   * Multiply the point size by a factor — relative sizing when the base's
+   * absolute size isn't knowable (e.g. a badge's `env.font`).
+   * @param scale - The point size multiplier, ex. 0.8
+   * @returns A new font with the scaled point size
+   */
+  withScale(scale: number): Font
 
   /** @returns A new font with weight */
   withWeight(weight: FontWeight): Font
