@@ -162,6 +162,34 @@ export class Font {
   /** @returns A new font with monospaced digit features */
   withMonospacedDigit(): Font
 
+  /** @returns A new font with diagonal fraction features */
+  withFractions(): Font
+
+  /** @returns A new font with slashed-zero features */
+  withSlashedZero(): Font
+
+  /** @returns A new font with oldstyle (lowercase) figure features */
+  withOldstyleFigures(): Font
+
+  /** @returns A new font with lining (uppercase) figure features */
+  withLiningFigures(): Font
+
+  /** @returns A new font with superscript (superior) features */
+  withSuperscript(): Font
+
+  /** @returns A new font with subscript (inferior) features */
+  withSubscript(): Font
+
+  /** @returns A new font with ordinal features */
+  withOrdinals(): Font
+
+  /**
+   * Enable an OpenType stylistic set (ss01–ss20). Out-of-range values are ignored.
+   * @param n - The stylistic set number (1–20)
+   * @returns A new font with the stylistic set enabled
+   */
+  withStylisticSet(n: number): Font
+
   /** @returns Resolved font attributes */
   resolve(cache: Cache): FontAttributes
 }
