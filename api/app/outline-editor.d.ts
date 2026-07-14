@@ -22,8 +22,14 @@ export interface OutlineEditor extends View {
   /**
    * Applies a filter to the outline editor display using an OutlinePath.
    * If the path is relative, it is resolved from the focus row.
+   *
+   * Set a plain path, or `{ path, label }` — the label displays in the
+   * filter field in place of the raw query while the field is unfocused.
+   * Paths matching a saved sidebar query display that query's title
+   * automatically.
    */
-  filter?: OutlinePath
+  get filter(): { path: OutlinePath; label?: string } | undefined
+  set filter(value: OutlinePath | { path: OutlinePath; label?: string } | undefined)
 
   /** True when row is in focused branch and not filtered or collapsed */
   isFocused(row: Row): boolean
