@@ -3,8 +3,6 @@ import { Size, Insets } from '../core/geometry'
 import { RelativeOutlinePath } from '../core/outline-path'
 import { EditorSettings } from '../style/editor-style'
 import { EditorTheme } from '../style/editor-theme'
-import { CommandName } from './commands'
-import { MenuItem } from './menu'
 import { OutlineEditor } from './outline-editor'
 import { Row } from './outline'
 
@@ -20,9 +18,14 @@ import { Row } from './outline'
  * It selects rows with a `where` path (same syntax as style rules), reads
  * `inputs` off each match, and hands them to `render`. That's how you surface
  * data inline — a `@priority` chip, a `summary("openTasks")` aggregate, a live
- * `@due` countdown (see `tick`), a progress bar. A badge can also be clicked
- * to open a small card of items — commands, actions, editable fields — so it
- * doubles as a lightweight inline control.
+ * `@due` countdown (see `tick`), a progress bar.
+ *
+ * A badge is DECORATION ONLY. To make it interactive, give it an `onClick`
+ * handler — typically one that presents a menu with `editor.showMenu(row,
+ * { items, anchor: '<badge>' })`. Because the menu is built imperatively
+ * from the row at click time, the same builder function also serves
+ * commands on rows the badge doesn't decorate (a set-due menu on a row
+ * with no due yet).
  */
 
 /**
@@ -42,7 +45,7 @@ export interface BadgeEnvironment {
   readonly font: Font
   /** The row's inherited text color, so the glyph tints with its text. */
   readonly color: Color
-  /** Epoch seconds; present only for `tick: true` badges. */
+  /** Epoch seconds; present only for ticking badges (`tick` set). */
   readonly now?: number
   /** Host platform the editor is running on */
   readonly os: 'macOS' | 'iOS'
@@ -114,20 +117,10 @@ export interface BadgeMetrics {
   readonly padding: Insets
 }
 
-/** Where a card interaction happened: the clicked row and its editor. */
+/** Context passed to `onClick`: the clicked row and its editor. */
 export interface BadgeContext {
   readonly editor: OutlineEditor
   readonly row: Row
-}
-
-/** What `render` returns: a glyph plus optional click behavior. */
-export interface BadgeSpec {
-  /** The rendered glyph, e.g. `Image.fromSymbol(...)` or `Image.fromText(...)`. */
-  image: Image
-  /** Items shown in a menu card on click. When present, wins over `command`. */
-  items?: MenuItem[]
-  /** Command dispatched on click (the clicked row is its `selection`). */
-  command?: CommandName
 }
 
 /** A value-aware badge rendered trailing a row's text. */
@@ -136,12 +129,26 @@ export interface BadgeConfig {
   where: RelativeOutlinePath
   /** Map of result-name → outline-path value expression evaluated on the row */
   inputs?: Record<string, string>
-  /** Re-render every second with `env.now` set */
-  tick?: boolean
-  /** Render input values to a `BadgeSpec`. Must be a pure function. */
-  render: (values: Readonly<Record<string, string | undefined>>, env: BadgeEnvironment) => BadgeSpec | null
-  /** Called when a `button` is chosen (except `command:`-id buttons, which dispatch their command instead) and when a row-embedded button is clicked. */
-  onAction?: (id: string, context: BadgeContext) => void
-  /** Called when a valued item commits, with a TYPED value: string (`field`, `calendar`, `choice`, `palette`), number (`duration` seconds), or boolean (`toggle`). */
-  onChange?: (id: string, value: string | number | boolean, context: BadgeContext) => void
+  /**
+   * Re-render every `tick` seconds with `env.now` set (a whole number of
+   * seconds; omit or `0` for no ticking). Use the coarsest interval that
+   * still looks live — `1` for a running clock, `60` for a due-date label
+   * that only needs to roll over about once a minute. The editor only runs
+   * the clock while a ticking badge is actually on screen, at the smallest
+   * interval among the visible ones.
+   */
+  tick?: number
+  /**
+   * Render input values to the badge's glyph, e.g. `Image.fromSymbol(...)`
+   * or `Image.fromText(...)`; return `null` for no badge. Must be a pure
+   * function.
+   */
+  render: (values: Readonly<Record<string, string | undefined>>, env: BadgeEnvironment) => Image | null
+  /**
+   * Called when the badge's glyph is clicked. Typically presents a menu:
+   * `onClick: ({ editor, row }) => editor.showMenu(row, { items,
+   * anchor: '<badge>' , ... })`. A badge with no `onClick` is not
+   * clickable.
+   */
+  onClick?: (context: BadgeContext) => void
 }

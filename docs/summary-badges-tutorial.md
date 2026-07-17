@@ -29,15 +29,13 @@ export function registerEstimate() {
     where: '.@estimate',
     render: (values, env) => {
       const value = values['estimate'] ?? ''
-      return {
-        image: Image.fromText(new Text(formatEstimate(value), env.font, env.color.alphaSet(0.6))),
-      }
+      return Image.fromText(new Text(formatEstimate(value), env.font, env.color.alphaSet(0.6)))
     },
   })
 }
 ```
 
-`where: '.@estimate'` selects the rows that get a badge, those with an `estimate` attribute. `render` runs per selected row and returns the glyph. It receives `values` (the row's attribute values — `values.estimate` here, since a badge reads its own attribute by default) and `env`, the row's inherited text presentation. Building the text from `env.font` and `env.color.alphaSet(0.6)` makes the badge match the surrounding text at 60% opacity.
+`where: '.@estimate'` selects the rows that get a badge, those with an `estimate` attribute. `render` runs per selected row and returns the glyph (or `null` for no badge). It receives `values` (the row's attribute values — `values.estimate` here, since a badge reads its own attribute by default) and `env`, the row's inherited text presentation. Building the text from `env.font` and `env.color.alphaSet(0.6)` makes the badge match the surrounding text at 60% opacity.
 
 Call `registerEstimate()` from your `activate` function, as with any other registration:
 
@@ -49,46 +47,53 @@ export async function activate(context: AppExtensionContext) {
 
 Save your changes. Now in Bike, give a row an `estimate` attribute set to `90` (<kbd>Command-Shift-A</kbd>) and you should see a `1h 30m` badge appear after its text.
 
-### Adding Click Actions
+### Making the Badge Clickable
 
-A badge can be interactive. Return an `actions` array and Bike shows those choices in a card when the badge is clicked:
+A badge is decoration only — to make it interactive, give it an `onClick`
+handler and present a menu from it with `editor.showMenu`. The menu is built
+imperatively from the row at click time, so you read the row directly and
+your handlers live only for that presentation.
 
-```typescript
-return {
-  image: Image.fromText(/* ... */),
-  actions: [
-    { title: '15m', role: 'set', value: '15', isCurrent: value === '15' },
-    { title: '30m', role: 'set', value: '30', isCurrent: value === '30' },
-    { title: '1h', role: 'set', value: '60', isCurrent: value === '60' },
-    { title: '2h', role: 'set', value: '120', isCurrent: value === '120' },
-    { role: 'separator' },
-    { title: 'Remove Estimate', role: 'remove' },
-  ],
-}
-```
-
-A `set` action writes the badge's own attribute (`estimate`) to `value`; `remove` clears it. Both are applied by the host to the clicked row in a single undo step, so you don't manipulate the outline yourself. Marking the matching choice with `isCurrent` puts a checkmark next to the active estimate.
-
-Here is the complete `estimate` badge, combining the glyph, the action card, and a small helper that formats minutes into a readable label:
+Here is the complete `estimate` badge: the glyph, an `onClick` that shows a
+menu of preset times, and a small helper that formats minutes into a
+readable label:
 
 ```typescript
-import { Image, Text } from 'bike/app'
+import { Image, MenuItem, OutlineEditor, Row, Text } from 'bike/app'
 
 export function registerEstimate() {
   bike.badge('estimate', {
     where: '.@estimate',
     render: (values, env) => {
       const value = values['estimate'] ?? ''
-      return {
-        image: Image.fromText(new Text(formatEstimate(value), env.font, env.color.alphaSet(0.6))),
-        actions: [
-          { title: '15m', role: 'set', value: '15', isCurrent: value === '15' },
-          { title: '30m', role: 'set', value: '30', isCurrent: value === '30' },
-          { title: '1h', role: 'set', value: '60', isCurrent: value === '60' },
-          { title: '2h', role: 'set', value: '120', isCurrent: value === '120' },
-          { role: 'separator' },
-          { title: 'Remove Estimate', role: 'remove' },
-        ],
+      return Image.fromText(new Text(formatEstimate(value), env.font, env.color.alphaSet(0.6)))
+    },
+    onClick: ({ editor, row }) => showEstimateMenu(editor, row),
+  })
+}
+
+function showEstimateMenu(editor: OutlineEditor, row: Row) {
+  const value = row.getAttribute('estimate') ?? ''
+  const items: MenuItem[] = [
+    ...['15', '30', '60', '120'].map((preset): MenuItem => ({
+      type: 'button',
+      id: preset,
+      title: formatEstimate(preset),
+      state: value === preset ? 'on' : 'off',
+    })),
+    { type: 'separator' },
+    { type: 'button', id: 'remove', title: 'Remove Estimate' },
+  ]
+  editor.showMenu(row, {
+    items,
+    // Anchor the menu at this badge's glyph (falls back to the row's text
+    // line on rows the badge doesn't decorate).
+    anchor: 'estimate',
+    onAction: (id, { row }) => {
+      if (id === 'remove') {
+        row.removeAttribute('estimate')
+      } else {
+        row.setAttribute('estimate', id)
       }
     },
   })
@@ -105,7 +110,15 @@ function formatEstimate(value: string): string {
 }
 ```
 
-Save, and click an estimate chip. The card should open with the preset times and a **Remove Estimate** option, and choosing one should update the row.
+Each preset is a `button` item; the one matching the row's current estimate
+gets a checkmark (`state: 'on'`). Choosing a button routes its `id` to the
+presentation's `onAction`, which writes or removes the attribute. Because
+`showEstimateMenu` takes any `(editor, row)`, the same function could also
+back a command that offers the menu on rows with no estimate yet.
+
+Save, and click an estimate chip. The menu should open with the preset
+times and a **Remove Estimate** option, and choosing one should update the
+row.
 
 ## Subtree Summaries
 
@@ -141,18 +154,9 @@ export function registerEstimate() {
         own !== '' && parseInt(own, 10) < parseInt(total, 10)
           ? `${formatEstimate(own)} / ${formatEstimate(total)}`
           : formatEstimate(total)
-      return {
-        image: Image.fromText(new Text(label, env.font, env.color.alphaSet(0.6))),
-        actions: [
-          { title: '15m', role: 'set', value: '15', isCurrent: own === '15' },
-          { title: '30m', role: 'set', value: '30', isCurrent: own === '30' },
-          { title: '1h', role: 'set', value: '60', isCurrent: own === '60' },
-          { title: '2h', role: 'set', value: '120', isCurrent: own === '120' },
-          { role: 'separator' },
-          { title: 'Remove Estimate', role: 'remove' },
-        ],
-      }
+      return Image.fromText(new Text(label, env.font, env.color.alphaSet(0.6)))
     },
+    onClick: ({ editor, row }) => showEstimateMenu(editor, row),
   })
 }
 ```
@@ -165,7 +169,7 @@ Save, then in Bike create a parent row with a few estimated rows under it. The p
 
 Badges overlap with the [decorations](style-context-tutorial.md#row-formatting-with-decorations) you can attach in the style context. Both add visual elements to a row and both can respond to clicks. They solve different problems, though.
 
-A decoration lives in `style/main.ts`, attaches to the underlying text layout, and is positioned by you. It doesn't affect layout, so it's the right tool for drawing on top of existing content — a background, a mark, a checkbox pinned to the row. A badge lives in `app/main.ts`, and lays out its own glyph trailing the row's text; Bike reserves the space for it. Badges are also value-aware in a way decorations aren't: they read attributes and summaries as `inputs` and can offer the action card you saw above.
+A decoration lives in `style/main.ts`, attaches to the underlying text layout, and is positioned by you. It doesn't affect layout, so it's the right tool for drawing on top of existing content — a background, a mark, a checkbox pinned to the row. A badge lives in `app/main.ts`, and lays out its own glyph trailing the row's text; Bike reserves the space for it. Badges are also value-aware in a way decorations aren't: they read attributes and summaries as `inputs`, and their `onClick` can present the menu you saw above.
 
 As a rule of thumb, reach for a badge to view and interact with branch values, and a decoration to change how the row's existing content is drawn.
 

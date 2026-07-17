@@ -1,32 +1,31 @@
 /**
- * Menus: the MenuCard config vocabulary — pure-data descriptions of a small
- * modal card of items (commands, actions, editable fields) rendered as a
- * real native menu. The vocabulary is host-neutral; badges are the current
- * host — a `BadgeSpec.items` array opens a card on click and routes
- * interactions to the badge's `onAction`/`onChange` callbacks.
+ * Menus: pure-data descriptions of a small modal menu of items (commands,
+ * actions, editable fields) rendered as a real native menu. Presented with
+ * `editor.showMenu(row, { items, ... })`, which routes interactions to that
+ * presentation's `onAction`/`onChange` handlers.
  */
 
-/** Checkmark state for a card `button`, mirroring cocoa menu item state. */
+/** Checkmark state for a menu `button`, mirroring cocoa menu item state. */
 export type MenuItemState = 'on' | 'off' | 'mixed'
 
 /**
- * An entry in a menu card, discriminated by `type` (the card is a real
- * menu). Items are pure data — a host can cache and diff them — so behavior
- * lives elsewhere: `button`s whose id has the form `command:<commandId>`
- * dispatch through the command registry (unregistered ones are hidden),
- * every other interactive item routes its `id` to the host's
- * `onAction`/`onChange` callbacks. Valued items commit through `onChange`
- * with TYPED values: a string (`field`, `calendar`, `choice`, `palette`), a
- * number (`duration`, whole seconds), or a boolean (`toggle`).
+ * An entry in a menu, discriminated by `type` (the menu is a real native
+ * menu). Items are pure data — behavior lives in the presentation: `button`s
+ * whose id has the form `command:<commandId>` dispatch through the command
+ * registry (unregistered ones are hidden), every other interactive item
+ * routes its `id` to the `showMenu` options' `onAction`/`onChange`
+ * handlers. Valued items commit through `onChange` with TYPED values: a
+ * string (`field`, `calendar`, `choice`, `palette`), a number (`duration`,
+ * whole seconds), or a boolean (`toggle`).
  *
  * Unknown `type`s and items missing required keys are skipped, never
- * errors — a card written against a future schema still renders.
+ * errors — a menu written against a future schema still renders.
  *
- * The card is MODAL and dismisses natively: Esc discards pending field
+ * The menu is MODAL and dismisses natively: Esc discards pending field
  * edits; click-out / Return / choosing an item commits them first.
  * Choosing a `button` (unless `dismisses: false`), `toggle`, `choice`
- * option, `palette` option, or `calendar` day closes the card; `field` and
- * `duration` edits keep it open. Menu cards require macOS 26.
+ * option, `palette` option, or `calendar` day closes the menu; `field` and
+ * `duration` edits keep it open. Menus require macOS 26.
  */
 export type MenuItem =
   | MenuButtonItem

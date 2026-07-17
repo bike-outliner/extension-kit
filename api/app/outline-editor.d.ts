@@ -1,6 +1,7 @@
 import { Affinity, AttributedString, Outline, Range, Row, TransactionOptions } from './outline'
 import { OutlinePath } from '../core/outline-path'
 import { Disposable } from './system'
+import { MenuItem } from './menu'
 import { View } from './bike'
 
 /** OutlineEditor is a view that displays an outline. */
@@ -112,6 +113,71 @@ export interface OutlineEditor extends View {
    * @returns A Disposable that clears this specific message.
    */
   showStatusMessage(message: string, timeout?: number): Disposable
+
+  /**
+   * Present a menu anchored to a row.
+   *
+   * The menu is a SNAPSHOT of `items` — it never re-renders while open —
+   * and the handlers live exactly as long as this presentation. Build the
+   * items from the row right before showing (read its attributes, decide
+   * what applies), so one builder function can serve both a badge's
+   * `onClick` and a command (e.g. a set-due menu on a row with no due yet).
+   *
+   * Requires macOS 26; on earlier systems nothing presents.
+   *
+   * @param row - The row the menu is anchored to (and the `context.row`
+   *   handed to the handlers).
+   * @param options - The menu's items, anchor, and handlers.
+   * @returns A handle for this presentation, or undefined when nothing
+   *   presents (no usable items).
+   */
+  showMenu(row: Row, options: ShowMenuOptions): MenuHandle | undefined
+}
+
+/** Context passed to `showMenu` handlers: the menu's row and its editor. */
+export interface MenuContext {
+  readonly editor: OutlineEditor
+  readonly row: Row
+}
+
+export interface ShowMenuOptions {
+  /**
+   * The menu's items. Buttons with a `command:<commandId>` id dispatch that
+   * command with the menu's row as its selection; ones naming an
+   * unregistered command are hidden (a menu left with no usable items
+   * doesn't present).
+   */
+  items: MenuItem[]
+  /**
+   * A badge name: anchor the menu at that badge's glyph on the row. Falls
+   * back to the row's text line when the badge isn't drawn there (so a
+   * badge's `onClick` can pass its own name unconditionally). Omit to
+   * anchor at the row's text line.
+   */
+  anchor?: string
+  /** A non-`command:` button (or row-embedded button) was chosen. */
+  onAction?: (id: string, context: MenuContext) => void
+  /**
+   * A valued item committed, with a TYPED value: string (`field`,
+   * `calendar`, `choice`, `palette`), number (`duration` seconds), or
+   * boolean (`toggle`). Values are buffered while the menu is open,
+   * delivered on commit-dismissal (Return, item selection, click-out), and
+   * dropped on Esc.
+   */
+  onChange?: (id: string, value: string | number | boolean, context: MenuContext) => void
+}
+
+/**
+ * A handle to one `showMenu` presentation. Menus are snapshots today, so
+ * the handle only dismisses — a future `update(items)` (live restructuring
+ * of the open menu) will land here.
+ */
+export interface MenuHandle {
+  /**
+   * Dismiss the menu if this presentation is still the live one (cancel
+   * semantics: buffered values drop). A stale handle no-ops.
+   */
+  dismiss(): void
 }
 
 /**
