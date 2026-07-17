@@ -108,7 +108,8 @@ Behavior worth knowing:
 - **delete** removes the matched rows and their descendants.
 - **update rows** applies one change to every ref: a `null` attribute removes the key.
 - **run script** evaluates plain JS in Bike's app extension context. JavaScriptCore, no
-  TypeScript or `import`.
+  TypeScript or `import`. Promise results are awaited — an async function or
+  promise-returning script returns its resolved value; rejection reports an error.
 
 ## Streaming
 
