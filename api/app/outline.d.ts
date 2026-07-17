@@ -65,6 +65,28 @@ export class Outline {
   resolveLink(string: string): URL | undefined
 
   /**
+   * Resolve an attachment src to the attachment's metadata.
+   *
+   * `src` is the `embed` text attribute of an attachment run (e.g.
+   * `'assets/photo.png'`). Attachments added this session resolve to
+   * staged copies, so the URL is readable before the document saves.
+   *
+   * @param src - The embed src to resolve.
+   * @returns The attachment's metadata, or undefined when the src is
+   *   invalid, this outline has no document, or no attachment file exists.
+   */
+  attachmentMetadata(src: string): AttachmentMetadata | undefined
+
+  /**
+   * Read an attachment's raw bytes.
+   *
+   * @param src - The embed src of the attachment.
+   * @returns A Promise resolving to the attachment's bytes; rejects when
+   *   the attachment can't be resolved (see `attachmentMetadata`) or read.
+   */
+  attachmentBytes(src: string): Promise<Uint8Array>
+
+  /**
    * Insert rows into the outline.
    *
    * @param rows - The source of the rows to insert. (Always copied)
@@ -170,6 +192,17 @@ export class Outline {
 
 export type OutlineArchive = { data: string; format: OutlineFormat }
 export type OutlineFormat = 'bike' | 'opml' | 'plaintext'
+
+/** Read-only metadata for a resolved attachment (embed asset). */
+export interface AttachmentMetadata {
+  /** The attachment's resolved file URL (staged copy when unsaved). */
+  readonly url: URL
+  /**
+   * The attachment's MIME type, derived from its file extension
+   * (`'application/octet-stream'` when unknown).
+   */
+  readonly mimeType: string
+}
 
 /**
  * Describes changes made to an outline.

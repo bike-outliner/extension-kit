@@ -17,4 +17,19 @@ declare const bike: import('../core/bike-globals').BikeUtilityGlobals & {
    * ```
    */
   readonly session: BikeSession
+
+  /**
+   * Build a `bike-attachment://` URL string serving an attachment (embed
+   * asset) of an open outline — usable directly in `<img src>` and with
+   * `fetch()`.
+   *
+   * An app context handing srcs to its DOM half should send the outline
+   * root's persistent id along (`outline.root.ensuredPersistentId`) so the
+   * DOM side can build these URLs.
+   *
+   * @param outlineId - The outline's persistent id (`SessionOutline.persistentId`).
+   * @param src - The embed src (e.g. `'assets/photo.png'`).
+   * @returns A `bike-attachment://` URL string.
+   */
+  attachmentURL(outlineId: OutlineId, src: string): string
 }
