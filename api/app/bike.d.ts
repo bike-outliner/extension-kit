@@ -5,6 +5,7 @@ import { Commands } from './commands'
 import { Keybindings } from './keybindings'
 import { BadgeConfig } from './badge'
 import { SummaryConfig } from './summary'
+import { FilterConfig } from './filter'
 import { Input } from './input'
 import { OutlineEditor } from './outline-editor'
 import { DOMScript, SheetHandle, PanelHandle } from './dom-script'
@@ -43,8 +44,10 @@ declare global {
 
     /** Register a row badge. See `BadgeConfig`. */
     badge(name: string, config: BadgeConfig): Disposable
-    /** Register a subtree summary, readable as `summary("name")`. See `SummaryConfig`. */
+    /** Register a summary (subtree or ancestor reduction), readable as `summary("name")`. See `SummaryConfig`. */
     summary(name: string, config: SummaryConfig): Disposable
+    /** Register a labeled filter query, offered in the filter field's autocomplete. See `FilterConfig`. */
+    addFilter(name: string, config: FilterConfig): Disposable
 
     /** All windows. */
     readonly windows: Window[]

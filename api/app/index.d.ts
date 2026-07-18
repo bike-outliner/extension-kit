@@ -1,5 +1,6 @@
 export * from './bike'
 export * from './badge'
+export * from './filter'
 export * from './menu'
 export * from './summary'
 export * from '../core/graphics'
