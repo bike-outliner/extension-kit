@@ -477,6 +477,7 @@ export interface Decoration {
     rotation: boolean // (default true)
     position: boolean // (default true)
     size: boolean // (default true)
+    contents: boolean // (default true)
     clear(): void // set all to false
   }
 }
