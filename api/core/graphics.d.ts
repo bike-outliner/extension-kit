@@ -234,6 +234,7 @@ export type FontAttributes = {
   xHeight: number
   xWidth: number
   maximumAdvancement: Size
+  uiScale: number // Size relative to the 14pt baseline
 }
 
 /** FontWeight */
