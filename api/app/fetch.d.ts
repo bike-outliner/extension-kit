@@ -4,9 +4,7 @@ declare global {
   /**
    * Fetch a URL.
    *
-   * Goal is to make this reasonably compatible with the Fetch API. Let me know
-   * if you need something that is not yet supported, or run into case that
-   * behaves differently than the web Fetch API.
+   * A partial implementation of the Fetch API.
    *
    * The fetch API requires host permissions in the manifest.json file:
    *
@@ -22,9 +20,6 @@ declare global {
    *  - `*://example.com/*` - matches all URLs on example.com
    *
    * @requires `host_permissions` match URL
-   * @param input - The URL to fetch.
-   * @param options - The options for the fetch request.
-   * @returns A promise that resolves to the response.
    */
   function fetch(input: string, options?: Options): Promise<Response>
 

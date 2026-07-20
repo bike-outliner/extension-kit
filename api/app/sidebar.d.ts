@@ -12,8 +12,7 @@ export interface Sidebar extends View {
    * creating it if needed). The location is automatically highlighted when the
    * editor navigates to its represented row by any means.
    *
-   * @param item - The location item to add.
-   * @returns A disposable to remove the item.
+   * @returns Disposable removing the item.
    */
   addLocation(item: LocationItem): Disposable
 }

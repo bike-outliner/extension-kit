@@ -30,7 +30,6 @@ export interface Keybindings {
    * Keybindings are only used when the outline editor has focus. They
    * will not be processed otherwise.
    *
-   * @param keybindings - The keybindings to add.
    * @returns Disposable removes added keybindings.
    */
   addKeybindings(keybindings: {

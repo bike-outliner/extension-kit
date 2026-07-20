@@ -25,13 +25,11 @@ export interface DOMExtensionContext<P extends DOMProtocol = DOMProtocol>
 
   /**
    * Receive messages from the app context.
-   * @param message
    */
   onmessage?: (message: P['toDOM']) => void
 
   /**
    * Send messages to the app context.
-   * @param message
    */
   postMessage: (message: P['toApp']) => void
 

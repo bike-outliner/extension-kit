@@ -109,7 +109,6 @@ export interface RunThemes {
  * conveniently apply all defined properties to a text style.
  */
 export interface TextContainerTheme {
-  /** Text color */
   readonly color?: Color
   /** Background color behind text */
   readonly backgroundColor?: Color
@@ -117,13 +116,9 @@ export interface TextContainerTheme {
   readonly fontFamily?: string
   /** Font size multiplier (e.g., 1.2 = 20% larger than base) */
   readonly fontAdjust?: number
-  /** Font weight */
   readonly fontWeight?: FontWeight
-  /** Font traits to apply */
   readonly fontTraits?: FontTrait[]
-  /** Underline styling */
   readonly underline?: TextLineTheme
-  /** Strikethrough styling */
   readonly strikethrough?: TextLineTheme
 
   /**
@@ -147,21 +142,13 @@ export interface TextContainerTheme {
  * properties are all required.)
  */
 export interface TextLineTheme {
-  /** Line color */
   readonly color?: Color
-  /** Single line style */
   readonly single?: boolean
-  /** Thick line style */
   readonly thick?: boolean
-  /** Double line style */
   readonly double?: boolean
-  /** Dot pattern */
   readonly patternDot?: boolean
-  /** Dash pattern */
   readonly patternDash?: boolean
-  /** Dash-dot pattern */
   readonly patternDashDot?: boolean
-  /** Dash-dot-dot pattern */
   readonly patternDashDotDot?: boolean
   /** Apply style word by word */
   readonly byWord?: boolean

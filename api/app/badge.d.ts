@@ -22,10 +22,7 @@ import { Row } from './outline'
  *
  * A badge is DECORATION ONLY. To make it interactive, give it an `onClick`
  * handler — typically one that presents a menu with `editor.showMenu(row,
- * { items, anchor: '<badge>' })`. Because the menu is built imperatively
- * from the row at click time, the same builder function also serves
- * commands on rows the badge doesn't decorate (a set-due menu on a row
- * with no due yet).
+ * { items, anchor: '<badge>' })`.
  */
 
 /**
@@ -37,11 +34,7 @@ import { Row } from './outline'
  * of `(values, env)`.
  */
 export interface BadgeEnvironment {
-  /**
-   * The outline's BASE text font (the stylesheet's `viewport.font`), not the
-   * row's — the same badge renders identically on a bold heading and a body
-   * row.
-   */
+  /** The outline's BASE text font (the stylesheet's `viewport.font`) */
   readonly font: Font
   /** The row's inherited text color, so the glyph tints with its text. */
   readonly color: Color
@@ -71,34 +64,17 @@ export interface BadgeEnvironment {
   readonly settings: EditorSettings
   /** Editor Theme, resolved for the current appearance (the dark theme in dark mode) */
   readonly theme: EditorTheme
-  /**
-   * The editor's UI scale: the outline's base text size relative to the 14pt
-   * baseline the UI's proportions are designed against. The same scale the
-   * stylesheet's chrome (caret, guides, indent) uses, so multiplying a fixed
-   * size by it keeps a badge in step with the reader's font.
-   */
+  /** The editor's UI scale: the outline's base text size relative to the 14pt baseline */
   readonly uiScale: number
-  /**
-   * Shared geometry for a badge that draws its own rect (a border, a tag),
-   * sized to this environment's base text. Use it instead of hand-picked
-   * numbers so every drawn badge in a row matches. Together `fontSize` and
-   * `padding` yield a tag exactly `side` tall with its label centered:
-   *
-   *   const bm = env.badgeMetrics
-   *   Image.fromText(new Text(label, env.font.withPointSize(bm.fontSize), color))
-   *     .withBackground({
-   *       stroke: color.alphaSet(0.3),
-   *       strokeWidth: bm.strokeWidth,
-   *       cornerRadius: bm.cornerRadius,
-   *       padding: bm.padding,
-   *     })
-   */
+  /** Shared geometry for a badge that draws its own rect (a border, a tag) */
   readonly badgeMetrics: BadgeMetrics
 }
 
 /**
- * Badge geometry, proportional to the outline's base text size — so badges
- * track the reader's font.
+ * Badge geometry, proportional to the outline's base text size.
+ *
+ * Badges don't nessarily need to use these, but if they draw a rect (a border,
+ * a tag) they should so every drawn badge in a row matches.
  */
 export interface BadgeMetrics {
   /** The badge rect's height. */
@@ -109,11 +85,7 @@ export interface BadgeMetrics {
   readonly strokeWidth: number
   /** Point size for a tag's label text (a step down from the base font). */
   readonly fontSize: number
-  /**
-   * Padding around a `fontSize` text image that makes the tag exactly
-   * `side` tall with its label's cap-height band centered (descenders hang
-   * below, as they should), plus proportional side breathing room.
-   */
+  /** Padding around a `fontSize` to achieve the badge rect's `side` height. */
   readonly padding: Insets
 }
 
@@ -129,14 +101,7 @@ export interface BadgeConfig {
   where: RelativeOutlinePath
   /** Map of result-name → outline-path value expression evaluated on the row */
   inputs?: Record<string, string>
-  /**
-   * Re-render every `tick` seconds with `env.now` set (a whole number of
-   * seconds; omit or `0` for no ticking). Use the coarsest interval that
-   * still looks live — `1` for a running clock, `60` for a due-date label
-   * that only needs to roll over about once a minute. The editor only runs
-   * the clock while a ticking badge is actually on screen, at the smallest
-   * interval among the visible ones.
-   */
+  /** Re-render every `tick` seconds with `env.now` set */
   tick?: number
   /**
    * Render input values to the badge's glyph, e.g. `Image.fromSymbol(...)`
@@ -147,8 +112,7 @@ export interface BadgeConfig {
   /**
    * Called when the badge's glyph is clicked. Typically presents a menu:
    * `onClick: ({ editor, row }) => editor.showMenu(row, { items,
-   * anchor: '<badge>' , ... })`. A badge with no `onClick` is not
-   * clickable.
+   * anchor: '<badge>' , ... })`.
    */
   onClick?: (context: BadgeContext) => void
 }

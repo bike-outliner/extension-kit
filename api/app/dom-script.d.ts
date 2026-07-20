@@ -7,20 +7,13 @@
  *
  * If you've used Web Workers, the architecture will feel familiar: both run in
  * isolated script contexts and communicate with the originating context using
- * `postMessage` and `onmessage`.
+ * `postMessage` and `onmessage`. DOMScripts do not have access to standard
+ * extension APIs, and for security some HTML/DOM APIs (e.g., network access)
+ * are disabled.
  *
  * DOMScripts are loaded by name and must be located in the `src/dom` folder of
  * your extension. Bike API's that allow you to install DOMScripts include
  * `window.presentSheet` and `window.inspector.addItem`.
- *
- * DOMScripts Summary:
- *
- * 1. Used to display UI using HTML/DOM.
- * 2. Do not have access to standard extension APIs.
- * 3. Run in a separate context from standard extension code.
- * 4. Must be located in the extension's `src/dom` folder and loaded by name.
- * 5. Communicate with extension code via `postMessage` and `onmessage`.
- * 6. For security some HTML/DOM APIs (e.g., network access) are disabled.
  *
  * DOMScripts created with a window relationship — inspector items, sheets,
  * and panels shown with an explicit window — are bound to that host window:
@@ -58,13 +51,11 @@ export interface DOMScriptHandle<P extends DOMProtocol = DOMProtocol>
   extends Disposable {
   /**
    * Receive messages from the DOM context.
-   * @param message
    */
   onmessage?: (message: P['toApp']) => void
 
   /**
    * Send messages to the DOM context.
-   * @param message
    */
   postMessage(message: P['toDOM']): void
 }

@@ -35,7 +35,6 @@ export interface BikeCommonGlobals {
    * Returns a `bike-extension://` URL for a file in this extension's folder.
    *
    * @param path - Relative path within the extension folder (e.g., "images/icon.png")
-   * @returns A `bike-extension://` URL string.
    */
   extensionURL(path: string): string
 }

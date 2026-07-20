@@ -10,7 +10,6 @@ export type CommandDefinition =
   | {
       /** Default button placement for this command. */
       button?: CommandButton
-      /** The action to perform when the command is triggered. */
       action: CommandAction
     }
 
@@ -35,8 +34,8 @@ export type CommandButton = {
 export interface Commands {
   /**
    * Adds commands to the app.
-   * @param commands - The commands to add, with optional priority. When
-   * multiple commands share a CommandName, higher priority commands are
+   *
+   * When multiple commands share a CommandName, higher priority commands are
    * tried first (see {@link CommandAction}). Default priority is 0.
    * @returns Disposable removes added commands.
    */
@@ -44,8 +43,7 @@ export interface Commands {
 
   /**
    * Performs the named command.
-   * @param command - The name of the command to perform.
-   * @param options - Optional editor and selection to use as the command context.
+   * @param options - Editor and selection to use as the command context.
    * @returns Undefined if the command was not found. True if the command
    * was found and returned true when performed. False if the command was
    * found but returned false when performed.

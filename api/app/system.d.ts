@@ -30,7 +30,6 @@ export interface Disposable {
 }
 
 export class URL {
-  /** Create a new URL object. */
   constructor(url: string)
 
   scheme?: string
@@ -48,7 +47,6 @@ export class URL {
   /**
    * Open this URL in the system's default application.
    * @requires `openURL` permission
-   * @param configuration - The configuration for opening the URL.
    */
   open(configuration: URLOpenConfiguration): void
 }

@@ -88,7 +88,6 @@ export type InputHandler =
 export interface Input {
   /**
    * Adds a text input handler.
-   * @param handler - A `handle` function, or `{ priority?, handle?, provideCompletions? }`.
    * @returns Disposable removes the handler.
    */
   addHandler(handler: InputHandler): Disposable

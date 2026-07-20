@@ -55,7 +55,6 @@ export interface OutlineEditor extends View {
    * Observe selection.
    * @param observer - The closure for new selections.
    * @param debounce - The debounce delay in milliseconds. (default 1000ms)
-   * @returns A Disposable to cancel the observer.
    */
   observeSelection(observer: (selection?: Selection) => void, debounce?: number): Disposable
 
@@ -249,13 +248,9 @@ type SelectionTypeDetail =
       /** A block selection over one or more rows */
       type: 'block'
       detail: {
-        /** The head row of the selection */
         headRow: Row
-        /** The anchor row of the selection */
         anchorRow: Row
-        /** The start row of the selection */
         startRow: Row
-        /** The end row of the selection */
         endRow: Row
       }
     }

@@ -37,7 +37,6 @@ import { EditorTheme } from './editor-theme'
  *   })
  * })
  * ```
- * @param id - Editor style id
  * @param displayName - User visible editor style name
  */
 export declare function defineEditorStyle(id: EditorStyleId, displayName: string): EditorStyle
@@ -49,7 +48,6 @@ export declare function defineEditorStyle(id: EditorStyleId, displayName: string
  * `matchingEditorStyleIds`. If that matcher is not set then these rules are
  * merged into all editor styles. editor styles that are modified.
  *
- * @param id - Editor style modifier id
  * @param displayName - User visible editor style modifier name
  * @param matchingEditorStyleIds - Regular expression to match editor style
  *   ids that this modifier should be applied to. If not set then this modifier
@@ -80,16 +78,12 @@ export interface EditorStyle {
    *   })
    * })
    * ```
-   * @param name - Layer name
-   * @param rulesCallback - Callback to define rules for this layer.
    */
   layer(
     name: RulesLayerName,
     rulesCallback: (
       /**
        * Define a row rule.
-       * @param match - The outline path to match rows.
-       * @param apply - Function to modify the matched row style.
        */
       row: (
         match: RelativeOutlinePath,
@@ -97,8 +91,6 @@ export interface EditorStyle {
       ) => void,
       /**
        * Define a text run rule.
-       * @param match - The outline path to match runs.
-       * @param apply - Function to modify the matched run style.
        */
       run: (
         match: RelativeOutlinePath,
@@ -107,13 +99,11 @@ export interface EditorStyle {
       /**
        * Define a caret rule. Generally this only needs to be used once per
        * editor style, by convention it is defined in the base layer.
-       * @param apply - Function to modify the caret style.
        */
       caret: (apply: (context: StyleContext, caret: CaretStyle) => void) => void,
       /**
        * Define a viewport rule. Generally this only needs to be used once per
        * editor style, by convention it is defined in the base layer.
-       * @param apply - Function to modify the viewport style.
        */
       viewport: (apply: (context: StyleContext, viewport: ViewportStyle) => void) => void,
       /**
@@ -129,8 +119,7 @@ export interface EditorStyle {
        * standard `bike` editor style, or some future standard style that also
        * ships with Bike.
        *
-       * @param fromId Editor style id to import from
-       * @param fromLayer The rules layer to import
+       * @param fromLayer Rules layer to import
        */
       include: (fromId: EditorStyleId, fromLayer: RulesLayerName) => void
     ) => void
@@ -181,13 +170,10 @@ export interface StyleContext {
   isFullWindow: boolean
   /** True when dragging selection  */
   isDragSource: boolean
-  /** Size of the editor's viewport  */
   viewportSize: Size
   /** Insets of overlapping chrome (e.g. floating toolbar/status bar) on the viewport. Subtract from `viewportSize` to get the visible content area. */
   viewportContentInsets: Insets
-  /** Editor Settings  */
   settings: EditorSettings
-  /** Editor Theme  */
   theme: EditorTheme
   /** Cache for values derived from this editor state */
   userCache: Map<string, any>
@@ -220,9 +206,7 @@ export interface EditorSettings {
   font: Font
   /** Line width (characters)  */
   lineWidth?: number
-  /** Line height multiple  */
   lineHeightMultiple: number
-  /** Row spacing multiple  */
   rowSpacingMultiple: number
 }
 
@@ -230,21 +214,14 @@ export type WritingFocusMode = 'paragraph' | 'sentence' | 'word'
 
 /** CaretStyle – The global text caret style */
 export interface CaretStyle {
-  /** The caret color  */
   color: Color
-  /** The caret width  */
   width: number
-  /** The caret blink style  */
   blinkStyle: CaretBlinkStyle
   /** The caret line background color  */
   lineColor: Color
-  /** The font of caret messages */
   messageFont: Font
-  /** The color of caret messages */
   messageColor: Color
-  /** The font of caret loaded attributes */
   loadedAttributesFont: Font
-  /** The color of caret loaded attributes */
   loadedAttributesColor: Color
 }
 
@@ -291,9 +268,7 @@ export interface RowStyle extends DecorationContainer {
  * TextStyle - The style for row text.
  */
 export interface TextStyle extends TextContainer {
-  /** Text scale */
   scale: number
-  /** The line height multiple */
   lineHeightMultiple: number
 }
 
@@ -321,23 +296,14 @@ export type Ligature = 'default' | 'none' | 'all'
 
 /** TextLineStyle - Wraps an NSUnderlineStyle. */
 export interface TextLineStyle {
-  /** The color of the line. */
   color: Color
-  /** True enables the single line flag. */
   single: boolean
-  /** True enables the thick line flag. */
   thick: boolean
-  /** True enables the double line flag. */
   double: boolean
-  /** True enables the patternDot flag. */
   patternDot: boolean
-  /** True enables the patternDash flag. */
   patternDash: boolean
-  /** True enables the patternDashDot flag. */
   patternDashDot: boolean
-  /** True enables the patternDashDotDot flag. */
   patternDashDotDot: boolean
-  /** True enables the byWord flag. */
   byWord: boolean
 }
 
@@ -345,27 +311,18 @@ export interface TextLineStyle {
  * TextContainer - Common text style properties shared by TextStyle and TextRunStyle
  */
 export interface TextContainer extends DecorationContainer {
-  /** Text font */
   font: Font
   /** The run kerning (default 0) */
   kerning: number
   /** The run tracking (default 0) */
   tracking: number
-  /** The run ligature */
   ligature: Ligature
-  /** The run baseline offset */
   baselineOffset: number
-  /** Text foreground color */
   color: Color
-  /** Text background color */
   backgroundColor: Color
-  /** Text underline style */
   underline: TextLineStyle
-  /** Text strikethrough style */
   strikethrough: TextLineStyle
-  /** Text margins */
   margin: Insets
-  /** Text padding */
   padding: Insets
 }
 
@@ -379,16 +336,11 @@ export interface TextContainer extends DecorationContainer {
 export interface DecorationContainer {
   /**
    * Add/Modify decoration by id.
-   *
-   * @param id - Decoration id
-   * @param modify - Function to modify decoration
    */
   decoration(id: string, modify: (decoration: Decoration, layout: Layout) => void): void
 
   /**
    * List and modify all existing decorations.
-   *
-   * @param modify - Function to modify each existing decoration
    */
   decorations(modify: (decoration: Decoration, layout: Layout) => void): void
 }
@@ -430,13 +382,10 @@ export interface Decoration {
   hidden: boolean
   /** Opacity (0-1) */
   opacity: number
-  /** Optional border */
   border: DecorationBorder
   /** Corners */
   corners: DecorationCorners
-  /** Optional shadow */
   shadow: DecorationShadow
-  /** Optional layer contents */
   contents: DecorationContents
   /** Background color */
   color: Color
@@ -518,46 +467,38 @@ export interface Layout {
  * properties.
  */
 export interface LayoutValue {
-  /** Construct a new LayoutValue that is the min between the this and the value parameter. */
+  /** Min of this and value. */
   min(value: number | LayoutValue): LayoutValue
-  /** Construct a new LayoutValue that is the max between the this and the value parameter. */
+  /** Max of this and value. */
   max(value: number | LayoutValue): LayoutValue
-  /** Construct a new LayoutValue that is this value multiplied by the value parameter. */
+  /** This scaled by value. */
   scale(value: number | LayoutValue): LayoutValue
-  /** Construct a new LayoutValue that is this value offset by the value parameter. */
+  /** This offset by value. */
   offset(value: number | LayoutValue): LayoutValue
-  /** Construct a new LayoutValue that is this value minus the value parameter. */
+  /** This minus value. */
   minus(value: number | LayoutValue): LayoutValue
 }
 
 /** DecorationBorder - Wraps CALayer border */
 export interface DecorationBorder {
-  /** Line color */
   color: Color
-  /** Line width */
   width: number
 }
 
 /** DecorationShadow - Wraps CALayer shadow */
 export interface DecorationShadow {
-  /** Shadow color */
   color: Color
-  /** Shadow opacity */
   opacity: number
   /** Shadow blur radius */
   radius: number
-  /** Shadow offset */
   offset: {
-    /** Shadow offset width */
     width: number
-    /** Shadow offset height */
     height: number
   }
 }
 
 /** DecorationCorners - Wraps CALayer corner */
 export interface DecorationCorners {
-  /** Corner radius */
   radius: number
   /** Apply radius to top right corner (default true) */
   maxXMaxYCorner: boolean

@@ -97,13 +97,9 @@ export class Insets {
 
   constructor(top: number, right: number, bottom: number, left: number)
 
-  /** The top inset */
   top: number
-  /** The right inset */
   right: number
-  /** The bottom inset */
   bottom: number
-  /** The left inset */
   left: number
 
   readonly width: number

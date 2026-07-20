@@ -12,18 +12,14 @@ export class Image {
 
   constructor(name: string)
 
-  /** @returns A new image with new size */
   withSize(size: Size): Image
-  /** @returns A new image with scaled size */
   withScale(scale: number): Image
-  /** @returns A new image by compositing this image with parameter */
   withComposite(image: Image): Image
   /**
    * @returns A new image drawn over a rounded-rect backdrop sized to this
    * image plus the background's padding
    */
   withBackground(background: ImageBackground): Image
-  /** @returns Resolved image attributes */
   resolve(cache: Cache): {
     width: number
     height: number
@@ -148,18 +144,15 @@ export class Font {
   static systemTitle3(): Font
 
   /**
-   * @param name - The font family, ex. "Helvetica"
-   * @param pointSize - The font point size, ex. 12
+   * @param name Font family, e.g. "Helvetica"
+   * @param pointSize e.g. 12
    */
   constructor(name: string, pointSize: number)
 
-  /** @returns A new font with family */
   withFamily(family: string): Font
 
-  /** @returns A new font with face */
   withFace(face: string): Font
 
-  /** @returns A new font with point size */
   withPointSize(pointSize: number): Font
 
   /**
@@ -170,49 +163,36 @@ export class Font {
    */
   withScale(scale: number): Font
 
-  /** @returns A new font with weight */
   withWeight(weight: FontWeight): Font
 
-  /** @returns A new font with bold trait */
   withBold(): Font
 
-  /** @returns A new font with italic trait */
   withItalics(): Font
 
-  /** @returns A new font with monospace trait */
   withMonospace(): Font
 
-  /** @returns A new font with small caps features */
   withSmallCaps(): Font
 
-  /** @returns A new font with lowercase small caps features */
   withLowercaseSmallCaps(): Font
 
-  /** @returns A new font with uppercase small caps features */
   withUppercaseSmallCaps(): Font
 
-  /** @returns A new font with monospaced digit features */
   withMonospacedDigit(): Font
 
-  /** @returns A new font with diagonal fraction features */
   withFractions(): Font
 
-  /** @returns A new font with slashed-zero features */
   withSlashedZero(): Font
 
-  /** @returns A new font with oldstyle (lowercase) figure features */
+  /** Oldstyle (lowercase) figures */
   withOldstyleFigures(): Font
 
-  /** @returns A new font with lining (uppercase) figure features */
+  /** Lining (uppercase) figures */
   withLiningFigures(): Font
 
-  /** @returns A new font with superscript (superior) features */
   withSuperscript(): Font
 
-  /** @returns A new font with subscript (inferior) features */
   withSubscript(): Font
 
-  /** @returns A new font with ordinal features */
   withOrdinals(): Font
 
   /**
@@ -222,7 +202,6 @@ export class Font {
    */
   withStylisticSet(n: number): Font
 
-  /** @returns Resolved font attributes */
   resolve(cache: Cache): FontAttributes
 }
 
@@ -305,34 +284,34 @@ export class Color {
   static systemYellow(): Color
 
   /**
-   * @param white - The white component (0-1)
+   * @param white 0-1
    */
   static gray(white: number): Color
 
   /**
    * Create color from HSL (hue, saturation, lightness all 0-1)
-   * @param hue - The hue component (0-1)
-   * @param saturation - The saturation component (0-1)
-   * @param lightness - The lightness component (0-1)
-   * @param alpha - The alpha component (0-1)
+   * @param hue 0-1
+   * @param saturation 0-1
+   * @param lightness 0-1
+   * @param alpha 0-1
    */
   static hsla(hue: number, saturation: number, lightness: number, alpha?: number): Color
 
   /**
    * Create color in OKLab perceptually uniform space (l: 0-1, a/b: ~-0.4 to 0.4)
-   * @param l - The lightness component (0-1)
-   * @param a - The a component (~-0.4 to 0.4)
-   * @param b - The b component (~-0.4 to 0.4)
-   * @param alpha - The alpha component (0-1)
+   * @param l 0-1
+   * @param a ~-0.4 to 0.4
+   * @param b ~-0.4 to 0.4
+   * @param alpha 0-1
    */
   static oklab(l: number, a: number, b: number, alpha?: number): Color
 
   /**
    * Create color in OKLch perceptually uniform space (l: 0-1, c: 0-0.4, h: 0-1)
-   * @param l - The lightness component (0-1)
-   * @param c - The chroma component (0-0.4)
-   * @param h - The hue component (0-1)
-   * @param alpha - The alpha component (0-1)
+   * @param l 0-1
+   * @param c 0-0.4
+   * @param h 0-1
+   * @param alpha 0-1
    */
   static oklch(l: number, c: number, h: number, alpha?: number): Color
 
@@ -346,15 +325,15 @@ export class Color {
   static lightDark(light: Color, dark: Color): Color
 
   /**
-   * @param image - The image to use as a tile pattern when filling the color
+   * @param image Tile pattern image used when filling
    */
   static pattern(image: Image): Color
 
   /**
-   * @param red - The red component (0-1)
-   * @param green - The green component (0-1)
-   * @param blue - The blue component (0-1)
-   * @param alpha - The alpha component (0-1)
+   * @param red 0-1
+   * @param green 0-1
+   * @param blue 0-1
+   * @param alpha 0-1
    */
   constructor(red: number, green: number, blue: number, alpha?: number)
 
@@ -400,20 +379,17 @@ export class Color {
 
   /**
    * Mix this color with another (CSS color-mix).
-   * @param color - The color to mix with
    * @param fraction - Mix amount (0 = this, 1 = color)
-   * @param colorSpace - Optional color space for mixing (default: oklab)
+   * @param colorSpace Color space for mixing (default oklab)
    */
   mixed(color: Color, fraction: number, colorSpace?: ColorSpace): Color
 
   /**
    * Select best contrasting color from candidates (CSS color-contrast).
-   * @param candidates - Array of candidate colors
-   * @param target - Optional WCAG target or custom ratio
+   * @param target - WCAG target or custom ratio
    */
   contrasted(candidates: Color[], target?: ContrastTarget): Color
 
-  /** @returns Resolved color attributes */
   resolve(cache: Cache): {
     alpha: number
     pattern?: Image

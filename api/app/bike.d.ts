@@ -278,7 +278,6 @@ export interface Clipboard {
    *
    * @requires `clipboardRead` permission
    * @param uti - The associated UTI. (default is "public.utf8-plain-text")
-   * @returns The text from the clipboard.
    */
   readText(uti?: string): string
 
@@ -286,7 +285,6 @@ export interface Clipboard {
    * Writes the text to the clipboard.
    *
    * @requires `clipboardWrite` permission
-   * @param string - The text to write to the clipboard.
    * @param uti - The associated UTI. (default is "public.utf8-plain-text")
    */
   writeText(string: string, uti?: string): void

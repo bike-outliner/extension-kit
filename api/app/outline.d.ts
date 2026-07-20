@@ -18,9 +18,6 @@ export class Outline {
    * 1. Query the existing outline
    * 2. Create a new outline from the query results
    * 3. Use `archive()` on the new outline to export the data
-   *
-   * @param rows - The rows to insert into the new outline.
-   * @returns The new outline.
    */
   constructor(rows?: RowSource)
 
@@ -39,14 +36,12 @@ export class Outline {
    * Archive this outline.
    *
    * @param format - The archive format (default bike).
-   * @returns The outline archived.
    */
   archive(format?: OutlineFormat): OutlineArchive
 
   /**
    * Get the row by id.
    * @param id - The numeric Row.ID or PersistentId of the row to get.
-   * @returns The row or undefined if not found.
    */
   getRowById(id: RowId | PersistentId): Row | undefined
 
@@ -113,16 +108,12 @@ export class Outline {
 
   /**
    * Query the outline immediately.
-   * @param path - The outline path to query.
-   * @returns The result value of the query.
    */
   query(path: OutlinePath): OutlinePathValue
 
   /**
    * Query the outline asynchronously.
-   * @param path - The outline path to query.
    * @param handler - The handler to call when result value is ready.
-   * @returns A Disposable to cancel the query.
    */
   scheduleQuery(path: OutlinePath, handler: (value: OutlinePathValue) => void): Disposable
 
@@ -133,9 +124,7 @@ export class Outline {
    * quickly you may not see intermediate results, but you will always get
    * results for the final outline state.
    *
-   * @param path - The outline path to query.
    * @param handler - The handler to call when a result value is ready.
-   * @returns A Disposable to cancel the query.
    */
   observeQuery(path: OutlinePath, handler: (value: OutlinePathValue) => void): Disposable
 
@@ -175,8 +164,6 @@ export class Outline {
 
   /**
    * Observe changes.
-   * @param handler - The handler to call when the outline changes.
-   * @returns A Disposable to cancel the handler.
    */
   observeChanges(handler: (change: OutlineChange) => void): Disposable
 
@@ -249,13 +236,12 @@ export type RowChange =
 
 /** A row is a paragraph of text that can also have children rows. */
 export interface Row {
-  /** Owning outline */
   readonly outline: Outline
   /** Numeric row id, unique within outline but not persistent across saves */
   readonly id: RowId
   /** URL link for this row combining outline and row persistent ids */
   readonly url: URL
-  /** Persistent id, defaults to undefined */
+  /** Persistent id */
   persistentId?: PersistentId
   /** Persistent id, generating one if needed */
   readonly ensuredPersistentId: PersistentId
@@ -265,14 +251,12 @@ export interface Row {
   /** Row's paragraph of text */
   text: AttributedString
 
-  /** Row attributes, stored as map of strings to strings */
+  /** Row attributes */
   readonly attributes: Record<RowAttributeName, string>
 
   /**
    * Get attribute by name.
-   * @param name - The name of the attribute.
    * @param type - The type to parse the attribute as. (default string)
-   * @returns The attribute value or undefined if not set.
    */
   getAttribute(name: RowAttributeName, type?: AttributeValueType): any | undefined
 
@@ -293,13 +277,9 @@ export interface Row {
   readonly ancestorsWithSelf: Row[]
   /** Parent row, only undefined for outline root. */
   readonly parent?: Row
-  /** Previous sibling row. */
   readonly prevSibling?: Row
-  /** Next sibling row. */
   readonly nextSibling?: Row
-  /** First child row. */
   readonly firstChild?: Row
-  /** Last child row. */
   readonly lastChild?: Row
 
   /** First leaf in branch rooted at this row */
@@ -339,22 +319,18 @@ export interface Row {
 export class AttributedString {
   /**
    * Create an AttributedString from a Markdown string.
-   * @param markdown - The markdown string to parse.
-   * @returns A new AttributedString with the parsed formatting.
    */
   static fromMarkdown(markdown: string): AttributedString
 
   /**
-   * Create an AttributedString from an HTML string.
-   * @param html - The HTML string to parse (should be a `<p>` element).
-   * @returns A new AttributedString with the parsed formatting.
+   * Create an AttributedString from an HTML string (should be a `<p>` element).
    */
   static fromHTML(html: string): AttributedString
 
-  /** Character contents as a string. */
+  /** Character contents */
   string: string
 
-  /** Character count of string. */
+  /** Character count */
   count: number
 
   /**
@@ -363,7 +339,6 @@ export class AttributedString {
    * @param index - The index to get the attribute at.
    * @param affinity - The affinity to disambiguate run boundaries (default upstream).
    * @param effectiveRange - The range of the attribute returned by reference.
-   * @returns The attribute value or undefined if not set.
    */
   attributeAt(
     attribute: TextAttributeName,
@@ -374,10 +349,8 @@ export class AttributedString {
 
   /**
    * Get attributes at index.
-   * @param index - The index to get the attributes at.
    * @param affinity - The affinity to disambiguate run boundaries (default upstream).
    * @param effectiveRange - The range of the attributes returned by reference.
-   * @returns The attributes at the index.
    */
   attributesAt(
     index: number,
@@ -410,45 +383,36 @@ export class AttributedString {
   /**
    * Return new attributed string from range.
    * @param range - The range to get the substring from.
-   * @returns The substring.
    */
   substring(range: Range): AttributedString
 
   /**
    * Insert string or attributed text at index.
-   * @param position - The index to insert the text at.
-   * @param text - The text to insert.
    */
   insert(position: number, text: string | AttributedString): void
 
   /**
    * Replace range with string or attributed text.
-   * @param range - The range to replace.
-   * @param text - The text to replace the range with.
    */
   replace(range: Range, text: string | AttributedString): void
 
   /**
    * Append string or attributed text.
-   * @param text - The text to append.
    */
   append(text: string | AttributedString): void
 
   /**
    * Delete text in range.
-   * @param range - The range to delete.
    */
   delete(range: Range): void
 
   /**
    * Convert this attributed string to Markdown.
-   * @returns Markdown representation of the attributed string.
    */
   toMarkdown(): string
 
   /**
    * Convert this attributed string to HTML.
-   * @returns HTML representation of the attributed string.
    */
   toHTML(): string
 }

@@ -9,9 +9,7 @@ declare module 'bike/components' {
   export interface SFSymbolProps extends React.HTMLAttributes<HTMLSpanElement> {
     /** SF Symbol name (e.g. "chevron.left", "star.fill") */
     name: string
-    /** Symbol weight */
     weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'
-    /** Symbol scale */
     scale?: 'small' | 'medium' | 'large'
   }
 
@@ -50,7 +48,6 @@ declare module 'bike/components' {
   export interface LabelProps extends React.HTMLAttributes<HTMLSpanElement> {
     /** Text color (default: primary/--label) */
     color?: 'secondary' | 'tertiary'
-    /** Font style */
     font?: 'headline' | 'subheadline' | 'caption' | 'footnote'
   }
 
@@ -95,7 +92,7 @@ declare module 'bike/components' {
   export function Box(props: BoxProps): React.JSX.Element
 
   export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
-    /** Optional header shown above the box content */
+    /** Header shown above the box content */
     label?: React.ReactNode
   }
 
@@ -138,12 +135,10 @@ declare module 'bike/components' {
   export interface SegmentedControlItem {
     /** Value identifier for this segment */
     value: string
-    /** Display label */
     label: React.ReactNode
   }
 
   export interface SegmentedControlProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
-    /** Segment items */
     items: SegmentedControlItem[]
     /** Currently selected value */
     value?: string
