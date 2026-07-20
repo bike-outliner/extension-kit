@@ -1,5 +1,5 @@
 import { Image, Font, Color } from '../core/graphics'
-import { Size, Insets } from '../core/geometry'
+import { Insets } from '../core/geometry'
 import { RelativeOutlinePath } from '../core/outline-path'
 import { EditorSettings } from '../style/editor-style'
 import { EditorTheme } from '../style/editor-theme'
@@ -36,30 +36,16 @@ import { Row } from './outline'
 export interface BadgeEnvironment {
   /** The outline's BASE text font (the stylesheet's `viewport.font`) */
   readonly font: Font
-  /** The row's inherited text color, so the glyph tints with its text. */
+  /**
+   * The outline's BASE text color (same as `theme.colors.text`), NOT the
+   * row's tint — so a badge reads as the outline's own chrome and doesn't
+   * pick up a heading color or a per-row color rule.
+   */
   readonly color: Color
   /** Epoch seconds; present only for ticking badges (`tick` set). */
   readonly now?: number
   /** Host platform the editor is running on */
   readonly os: 'macOS' | 'iOS'
-  /** True when editor has keyboard focus */
-  readonly isKey: boolean
-  /** True when editor is typing (mouse hidden) */
-  readonly isTyping: boolean
-  /** True when editor is filtering */
-  readonly isFiltering: boolean
-  /** True when in dark mode */
-  readonly isDarkMode: boolean
-  /** True when in full screen mode */
-  readonly isFullScreen: boolean
-  /** True when in full window mode (window chrome hidden, document fills the window) */
-  readonly isFullWindow: boolean
-  /** True when dragging selection */
-  readonly isDragSource: boolean
-  /** Size of the editor's viewport */
-  readonly viewportSize: Size
-  /** Insets of overlapping chrome (e.g. floating toolbar/status bar) on the viewport. Subtract from `viewportSize` to get the visible content area. */
-  readonly viewportContentInsets: Insets
   /** Editor Settings */
   readonly settings: EditorSettings
   /** Editor Theme, resolved for the current appearance (the dark theme in dark mode) */

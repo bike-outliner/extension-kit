@@ -116,19 +116,9 @@ export interface OutlineEditor extends View {
   /**
    * Present a menu anchored to a row.
    *
-   * The menu is a SNAPSHOT of `items` — it never re-renders while open —
-   * and the handlers live exactly as long as this presentation. Build the
-   * items from the row right before showing (read its attributes, decide
-   * what applies), so one builder function can serve both a badge's
-   * `onClick` and a command (e.g. a set-due menu on a row with no due yet).
-   *
-   * Requires macOS 26; on earlier systems nothing presents.
-   *
-   * @param row - The row the menu is anchored to (and the `context.row`
-   *   handed to the handlers).
+   * @param row - The row the menu is anchored to
    * @param options - The menu's items, anchor, and handlers.
-   * @returns A handle for this presentation, or undefined when nothing
-   *   presents (no usable items).
+   * @returns A handle for this presentation, or undefined if the menu was not presented (no items).
    */
   showMenu(row: Row, options: ShowMenuOptions): MenuHandle | undefined
 }
@@ -141,12 +131,13 @@ export interface MenuContext {
 
 export interface ShowMenuOptions {
   /**
-   * The menu's items. Buttons with a `command:<commandId>` id dispatch that
-   * command with the menu's row as its selection; ones naming an
-   * unregistered command are hidden (a menu left with no usable items
-   * doesn't present).
+   * Builds the menu's items. Called for the initial menu and re-invoked on
+   * every refresh (see `showMenu`), so it must be a pure function of current
+   * state. Buttons with a `command:<commandId>` id dispatch that command
+   * with the menu's row as its selection; ones naming an unregistered
+   * command are hidden (a menu left with no usable items doesn't present).
    */
-  items: MenuItem[]
+  items: () => MenuItem[]
   /**
    * A badge name: anchor the menu at that badge's glyph on the row. Falls
    * back to the row's text line when the badge isn't drawn there (so a
@@ -166,17 +157,20 @@ export interface ShowMenuOptions {
   onChange?: (id: string, value: string | number | boolean, context: MenuContext) => void
 }
 
-/**
- * A handle to one `showMenu` presentation. Menus are snapshots today, so
- * the handle only dismisses — a future `update(items)` (live restructuring
- * of the open menu) will land here.
- */
+/** A handle to one `showMenu` presentation. */
 export interface MenuHandle {
   /**
    * Dismiss the menu if this presentation is still the live one (cancel
    * semantics: buffered values drop). A stale handle no-ops.
    */
   dismiss(): void
+  /**
+   * Re-render the open menu from its `items` builder — for state that
+   * changed OUTSIDE a menu interaction (a timer, an async result).
+   * Non-dismissing interactions already refresh automatically. A stale
+   * handle no-ops.
+   */
+  refresh(): void
 }
 
 /**
@@ -209,6 +203,15 @@ type SelectionCommon = {
   rows: Row[]
   /** The common ancestors of the rows in the selection */
   coverRows: Row[]
+  /**
+   * Context values computed at the selection head row: the nearest-wins
+   * union of the head row's and its ancestors' attributes (system
+   * attributes such as `indent` excluded), merged with each registered
+   * summary evaluated at the head row (summary values win on name
+   * collision). Selection observers re-fire when these values change even
+   * if the selection itself has not moved.
+   */
+  context: Record<string, string | number | boolean | null>
 }
 
 type SelectionTypeDetail =
