@@ -1,5 +1,6 @@
 declare module 'bike/components' {
   import * as React from 'react'
+  import { SFSymbolName } from '../core/bike-globals'
 
   // SFSymbol
 
@@ -8,7 +9,7 @@ declare module 'bike/components' {
 
   export interface SFSymbolProps extends React.HTMLAttributes<HTMLSpanElement> {
     /** SF Symbol name (e.g. "chevron.left", "star.fill") */
-    name: string
+    name: SFSymbolName
     weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'
     scale?: 'small' | 'medium' | 'large'
   }

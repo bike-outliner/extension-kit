@@ -1,4 +1,5 @@
 import { Insets, Size, Path, LineCap, LineJoin, FillRule } from './geometry'
+import { SFSymbolName } from './bike-globals'
 
 /** Opaque cache passed to `resolve()` methods by the styling system. */
 export interface Cache {}
@@ -92,7 +93,7 @@ export interface ShapeStroke {
  * image content
  */
 export class SymbolConfiguration {
-  constructor(name: string, variableValue?: number)
+  constructor(name: SFSymbolName, variableValue?: number)
 
   withFont(font: Font): SymbolConfiguration
   withSymbolScale(scale: SymbolScale): SymbolConfiguration

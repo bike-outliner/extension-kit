@@ -2,6 +2,7 @@ import { View } from './bike'
 import { CommandName } from './commands'
 import { Row } from './outline'
 import { Disposable } from './system'
+import { SFSymbolName } from '../core/bike-globals'
 
 /** Sidebar is a view that displays a list of navigation items. */
 export interface Sidebar extends View {
@@ -24,7 +25,7 @@ export type LocationItem = Readonly<{
   /** The text to display. */
   text: string
   /** The SF Symbol name to display. */
-  symbol: string
+  symbol: SFSymbolName
   /** The row ID this location represents. (Row may not exist yet) */
   representedRowId: string
   /** Returns the row this location targets, creating it if needed. */

@@ -130,46 +130,19 @@ export interface MenuContext {
 }
 
 export interface ShowMenuOptions {
-  /**
-   * Builds the menu's items. Called for the initial menu and re-invoked on
-   * every refresh (see `showMenu`), so it must be a pure function of current
-   * state. Buttons with a `command:<commandId>` id dispatch that command
-   * with the menu's row as its selection; ones naming an unregistered
-   * command are hidden (a menu left with no usable items doesn't present).
-   */
+  /** Called for the initial menu and re-invoked on every refresh */
   items: () => MenuItem[]
-  /**
-   * A badge name: anchor the menu at that badge's glyph on the row. Falls
-   * back to the row's text line when the badge isn't drawn there (so a
-   * badge's `onClick` can pass its own name unconditionally). Omit to
-   * anchor at the row's text line.
-   */
+  /** A badge name: anchor the menu at that badge's glyph on the row. */
   anchor?: string
-  /** A non-`command:` button (or row-embedded button) was chosen. */
-  onAction?: (id: string, context: MenuContext) => void
-  /**
-   * A valued item committed, with a TYPED value: string (`field`,
-   * `calendar`, `choice`, `palette`), number (`duration` seconds), or
-   * boolean (`toggle`). Values are buffered while the menu is open,
-   * delivered on commit-dismissal (Return, item selection, click-out), and
-   * dropped on Esc.
-   */
-  onChange?: (id: string, value: string | number | boolean, context: MenuContext) => void
+  /** A menu item was chosen, closing the menu. */
+  onAction?: (id: string, value: string | undefined, context: MenuContext) => void
 }
 
 /** A handle to one `showMenu` presentation. */
 export interface MenuHandle {
-  /**
-   * Dismiss the menu if this presentation is still the live one (cancel
-   * semantics: buffered values drop). A stale handle no-ops.
-   */
+  /** Dismiss the menu if this presentation is still the live one */
   dismiss(): void
-  /**
-   * Re-render the open menu from its `items` builder — for state that
-   * changed OUTSIDE a menu interaction (a timer, an async result).
-   * Non-dismissing interactions already refresh automatically. A stale
-   * handle no-ops.
-   */
+  /** Re-render the open menu from its `items` builder */
   refresh(): void
 }
 
@@ -203,14 +176,7 @@ type SelectionCommon = {
   rows: Row[]
   /** The common ancestors of the rows in the selection */
   coverRows: Row[]
-  /**
-   * Context values computed at the selection head row: the nearest-wins
-   * union of the head row's and its ancestors' attributes (system
-   * attributes such as `indent` excluded), merged with each registered
-   * summary evaluated at the head row (summary values win on name
-   * collision). Selection observers re-fire when these values change even
-   * if the selection itself has not moved.
-   */
+  /** Self and ancestor attributes of head row (nearest wins) */
   context: Record<string, string | number | boolean | null>
 }
 

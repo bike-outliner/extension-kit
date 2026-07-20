@@ -5,14 +5,13 @@ import { Commands } from './commands'
 import { Keybindings } from './keybindings'
 import { BadgeConfig } from './badge'
 import { SummaryConfig } from './summary'
-import { FilterConfig } from './filter'
 import { Input } from './input'
 import { OutlineEditor } from './outline-editor'
 import { DOMScript, SheetHandle, PanelHandle } from './dom-script'
 import { URL, Disposable, Permissions } from './system'
 import { Rect } from '../core/geometry'
 import { DOMProtocol } from '../core/dom-protocol'
-import { BikeUtilityGlobals } from '../core/bike-globals'
+import { BikeUtilityGlobals, SFSymbolName } from '../core/bike-globals'
 import { Outline } from './outline'
 import { JSONStore } from '../core/json'
 
@@ -46,8 +45,6 @@ declare global {
     badge(name: string, config: BadgeConfig): Disposable
     /** Register a summary (subtree or ancestor reduction), readable as `summary("name")`. See `SummaryConfig`. */
     summary(name: string, config: SummaryConfig): Disposable
-    /** Register a labeled filter query, offered in the filter field's autocomplete. See `FilterConfig`. */
-    addFilter(name: string, config: FilterConfig): Disposable
 
     /** All windows. */
     readonly windows: Window[]
@@ -459,7 +456,7 @@ interface ChoiceBoxItem {
   /** Optional container/category shown after the name (separated by tab). */
   container?: string
   /** Optional SF Symbol name to display beside the item. */
-  symbol?: string
+  symbol?: SFSymbolName
 }
 
 /** A single source of items for a choice box. The default source omits `prefix`;
@@ -473,7 +470,7 @@ interface ChoiceBoxSource {
   /** Placeholder text shown in the search field while this source is active. */
   placeholder?: string
   /** Default SF Symbol to use when an item doesn't specify one. */
-  defaultSymbol?: string
+  defaultSymbol?: SFSymbolName
   /** Whether the user can dismiss without selecting (default: false). */
   allowsEmptySelection?: boolean
   /** Whether multiple items can be selected (default: false). */

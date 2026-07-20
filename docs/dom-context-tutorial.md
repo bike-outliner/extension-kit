@@ -135,6 +135,26 @@ For more complex custom views, you might want to use React.
 
 Bike bundles and loads a single copy of React into each web view. The extension kit is set up to use that bundled version when you import React into your DOM script. You may also use the `.tsx` file extension and JSX syntax in your DOM script.
 
+## Receiving Dropped Rows
+
+When outline rows are dragged over your DOM script's web view, Bike dispatches synthetic DOM events on the element under the cursor: `bike:rowdragenter`, `bike:rowdragover`, `bike:rowdragleave`, and `bike:rowdrop`. The events bubble, so a delegated listener on `context.element` covers your whole UI.
+
+Acceptance mirrors HTML5 drag-and-drop: call `preventDefault()` on `bike:rowdragenter` or `bike:rowdragover` to accept the drop. If nothing accepts, the cursor shows the drag isn't allowed and no `bike:rowdrop` fires. Native drags don't trigger CSS `:hover`, so use the enter/over/leave events to toggle your own highlight class.
+
+Each event's `detail` carries `{ outline, rows, clientX, clientY }` in `bike.session`'s id spaces — the source outline's persistent id and the dragged rows' session ids — so you can pass them straight to `bike.session` calls, even when the rows came from a different document:
+
+```typescript
+context.element.addEventListener('bike:rowdragover', (e) => {
+  if ((e.target as HTMLElement).closest('.drop-zone')) e.preventDefault()
+})
+context.element.addEventListener('bike:rowdrop', (e) => {
+  const { outline, rows } = e.detail
+  bike.session.updateRows({ outline, rows, attributes: { flagged: '' } })
+})
+```
+
+For a working example see the calendar core extension, which sets a row's `due` date when you drop it on a calendar day.
+
 ## Next Steps
 
 Follow the [Style Context Tutorial](style-context-tutorial.md) to create your own editor styles.

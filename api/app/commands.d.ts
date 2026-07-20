@@ -1,5 +1,6 @@
 import { OutlineEditor, Selection } from './outline-editor'
 import { Disposable } from './system'
+import { SFSymbolName } from '../core/bike-globals'
 
 /**
  * Command definition. Either a bare action closure, or an object that pairs the
@@ -25,7 +26,7 @@ export type CommandButtonLocation =
 /** A default button an extension contributes for one of its commands. */
 export type CommandButton = {
   /** SF Symbol name shown on the button (e.g. `'star'`, `'bolt'`). */
-  symbol: string
+  symbol: SFSymbolName
   /** The bar the button is placed in by default. */
   location: CommandButtonLocation
 }

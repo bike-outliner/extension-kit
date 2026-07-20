@@ -76,7 +76,13 @@ interface SessionEditor {
   focused: SessionId[]
   collapsed: SessionId[]
   filter: OutlinePath | null
-  selection: { anchor: SessionId; head: SessionId; rows: SessionId[]; text: string } | null
+  selection: {
+    anchor: SessionId
+    head: SessionId
+    rows: SessionId[]
+    text: string
+    context: Record<string, string | number | boolean | null> // head row enclosing attributes
+  } | null
 }
 
 interface CommandInfo {

@@ -1,5 +1,11 @@
 import { JSONStore } from './json'
 
+/**
+ * An SF Symbol name, e.g. `'star'`, `'chevron.left'`, `'calendar'`.
+ * Browse the catalog in Apple's SF Symbols app.
+ */
+export type SFSymbolName = string
+
 /** Options for rendering an SF Symbol. */
 export interface SFSymbolOptions {
   weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'
@@ -71,5 +77,5 @@ export interface BikeUtilityGlobals extends BikeCommonGlobals {
   formatDate(date: Date, pattern: string): string
 
   /** Returns a URL string for the named SF Symbol. */
-  symbolURL(name: string, options?: SFSymbolOptions): string
+  symbolURL(name: SFSymbolName, options?: SFSymbolOptions): string
 }

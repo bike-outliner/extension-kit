@@ -1,4 +1,5 @@
 /// <reference path="./session.d.ts" />
+/// <reference path="./drop.d.ts" />
 
 declare module '*.css' {}
 
