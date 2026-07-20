@@ -1,28 +1,18 @@
 /**
- * Menus presented with `editor.showMenu(row, { items, ... })`
+ * Presented with `editor.showMenu(row, { items, ... })`
  */
 
 import { SFSymbolName } from '../core/bike-globals'
 import { CommandName } from './commands'
 
-/** Checkmark state for a menu `button`, mirroring cocoa menu item state. */
 export type MenuItemState = 'on' | 'off' | 'mixed'
 
-/** Menu item types */
 export type MenuItem =
   | MenuButtonItem
   | MenuSeparatorItem
   | MenuPaletteItem
   | MenuCalendarItem
 
-/**
- * A menu button row.
- *
- * Choosing it reports `onAction(id, context)` and closes the card. An id of the
- * form `command:<commandId>` instead dispatches that command with the clicked
- * row as its selection (never reaching `onAction`); buttons naming an
- * unregistered command are hidden.
- */
 export interface MenuButtonItem {
   type: 'button'
   id: `command:${CommandName}` | (string & {})
@@ -36,7 +26,6 @@ export interface MenuSeparatorItem {
   type: 'separator'
 }
 
-/** One option in a {@link MenuPaletteItem}. */
 export interface MenuPaletteOption {
   value: string
   title: string
@@ -44,7 +33,6 @@ export interface MenuPaletteOption {
   color?: string // #rrggbb
 }
 
-/** A palette row */
 export interface MenuPaletteItem {
   type: 'palette'
   id: string
@@ -56,7 +44,6 @@ export interface MenuPaletteItem {
   enabled?: boolean
 }
 
-/** An inline month calendar. */
 export interface MenuCalendarItem {
   type: 'calendar'
   id: string
