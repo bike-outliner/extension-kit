@@ -97,11 +97,21 @@ export interface BadgeContext {
 
 /** A value-aware badge rendered trailing a row's text. */
 export interface BadgeConfig {
-  /** Relative outline path selecting the rows that show this badge (`.@priority`) */
+  /**
+   * Relative outline path selecting the rows that show this badge
+   * (`.@priority`). Self-only tests only — unbounded traversals like
+   * `.//task` throw at registration (they'd walk every visible row's
+   * subtree per style pass). Select on a `summary(...)` instead.
+   */
   where: RelativeOutlinePath
-  /** Map of result-name → outline-path value expression evaluated on the row */
+  /**
+   * Map of result-name → outline-path value expression evaluated on the
+   * row. Omitted, it defaults to `{ <name>: '@<name>' }` — so the badge's
+   * name must be a valid attribute token (registration throws otherwise),
+   * and `render` receives `values.<name>` without declaring it.
+   */
   inputs?: Record<string, string>
-  /** Re-render every `tick` seconds with `env.now` set */
+  /** Re-render every `tick` WHOLE seconds (integer >= 1) with `env.now` set; smaller values disable ticking */
   tick?: number
   /**
    * Render input values to the badge's glyph, e.g. `Image.fromSymbol(...)`

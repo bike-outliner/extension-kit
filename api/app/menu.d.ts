@@ -15,8 +15,11 @@ export type MenuItemState = 'on' | 'off' | 'mixed'
  * registry (unregistered ones are hidden), every other interactive item
  * routes its `id` to the `showMenu` options' `onAction`/`onChange`
  * handlers. Valued items commit through `onChange` with TYPED values: a
- * string (`field`, `calendar`, `choice`, `palette`), a number (`duration`,
- * whole seconds), or a boolean (`toggle`).
+ * string (`field`, `calendar`, `choice`, `palette`, `time`), a number
+ * (`duration`, whole seconds), or a boolean (`toggle`). Values are
+ * BUFFERED while the menu is open and delivered — latest value per item —
+ * when it commit-dismisses; Esc discards them. There is no live per-edit
+ * delivery.
  *
  * Unknown `type`s and items missing required keys are skipped, never
  * errors — a menu written against a future schema still renders.
@@ -35,6 +38,7 @@ export type MenuItem =
   | MenuRowItem
   | MenuCalendarItem
   | MenuDurationItem
+  | MenuTimeItem
   | MenuSubmenuItem
   | MenuPaletteItem
   | MenuHeaderItem
@@ -104,9 +108,10 @@ export interface MenuChoiceOption {
 }
 
 /**
- * An editable text field row. Commits — Return, end of editing (focus left
- * the field), card dismissal — call `onChange(id, value, ctx)` with the
- * text; Esc discards. An unchanged field never reports.
+ * An editable text field row. Return or end of editing (focus left the
+ * field) stages the text; it is delivered via `onChange(id, value, ctx)`
+ * when the card commit-dismisses. Esc discards. An unchanged field never
+ * reports.
  */
 export interface MenuFieldItem {
   type: 'field'
@@ -196,8 +201,9 @@ export interface MenuCalendarItem {
 
 /**
  * A duration picker: keyboard-editable digit fields (arrows step, typed
- * digits accumulate, delete clears). Every change commits the duration as
- * WHOLE SECONDS — a NUMBER — via `onChange`; the card stays open.
+ * digits accumulate, delete clears). Edits update the pending duration —
+ * WHOLE SECONDS, a NUMBER — with the card open; it is delivered via
+ * `onChange` on commit-dismissal.
  */
 export interface MenuDurationItem {
   type: 'duration'
@@ -216,6 +222,26 @@ export interface MenuDurationItem {
 }
 
 /**
+ * A time-of-day picker: keyboard-editable digit fields, like `duration` but
+ * for a wall-clock time. Edits update the pending `HH:mm:ss` string value
+ * (the display is localized, the wire value is not); the card stays open.
+ */
+export interface MenuTimeItem {
+  type: 'time'
+  id: string
+  /** Initial `HH:mm:ss` value; omitted = midnight. */
+  value?: string
+  /** Caption above the picker, in small secondary text. */
+  label?: string
+  /**
+   * Which component fields to show; omitted/empty = hour/minute. Hidden
+   * fields are zero in the reported value.
+   */
+  fields?: ('hour' | 'minute' | 'second')[]
+  enabled?: boolean
+}
+
+/**
  * A nested menu of any item types. AVOID focusable children (`field`,
  * `row`, `duration`) in submenus — they are not keyboard-coordinated there
  * and disturb the root card's typing while the submenu is open.
@@ -227,11 +253,11 @@ export interface MenuSubmenuItem {
   /** SF Symbol name (required for `style: 'icon'`). */
   symbol?: string
   /**
-   * `'row'` (default): a native titled item. `'icon'`: a hosted row with a
+   * `'native'` (default): a native titled item. `'icon'`: a hosted row with a
    * compact icon button; the submenu shows while the pointer is over the
    * button.
    */
-  style?: 'row' | 'icon'
+  style?: 'native' | 'icon'
   /** Caption above the icon button (`style: 'icon'` only). */
   label?: string
   items: MenuItem[]
