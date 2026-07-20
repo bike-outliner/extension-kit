@@ -132,8 +132,8 @@ export interface MenuContext {
 export interface ShowMenuOptions {
   /** Called for the initial menu and re-invoked on every refresh */
   items: () => MenuItem[]
-  /** A badge name: anchor the menu at that badge's glyph on the row. */
-  anchor?: string
+  /** Badge name or character index. Defaults to end of row text. */
+  anchor?: string | number
   /** A menu item was chosen, closing the menu. */
   onAction?: (id: string, value: string | undefined, context: MenuContext) => void
 }
