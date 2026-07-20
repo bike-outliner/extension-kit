@@ -20,7 +20,6 @@ type PersistentId = import('../app/outline').PersistentId
 type OutlineId = string
 type EditorId = string
 type ContextSentinel = '@window' | '@frontmost'
-/** Absolute file path of an outline that is currently open in Bike. */
 type FilePath = string
 type OutlineRef = OutlineId | FilePath | ContextSentinel
 type EditorRef = EditorId | ContextSentinel
@@ -81,7 +80,6 @@ interface SessionEditor {
     head: SessionId
     rows: SessionId[]
     text: string
-    context: Record<string, string | number | boolean | null> // head row enclosing attributes
   } | null
 }
 

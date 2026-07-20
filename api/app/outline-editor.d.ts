@@ -176,8 +176,6 @@ type SelectionCommon = {
   rows: Row[]
   /** The common ancestors of the rows in the selection */
   coverRows: Row[]
-  /** Self and ancestor attributes of head row (nearest wins) */
-  context: Record<string, string | number | boolean | null>
 }
 
 type SelectionTypeDetail =
