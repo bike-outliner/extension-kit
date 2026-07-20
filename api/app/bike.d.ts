@@ -74,10 +74,7 @@ declare global {
     /** Observer called current and future frontmost outline editors. */
     observeFrontmostOutlineEditor(handler: (_: OutlineEditor | undefined) => void): Disposable
 
-    /**
-     * All connected screens. `screens[0]` is the primary (menu bar) screen,
-     * matching `NSScreen.screens` ordering.
-     */
+    /** All connected screens. `screens[0]` is the primary (menu bar) screen */
     readonly screens: Screen[]
     /** The primary screen (the one with the menu bar). */
     readonly mainScreen: Screen

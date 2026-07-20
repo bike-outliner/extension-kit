@@ -2,7 +2,7 @@ import { SelfOnlyOutlinePath, SelfOnlyValuePath } from '../core/outline-path'
 
 /**
  * Summaries: incremental & cached reductions over an outline axis.
-*
+ *
  * A summary reduces in one direction (`axis`). For example reduce a row's
  * subtree (`descendant-or-self`, the default) and then it's efficient to read
  * that value later in outline path queries. This example is used to count total
