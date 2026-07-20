@@ -90,6 +90,8 @@ See these projects for example extensions built with this kit:
 - [DOM Context Tutorial](docs/dom-context-tutorial.md) — custom UI with sheets and React
 - [Style Context Tutorial](docs/style-context-tutorial.md) — outline styling, decorations, themes
 - [Summary & Badges Tutorial](docs/summary-badges-tutorial.md) — subtree summaries and value-aware row badges
+- [Filter Queries Tutorial](docs/filter-queries-tutorial.md) — labeled filter queries in the filter field autocomplete
+- [Attachments Tutorial](docs/attachments-tutorial.md) — reading and displaying embedded file attachments
 - [Testing Extensions Tutorial](docs/testing-extensions-tutorial.md) — writing and running tests
 - [Sharing Extensions Tutorial](docs/sharing-extensions-tutorial.md) — packaging, releasing, and registry submission
 - [Session Automation Reference](docs/session-automation.md) — the `bike` CLI (+MCP) and `bike.session` DOM API
