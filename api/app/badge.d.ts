@@ -36,11 +36,7 @@ import { Row } from './outline'
 export interface BadgeEnvironment {
   /** The outline's BASE text font (the stylesheet's `viewport.font`) */
   readonly font: Font
-  /**
-   * The outline's BASE text color (same as `theme.colors.text`), NOT the
-   * row's tint — so a badge reads as the outline's own chrome and doesn't
-   * pick up a heading color or a per-row color rule.
-   */
+  /** The outline's BASE text color (same as `theme.colors.text`) */
   readonly color: Color
   /** Epoch seconds; present only for ticking badges (`tick` set). */
   readonly now?: number

@@ -466,7 +466,6 @@ interface ChoiceBoxSource {
    *  The prefix itself is stripped from the fuzzy-match text. Omit on exactly one
    *  source per choice box to mark it as the default. */
   prefix?: string
-
   /** Placeholder text shown in the search field while this source is active. */
   placeholder?: string
   /** Default SF Symbol to use when an item doesn't specify one. */
