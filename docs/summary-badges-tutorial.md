@@ -15,7 +15,7 @@ This tutorial assumes that you have [created an extension](creating-extensions.m
 
 ## Registering a Badge
 
-We'll build an `estimate` badge: a small time chip that appears on any row carrying an `@estimate` attribute (a number of minutes).
+We'll build an `estimate` badge: a small time glyph that appears on any row carrying an `@estimate` attribute (a number of minutes).
 
 ### A Value-Aware Glyph
 
@@ -116,7 +116,7 @@ presentation's `onAction`, which writes or removes the attribute. Because
 `showEstimateMenu` takes any `(editor, row)`, the same function could also
 back a command that offers the menu on rows with no estimate yet.
 
-Save, and click an estimate chip. The menu should open with the preset
+Save, and click an estimate badge. The menu should open with the preset
 times and a **Remove Estimate** option, and choosing one should update the
 row.
 

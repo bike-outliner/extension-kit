@@ -17,7 +17,7 @@ import { Row } from './outline'
  *
  * It selects rows with a `where` path (same syntax as style rules), reads
  * `inputs` off each match, and hands them to `render`. That's how you surface
- * data inline — a `@priority` chip, a `summary("openTasks")` aggregate, a live
+ * data inline — a `@priority` badge, a `summary("openTasks")` aggregate, a live
  * `@due` countdown (see `tick`), a progress bar.
  *
  * A badge is DECORATION ONLY. To make it interactive, give it an `onClick`
@@ -83,7 +83,7 @@ export interface BadgeContext {
 /**
  * One image of a keyed multi-image render. The key identifies the sub-badge
  * everywhere: `onClick` receives it, and `showMenu` anchors to it via
- * `{ badge, key }` (the catch-all attribute chips key by attribute name).
+ * `{ badge, key }` (the catch-all attribute badges key by attribute name).
  */
 export interface KeyedImage {
   key: string

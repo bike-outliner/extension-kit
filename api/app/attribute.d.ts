@@ -68,7 +68,7 @@ export interface AttributeConfig {
   /**
    * The attribute's small canonical value set ("1"/"2"/"3" for priority).
    * Static — it travels with the definition (`AttributeInfo`), so the
-   * built-in chip badge's menu offers these as pick rows, and completion
+   * built-in catch-all badge's menu offers these as pick rows, and completion
    * offers them ahead of `values(pattern)`. Use `values` instead for
    * dynamic or open-ended suggestion sets.
    */
@@ -88,7 +88,7 @@ export interface AttributeConfig {
   parse?: (text: string) => AttributeParseResult | undefined
   /**
    * Whether the built-in catch-all badge may render this attribute as a
-   * generic `name: value` chip when no dedicated badge does. Default true.
+   * generic `name: value` badge when no dedicated badge does. Default true.
    * Set false when your extension presents the attribute itself (a
    * dedicated `bike.badge`, or row styling like `done`) — an EXPLICIT
    * opt-out; registering a definition alone never changes rendering.
