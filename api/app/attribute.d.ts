@@ -15,6 +15,20 @@
  * built-in catch-all badge; `defaultBadge: false` opts an attribute out.
  */
 
+/**
+ * Declared value type — a serialization convention readers and writers agree
+ * on (row attribute values are always strings):
+ *
+ * - `'string'` — any text (the default).
+ * - `'number'` — a decimal via `String(n)` ("2", "3.5").
+ * - `'date'` — `YYYY-MM-DD` (local calendar day), or a full ISO-8601 UTC
+ *   timestamp when timed ("2026-07-24T17:00:00Z").
+ * - `'duration'` — `<n><unit>` with unit `m` / `h` / `d` ("30m", "2h",
+ *   "1.5h", "1d").
+ * - `'flag'` — valueless only: present with the empty string, or absent.
+ */
+export type AttributeType = 'string' | 'number' | 'date' | 'duration' | 'flag'
+
 /** A quick effect offered under the bare `@` popup. */
 export interface AttributeShortcut {
   /** Stable id within this attribute's shortcuts; defaults to `name`. */
@@ -53,6 +67,14 @@ export interface AttributeConfig {
    * capitalized attribute name.
    */
   title?: string
+  /**
+   * Declared value type — purely declarative, carried through
+   * {@link AttributeInfo} so other extensions read and write the value the
+   * same way. Default 'string'. A 'flag' attribute is valueless:
+   * registering one with `standardValues`, `values`, `parse`, or `list` is
+   * rejected.
+   */
+  type?: AttributeType
   /**
    * Single-character token alias: `<sigil>text` at the end of a row's text
    * is values mode for this attribute (`^fri` ≡ `@due:fri`). Must not be a
@@ -94,11 +116,39 @@ export interface AttributeConfig {
    * opt-out; registering a definition alone never changes rendering.
    */
   defaultBadge?: boolean
+  /**
+   * `standardValues` is the COMPLETE legal set: completion drops the
+   * literal `Set name = text` fallback (a successful `parse` still backs
+   * it), and sharing extensions may exhaustively switch on the values.
+   * Default false.
+   */
+  strict?: boolean
+  /**
+   * The value is a comma-separated list. The convention readers and writers
+   * agree on: split on ',', trim each item, join with ','. Completion
+   * disables its ','-chain commit in values mode so commas are typable.
+   * Default false.
+   */
+  list?: boolean
+  /**
+   * Present ⇒ a bare valueless `@name` is meaningful, displayed with this
+   * label ("Soon" for due, "Done" for done). Names completion's bare-commit
+   * row and the built-in catch-all badge's valueless rendering.
+   */
+  emptyLabel?: string
+  /** One-line documentation, surfaced through {@link AttributeInfo}. */
+  description?: string
 }
 
 /** A registered definition snapshot, as reported by `bike.observeAttributes`. */
 export interface AttributeInfo {
   name: string
+  title: string
+  type: AttributeType
+  strict: boolean
+  list: boolean
+  emptyLabel?: string
+  description?: string
   defaultBadge: boolean
   standardValues: AttributeValue[]
 }

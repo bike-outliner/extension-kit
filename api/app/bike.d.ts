@@ -3,7 +3,7 @@ import { Inspector } from './inspector'
 import { Settings } from './settings'
 import { Commands } from './commands'
 import { Keybindings } from './keybindings'
-import { AttributeConfig, AttributeInfo } from './attribute'
+import { AttributeConfig, AttributeInfo, AttributeParseResult } from './attribute'
 import { BadgeConfig } from './badge'
 import { SummaryConfig } from './summary'
 import { Input } from './input'
@@ -50,6 +50,12 @@ declare global {
     attribute(name: string, config: AttributeConfig): Disposable
     /** Observe current and future attribute infos */
     observeAttributes(handler: (infos: AttributeInfo[]) => void): Disposable
+    /**
+     * Parse free text through the named attribute's registered `parse` —
+     * whichever extension owns the definition. Undefined when there is no
+     * definition, no parse, or the text doesn't resolve.
+     */
+    parseAttribute(name: string, text: string): AttributeParseResult | undefined
 
     /** All windows. */
     readonly windows: Window[]
