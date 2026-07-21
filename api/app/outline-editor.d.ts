@@ -24,13 +24,23 @@ export interface OutlineEditor extends View {
    * Applies a filter to the outline editor display using an OutlinePath.
    * If the path is relative, it is resolved from the focus row.
    *
-   * Set a plain path, or `{ path, label }` — the label displays in the
-   * filter field in place of the raw query while the field is unfocused.
-   * Paths matching a saved sidebar query display that query's title
-   * automatically.
+   * Set a plain path, or `{ path, label, emptyMessage }` — the label
+   * displays in the filter field in place of the raw query while the field
+   * is unfocused. Paths matching a saved sidebar query display that query's
+   * title automatically. The emptyMessage displays centered in the editor
+   * while the filter matches no rows.
+   *
+   * Setter-only: pass `pushLocation: false` when live-refining an existing
+   * filter (e.g. a drag growing a date range) so Back doesn't accumulate a
+   * navigation step per refinement; defaults to true.
    */
-  get filter(): { path: OutlinePath; label?: string } | undefined
-  set filter(value: OutlinePath | { path: OutlinePath; label?: string } | undefined)
+  get filter(): { path: OutlinePath; label?: string; emptyMessage?: string } | undefined
+  set filter(
+    value:
+      | OutlinePath
+      | { path: OutlinePath; label?: string; emptyMessage?: string; pushLocation?: boolean }
+      | undefined
+  )
 
   /** True when row is in focused branch and not filtered or collapsed */
   isFocused(row: Row): boolean
