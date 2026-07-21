@@ -40,11 +40,20 @@ export interface CompletionItem {
 }
 
 /**
+ * How the user accepted a completion item. `'pick'` (Return, click) is the
+ * terminal choice; `'complete'` (Tab, or a typed {@link
+ * CompletionResult.completeChars} character) asks the provider to fill in
+ * the item's text and keep going — e.g. expanding an attribute name to
+ * `@name:` so its values can be completed next.
+ */
+export type CompletionAcceptKind = 'pick' | 'complete'
+
+/**
  * What `provideCompletions` offers at the caret. The popup fuzzy-filters
  * `items` by `pattern`, anchors under `range`, and calls `accept` when the
  * user picks an item (Enter/Tab/click). The popup closes itself when
- * nothing matches (unless `emptyFallback` is provided) and when the
- * selection changes.
+ * nothing matches (unless `fallback` is provided) and when the selection
+ * changes.
  */
 export interface CompletionResult {
   /** Character range in the context row being completed (e.g. the typed token). */
@@ -52,10 +61,29 @@ export interface CompletionResult {
   /** Text the item names are fuzzy-matched against (e.g. the token's text). */
   pattern: string
   items: CompletionItem[]
-  /** Shown as the only row when a non-empty pattern matches no item. */
-  emptyFallback?: CompletionItem
-  /** Commit the picked item (typically inside `editor.transaction`). */
-  accept(item: CompletionItem): void
+  /**
+   * The escape hatch for committing the literal typed text (e.g. an
+   * `Add @pri` action while `priority` matches): pinned as the last popup
+   * row behind a separator whenever the pattern is non-empty — never
+   * fuzzy-ranked, never auto-highlighted — and the only (auto-selected)
+   * row when nothing matches. Reached by arrowing down, or directly with
+   * ⌥⏎. Convention: omit it when the typed text exactly equals an
+   * existing item, so the escape never duplicates a match.
+   */
+  fallback?: CompletionItem
+  /**
+   * Characters that accept the highlighted item with kind `'complete'`
+   * instead of being typed — `accept` supplies the character itself. Omit
+   * where those characters must stay typable (e.g. `:` inside a value).
+   */
+  completeChars?: string
+  /**
+   * Commit the picked item (typically inside `editor.transaction`). After
+   * `accept` returns, the popup re-queries providers at the caret — a
+   * `'complete'` accept that rewrote the token gets its follow-up popup
+   * immediately.
+   */
+  accept(item: CompletionItem, kind: CompletionAcceptKind): void
 }
 
 /**
