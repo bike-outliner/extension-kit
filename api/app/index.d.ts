@@ -1,4 +1,5 @@
 export * from './bike'
+export * from './attribute'
 export * from './badge'
 export * from './filter'
 export * from './menu'

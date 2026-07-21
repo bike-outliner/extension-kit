@@ -3,6 +3,7 @@ import { Inspector } from './inspector'
 import { Settings } from './settings'
 import { Commands } from './commands'
 import { Keybindings } from './keybindings'
+import { AttributeConfig, AttributeInfo } from './attribute'
 import { BadgeConfig } from './badge'
 import { SummaryConfig } from './summary'
 import { Input } from './input'
@@ -40,11 +41,15 @@ declare global {
     readonly settings: Settings
     /** Secure storage for secrets (API tokens, passwords, etc) */
     readonly keychain: Keychain
-
+    
     /** Register a row badge. See `BadgeConfig`. */
     badge(name: string, config: BadgeConfig): Disposable
     /** Register a summary (subtree or ancestor reduction), readable as `summary("name")`. See `SummaryConfig`. */
     summary(name: string, config: SummaryConfig): Disposable
+    /** Register an attribute definition (completion, rendering, …). See `AttributeConfig`. */
+    attribute(name: string, config: AttributeConfig): Disposable
+    /** Observe current and future attribute infos */
+    observeAttributes(handler: (infos: AttributeInfo[]) => void): Disposable
 
     /** All windows. */
     readonly windows: Window[]

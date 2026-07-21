@@ -121,6 +121,9 @@ export interface OutlineEditor extends View {
    * @returns A handle for this presentation, or undefined if the menu was not presented (no items).
    */
   showMenu(row: Row, options: ShowMenuOptions): MenuHandle | undefined
+
+  /** Show autocomplete for current caret if any completions exist */
+  showCompletions(): void
 }
 
 /** Context passed to `showMenu` handlers: the menu's row and its editor. */
@@ -132,8 +135,12 @@ export interface MenuContext {
 export interface ShowMenuOptions {
   /** Called for the initial menu and re-invoked on every refresh */
   items: () => MenuItem[]
-  /** Badge name or character index. Defaults to end of row text. */
-  anchor?: string | number
+  /**
+   * Badge name, character index, or — for one image of a keyed multi-image
+   * badge — `{ badge, key }` (the key from the badge's `onClick`).
+   * Defaults to end of row text.
+   */
+  anchor?: string | number | { badge: string; key?: string }
   /** A menu item was chosen, closing the menu. */
   onAction?: (id: string, value: string | undefined, context: MenuContext) => void
 }

@@ -71,10 +71,23 @@ export interface BadgeMetrics {
   readonly padding: Insets
 }
 
-/** Context passed to `onClick`: the clicked row and its editor. */
+/** Context passed to `onClick`: the clicked row and its editor. `key`
+ * identifies the clicked image of a keyed multi-image render (absent for
+ * single-image badges). */
 export interface BadgeContext {
   readonly editor: OutlineEditor
   readonly row: Row
+  readonly key?: string
+}
+
+/**
+ * One image of a keyed multi-image render. The key identifies the sub-badge
+ * everywhere: `onClick` receives it, and `showMenu` anchors to it via
+ * `{ badge, key }` (the catch-all attribute chips key by attribute name).
+ */
+export interface KeyedImage {
+  key: string
+  image: Image
 }
 
 /** A value-aware badge rendered trailing a row's text. */
@@ -91,20 +104,25 @@ export interface BadgeConfig {
    * row. Omitted, it defaults to `{ <name>: '@<name>' }` — so the badge's
    * name must be a valid attribute token (registration throws otherwise),
    * and `render` receives `values.<name>` without declaring it.
+   *
+   * The string `'*'` is the catch-all form: `values` becomes the row's
+   * FULL attribute map (reserved names excluded) — pair it with a
+   * match-any `where` (`.*`) and a keyed multi-image render.
    */
-  inputs?: Record<string, string>
+  inputs?: Record<string, string> | '*'
   /** Re-render every `tick` WHOLE seconds (integer >= 1) with `env.now` set; smaller values disable ticking */
   tick?: number
   /**
-   * Render input values to the badge's glyph, e.g. `Image.fromSymbol(...)`
-   * or `Image.fromText(...)`; return `null` for no badge. Must be a pure
-   * function.
+   * Render input values to the badge's glyph(s): a single `Image` (the
+   * common case), an array of `KeyedImage` (a multi-image badge — one
+   * glyph per key, displayed in array order), or `null` for no badge.
    */
-  render: (values: Readonly<Record<string, string | undefined>>, env: BadgeEnvironment) => Image | null
+  render: (values: Readonly<Record<string, string | undefined>>, env: BadgeEnvironment) => Image | KeyedImage[] | null
   /**
-   * Called when the badge's glyph is clicked. Typically presents a menu:
-   * `onClick: ({ editor, row }) => editor.showMenu(row, { items,
-   * anchor: '<badge>' , ... })`.
+   * Called when a badge glyph is clicked — `context.key` identifies the
+   * clicked image of a keyed render. Typically presents a menu:
+   * `onClick: ({ editor, row, key }) => editor.showMenu(row, { items,
+   * anchor: { badge: '<name>', key }, ... })`.
    */
   onClick?: (context: BadgeContext) => void
 }
