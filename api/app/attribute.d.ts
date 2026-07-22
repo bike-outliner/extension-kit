@@ -41,10 +41,12 @@ export interface AttributeShortcut {
 
 /** A value suggestion for `@name:` / sigil completion. */
 export interface AttributeValue {
-  /** Display text, fuzzy-matched ("Friday (Jul 24)"). */
+  /** Display text, fuzzy-matched ("Friday"). */
   name: string
   /** The attribute value committed when picked. */
   value: string
+  /** Right-aligned popup detail ("Jul 24"). Display only — not matched. */
+  detail?: string
 }
 
 /** A successful free-text parse. */
