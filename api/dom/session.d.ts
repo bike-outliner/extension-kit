@@ -259,6 +259,15 @@ interface BikeSession {
     after?: RowRef
   }): Promise<SessionRow[]>
 
+  /**
+   * Apply focus / filter / fold / selection / activate to the editor in one
+   * call. Operations apply in that fixed order.
+   *
+   * Note `focus` is Bike's focus — drill into a row — not keyboard focus.
+   * Keyboard focus is `activate`, which matters from a DOM context: clicking
+   * in a panel or inspector item makes its webview first responder, so a
+   * `select` alone leaves the caret in an editor that isn't taking keystrokes.
+   */
   updateEditor(params: {
     outline?: OutlineRef
     focus?: RowRef
@@ -267,6 +276,12 @@ interface BikeSession {
     selectHead?: RowRef
     expand?: RowRef[]
     collapse?: RowRef[]
+    /**
+     * Give the editor keyboard focus: activates Bike, brings the editor's
+     * window to the front, and makes the editor first responder. Applied last,
+     * after any selection.
+     */
+    activate?: boolean
   }): Promise<SessionEditor>
   
   evaluateCommands(params: {
