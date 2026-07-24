@@ -1,15 +1,15 @@
 /**
  * Attribute definitions: configure how the editor treats a specific attribute.
- * Today that covers completion and default-badge rendering.
+ * Today that covers the attribute palette and default-badge rendering.
  *
- * Completion: typing `@name` / `@name:value` at the END of a row's text
- * completes and commits row attributes. That works for ANY attribute; a
- * definition adds what only the owning extension knows:
+ * The palette (⌘→, the @ button, or a `menu: 'default'` badge) edits row
+ * attributes for ANY name; a definition adds what only the owning extension
+ * knows:
  *
- * - `shortcuts` — quick effects under the bare `@` popup ("Due Tomorrow⏎").
- * - `values` — suggestions after `@name:` ("Today", "Friday (Jul 24)").
- * - `parse` — free text → a committed value (`@due:next fri`).
- * - `sigil` — a one-character alias: `^fri` ≡ `@due:fri`.
+ * - `shortcuts` — one-step name+value effects ("Due Tomorrow").
+ * - `standardValues` — the canonical value set, offered first.
+ * - `values` — suggestions given the typed pattern ("Today", "Friday").
+ * - `parse` — free text → a committed value ("next fri").
  *
  * Rendering: unclaimed attributes get a generic `name:value` badge from the
  * built-in catch-all badge; `defaultBadge: false` opts an attribute out.
@@ -39,7 +39,7 @@ export interface AttributeShortcut {
   value: string
 }
 
-/** A value suggestion for `@name:` / sigil completion. */
+/** A value suggestion for the palette's value stage. */
 export interface AttributeValue {
   /** Display text, fuzzy-matched ("Friday"). */
   name: string
@@ -77,13 +77,6 @@ export interface AttributeConfig {
    * rejected.
    */
   type?: AttributeType
-  /**
-   * Single-character token alias: `<sigil>text` at the end of a row's text
-   * is values mode for this attribute (`^fri` ≡ `@due:fri`). Must not be a
-   * letter, digit, whitespace, `@`, `:`, or the reserved `#`. First
-   * registration wins a contested sigil.
-   */
-  sigil?: string
   /**
    * Quick effects for the bare `@` popup, grouped above the attribute
    * names. Built fresh per popup — date-relative values roll over.

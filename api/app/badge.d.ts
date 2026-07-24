@@ -20,9 +20,11 @@ import { Row } from './outline'
  * data inline — a `@priority` badge, a `summary("openTasks")` aggregate, a live
  * `@due` countdown (see `tick`), a progress bar.
  *
- * A badge is DECORATION ONLY. To make it interactive, give it an `onClick`
- * handler — typically one that presents a menu with `editor.showMenu(row,
- * { items, anchor: '<badge>' })`.
+ * A badge is DECORATION ONLY. To make it interactive, give it `menu:
+ * 'default'` — the built-in attribute menu (filter / standard values /
+ * edit / remove) opens on click — or a custom `onClick` handler, typically
+ * one that presents a menu with `editor.showMenu(row, { items, anchor:
+ * '<badge>' })`. A badge with neither is not clickable.
  */
 
 /**
@@ -119,10 +121,21 @@ export interface BadgeConfig {
    */
   render: (values: Readonly<Record<string, string | undefined>>, env: BadgeEnvironment) => Image | KeyedImage[] | null
   /**
+   * `'default'` opens the built-in attribute menu when a badge glyph is
+   * clicked: Filter / Filter = value, the attribute definition's standard
+   * values as radios, "Value…" (the attribute palette's value stage), and
+   * Remove. The target attribute is the clicked image's key (a keyed
+   * multi-image render) or, unkeyed, the badge's own name. A custom
+   * `onClick` wins when both are set; a badge with neither is not
+   * clickable.
+   */
+  menu?: 'default'
+  /**
    * Called when a badge glyph is clicked — `context.key` identifies the
    * clicked image of a keyed render. Typically presents a menu:
    * `onClick: ({ editor, row, key }) => editor.showMenu(row, { items,
-   * anchor: { badge: '<name>', key }, ... })`.
+   * anchor: { badge: '<name>', key }, ... })`. Wins over `menu: 'default'`
+   * when both are set.
    */
   onClick?: (context: BadgeContext) => void
 }

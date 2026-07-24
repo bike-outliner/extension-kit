@@ -2,6 +2,7 @@ import { Affinity, AttributedString, Outline, Range, Row, TransactionOptions } f
 import { OutlinePath } from '../core/outline-path'
 import { Disposable } from './system'
 import { MenuItem } from './menu'
+import { PickerHandle, ShowPickerOptions } from './picker'
 import { View } from './bike'
 
 /** OutlineEditor is a view that displays an outline. */
@@ -126,14 +127,45 @@ export interface OutlineEditor extends View {
   /**
    * Present a menu anchored to a row.
    *
+   * The menu is a STATIC native menu snapshot of `options.items` — see the
+   * `menu` module header. Dismissal is native (Esc, click-out, choosing an
+   * item); a chosen item reports through `onAction` (or dispatches its
+   * `command:` id).
+   *
    * @param row - The row the menu is anchored to
-   * @param options - The menu's items, anchor, and handlers.
-   * @returns A handle for this presentation, or undefined if the menu was not presented (no items).
+   * @param options - The menu's items, anchor, and action handler.
    */
-  showMenu(row: Row, options: ShowMenuOptions): MenuHandle | undefined
+  showMenu(row: Row, options: ShowMenuOptions): void
+
+  /**
+   * Present the standalone value-picker shell anchored to a row: a filter
+   * field, a suggestion list, and — when the presentation has a kind — that
+   * kind's picker fixed below (the attribute palette's value-stage UI).
+   *
+   * A lightweight key window (not a menu): non-modal, fully
+   * keyboard-drivable, closed by accept (a suggestion row, a
+   * single-gesture pick, or Return) or cancel (Esc, click-out, dismiss).
+   * Bind to a registered attribute with `options.attribute`, or supply the
+   * list inline — see the module header and per-kind options in
+   * {@link ShowPickerOptions} for each kind's wire encoding.
+   *
+   * @param row - The row the picker is anchored to
+   * @param options - The picker's attribute/kind, suggestions, initial value, anchor, and handlers.
+   * @returns A handle for this presentation, or undefined on invalid options (unknown kind, nothing to show, missing onAccept, row gone).
+   */
+  showPicker(row: Row, options: ShowPickerOptions): PickerHandle | undefined
 
   /** Show autocomplete for current caret if any completions exist */
   showCompletions(): void
+
+  /**
+   * Present the row's attribute palette (the @ button's two-stage
+   * names/values panel). Editing ONE known attribute is
+   * {@link showPicker} with `attribute`.
+   *
+   * @param row - The row the palette edits (and anchors to)
+   */
+  showAttributePalette(row: Row): void
 }
 
 /** Context passed to `showMenu` handlers: the menu's row and its editor. */
@@ -143,8 +175,8 @@ export interface MenuContext {
 }
 
 export interface ShowMenuOptions {
-  /** Called for the initial menu and re-invoked on every refresh */
-  items: () => MenuItem[]
+  /** The menu's items. */
+  items: MenuItem[]
   /**
    * Badge name, character index, or — for one image of a keyed multi-image
    * badge — `{ badge, key }` (the key from the badge's `onClick`).
@@ -152,15 +184,7 @@ export interface ShowMenuOptions {
    */
   anchor?: string | number | { badge: string; key?: string }
   /** A menu item was chosen, closing the menu. */
-  onAction?: (id: string, value: string | undefined, context: MenuContext) => void
-}
-
-/** A handle to one `showMenu` presentation. */
-export interface MenuHandle {
-  /** Dismiss the menu if this presentation is still the live one */
-  dismiss(): void
-  /** Re-render the open menu from its `items` builder */
-  refresh(): void
+  onAction?: (id: string, context: MenuContext) => void
 }
 
 /**
