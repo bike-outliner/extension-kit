@@ -102,12 +102,6 @@ export class SymbolConfiguration {
   preferringMonochrome(): SymbolConfiguration
   preferringMulticolor(): SymbolConfiguration
   preferringHierarchical(): SymbolConfiguration
-  /** @deprecated Misspelling kept for compatibility — use `preferringMonochrome`. */
-  preferingMonochrome(): SymbolConfiguration
-  /** @deprecated Misspelling kept for compatibility — use `preferringMulticolor`. */
-  preferingMulticolor(): SymbolConfiguration
-  /** @deprecated Misspelling kept for compatibility — use `preferringHierarchical`. */
-  preferingHierachical(): SymbolConfiguration
 }
 
 /** SymbolScale – Use font for symbol size, then adjust with symbol scale */
@@ -229,8 +223,14 @@ export type FontWeight =
   | 'heavy'
   | 'black'
 
-/** Color space for mixing operations */
-export type ColorSpace = 'srgb' | 'hsl' | 'oklab' | 'oklch'
+/**
+ * Color space for mixing operations.
+ *
+ * `srgb`, `hsl`, `oklab` and `oklch` match the CSS `color-mix()` spaces. `okhsl` and
+ * `okhsv` are Ottosson's Oklab-backed HSL/HSV — not CSS spaces, but useful when you want
+ * equal saturation or lightness steps to read as equal.
+ */
+export type ColorSpace = 'srgb' | 'hsl' | 'oklab' | 'oklch' | 'okhsl' | 'okhsv'
 
 /** WCAG contrast targets */
 export type ContrastTarget = 'aa' | 'aaLarge' | 'aaa' | 'aaaLarge' | number
@@ -290,8 +290,8 @@ export class Color {
   static gray(white: number): Color
 
   /**
-   * Create color from HSL (hue, saturation, lightness all 0-1)
-   * @param hue 0-1
+   * Create color from HSL, matching the CSS `hsl()` function.
+   * @param hue Degrees. Wraps, so -30 and 330 are the same hue.
    * @param saturation 0-1
    * @param lightness 0-1
    * @param alpha 0-1
@@ -299,7 +299,7 @@ export class Color {
   static hsla(hue: number, saturation: number, lightness: number, alpha?: number): Color
 
   /**
-   * Create color in OKLab perceptually uniform space (l: 0-1, a/b: ~-0.4 to 0.4)
+   * Create color in OKLab perceptually uniform space, matching the CSS `oklab()` function.
    * @param l 0-1
    * @param a ~-0.4 to 0.4
    * @param b ~-0.4 to 0.4
@@ -308,10 +308,13 @@ export class Color {
   static oklab(l: number, a: number, b: number, alpha?: number): Color
 
   /**
-   * Create color in OKLch perceptually uniform space (l: 0-1, c: 0-0.4, h: 0-1)
+   * Create color in OKLch perceptually uniform space, matching the CSS `oklch()` function.
+   *
+   * Values outside the sRGB gamut are gamut-mapped when drawn, preserving hue — so a
+   * chroma higher than the display can show reduces chroma rather than shifting color.
    * @param l 0-1
    * @param c 0-0.4
-   * @param h 0-1
+   * @param h Degrees. Wraps, so -30 and 330 are the same hue.
    * @param alpha 0-1
    */
   static oklch(l: number, c: number, h: number, alpha?: number): Color
@@ -382,6 +385,9 @@ export class Color {
    * Mix this color with another (CSS color-mix).
    * @param fraction - Mix amount (0 = this, 1 = color)
    * @param colorSpace Color space for mixing (default oklab)
+   *
+   * Hue-bearing spaces (`hsl`, `oklch`, `okhsl`, `okhsv`) take the shorter arc, and carry
+   * the other color's hue when one side is gray.
    */
   mixed(color: Color, fraction: number, colorSpace?: ColorSpace): Color
 

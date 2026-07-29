@@ -60,6 +60,45 @@ export interface DOMScriptHandle<P extends DOMProtocol = DOMProtocol>
   postMessage(message: P['toDOM']): void
 }
 
+/** Options for `window.presentSheet`. */
+export interface SheetOptions {
+  width?: number
+  height?: number
+}
+
+/**
+ * Panel role, setting defaults for floating / canBecomeMain /
+ * hidesOnDeactivate. Declaring any of those individually overrides the role.
+ *
+ * - `'inspector'` — small, auxiliary. true / false / true. The default role.
+ * - `'utility'` — medium, tool-like. true / false / true.
+ * - `'window'` — full, document-like. false / true / false.
+ */
+export type PanelRole = 'inspector' | 'utility' | 'window'
+
+/** Options for `bike.showPanel`. */
+export interface PanelOptions {
+  /** The DOM script to run in the panel. */
+  script: DOMScript
+  /** Panel window title. */
+  title?: string
+  /** Panel role that sets default window behavior. */
+  role?: PanelRole
+  /** Whether the panel floats above other windows. Defaults to the role's
+   *  value (true unless role is 'window'). */
+  floating?: boolean
+  /** Whether the panel hides when the app deactivates. Defaults to the role's
+   *  value (true unless role is 'window'). */
+  hidesOnDeactivate?: boolean
+  /** Whether the panel can become the main window. Defaults to the role's
+   *  value (false unless role is 'window'). */
+  canBecomeMain?: boolean
+  /** Unique identifier for frame autosave. */
+  id?: string
+  /** Initial frame in AppKit global coordinates (defaults to centered on main screen). */
+  frame?: Rect
+}
+
 /** A DOMScriptHandle whose receive channel includes sheet lifecycle events. */
 export type SheetHandle<P extends DOMProtocol = DOMProtocol> =
   DOMScriptHandle<{ toDOM: P['toDOM']; toApp: P['toApp'] | SheetEvent }>

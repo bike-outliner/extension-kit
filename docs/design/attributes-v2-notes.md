@@ -1,10 +1,9 @@
 # Attributes v2 — design notes
 
-Draft "ideal interface" designs for the v2 attribute system: `attribute2.d.ts`,
-`picker2.d.ts`, `badge2.d.ts`, `summary2.d.ts`. Not wired into `index.d.ts` or
-`bike.d.ts` yet; the v1 files (`../attribute.d.ts`, `../badge.d.ts`,
-`../picker.d.ts`, `../summary.d.ts`) remain the shipping API until these
-replace them (clean break, no compat shims).
+The design rationale behind the v2 attribute system — `api/app/attribute.d.ts`,
+`picker.d.ts`, `badge.d.ts`, `summary.d.ts`. These files WERE the drafts; at
+api 0.58.0 they replaced the v1 API outright (clean break, no compat shims) and
+this document is kept as the record of why the interfaces look the way they do.
 
 ## The core idea
 
@@ -26,28 +25,32 @@ Three mechanisms carry that:
    `dateRange` → `interval` (matching the ISO term the query engine already
    uses), picker `dateTime` → gone (`date` + `time: 'required'` facet).
 2. **Shared facets.** Each type's constraint set (`NumberFacet`,
-   `ChoiceFacet`, …) is defined once in `attribute2.d.ts` and intersected
+   `ChoiceFacet`, …) is defined once in `attribute.d.ts` and intersected
    into BOTH the attribute config variant and the picker options variant.
    The two surfaces cannot drift, and "the attribute-bound picker derives
    its editor from the definition" is definitionally complete.
 3. **Lossless `AttributeInfo`.** The registry snapshot is a discriminated
    union carrying every facet field, defaults resolved (`choices`
-   normalized, rating `max: 5` filled, …). Any consumer can reconstruct the
+   normalized, defaults filled, …). Any consumer can reconstruct the
    full editing/rendering experience from the info alone.
 
 Supporting decisions:
 
-- **One named-value shape.** `AttributeValue { name, value, detail? }` is
-  the only "offered value" row type — choices, suggestions, picker rows.
-  `AttributeShortcut` extends it with `id`. v1's `PickerValue` /
+- **One named-value shape.** `AttributeValue { name, value, detail?,
+  menu? }` is the only "offered value" row type — choices, suggestions,
+  picker rows. `menu: true` promotes a row into the built-in attribute
+  menu (0.63.0 — this replaced the separate `AttributeShortcut` list and
+  the palette's bare-`@` shortcut rows). v1's `PickerValue` /
   `PickerChoiceOption` are gone.
 - **Wire encodings are normative in exactly one place** — the
-  `AttributeType` doc in `attribute2.d.ts`. Picker kinds and summary docs
+  `AttributeType` doc in `attribute.d.ts`. Picker kinds and summary docs
   reference it instead of restating it.
-- **One suggestion contract.** `AttributeSuggest = (pattern, signal) =>
-  AttributeValue[] | Promise<…>` is used by attribute definitions AND
-  ad-hoc pickers (v1's picker `values` callback was sync-only). The
-  provider/window `filter` flag moved into the shared contract.
+- **One suggestion contract.** `AttributeSuggest = (pattern) =>
+  AttributeValue[]` is used by attribute definitions AND ad-hoc pickers.
+  Sync-only as of 0.63.0: the bridge always called providers synchronously
+  and discarded Promises, so the async signature (and the never-wired
+  `signal` / provider-vs-window `filter` flag) was removed rather than
+  implemented.
 
 ## Native backing (OutlineAttributes)
 
@@ -56,8 +59,9 @@ and standard suggestions are implemented once, in Swift, in
 `Bike/OutlineAttributes` — `AttributeType.canonicalize/parse/display` +
 `AttributeConstraints`. The TS API deliberately exposes NO extension hooks
 for per-type parsing (v1's `AttributeConfig.parse` / `standardValues` are
-gone); a definition contributes only domain `shortcuts` and extra
-`suggestions`. `AttributeConstraints` is the runtime dual of the facets.
+gone); a definition contributes only extra `suggestions` (whose `menu`
+marks feed the built-in attribute menu). `AttributeConstraints` is the
+runtime dual of the facets.
 
 Known gaps to close in the Swift package before consolidation (from the
 2026-07-24 review):
@@ -70,8 +74,8 @@ Known gaps to close in the Swift package before consolidation (from the
 - Date NL can't produce a time, so `time: 'required'` + "tomorrow"
   dead-ends; either NL learns "tomorrow 3pm" or `'required'` defaults a
   time-of-day.
-- Free-text number/measurement parse is dot-decimal only (not
-  locale-lenient) while display is localized.
+- Free-text number parse is dot-decimal only (not locale-lenient) while
+  display is localized.
 - `list` + comma-bearing encodings (`recurrence`) corrupts via the comma
   split — now rejected at registration (see below); the facade should get
   a matching `validate(constraints)` so registration errors come from the
@@ -112,7 +116,7 @@ Known gaps to close in the Swift package before consolidation (from the
 - **Explicit behavior flags kept.** `defaultBadge` remains an opt-out flag;
   registering a definition never changes rendering by itself.
 - **Registration validates.** Bad configs throw at `bike.attribute` time
-  (empty `choices`, `min > max`, rating `max < 1`, `list`/`suggestions` on
+  (empty `choices`, `min > max`, `list`/`suggestions` on
   `flag`, `list` on `recurrence`) rather than failing silently at use time.
 - **Badges format through the environment.** `env.formatAttribute(name,
   wire)` / `env.formatValue(type, wire)` expose the native display layer so
@@ -123,23 +127,18 @@ Known gaps to close in the Swift package before consolidation (from the
   reduction (durations add, dates min/max chronologically) with the result
   emitted canonically — so `summary("totalTime")` is itself a wire value
   badges can format and queries can compare. Unparseable rows contribute
-  nothing rather than poisoning the reduction. `dimension`/`unit` ride
-  along for `measurement` only. Untyped summaries keep v1 numeric/string
-  behavior.
+  nothing rather than poisoning the reduction. Untyped summaries keep v1
+  numeric/string behavior.
 
 ## Open questions
 
 - **`suggestions` on all types vs. some.** Currently allowed on everything
-  but `flag` (augmenting host built-ins). Is that right for e.g. `color`
-  (presets already cover it) — or should some types reject it?
+  but `flag` (augmenting host built-ins). Is that right for every type — or
+  should some reject it?
 - **Attribute-bound facet overrides.** `attribute` + explicit `kind` lets a
   caller override the embedded editor while keeping definition-bound
   suggestions. Is partial facet override (attribute + just `min`) worth the
   type-system cost? Currently: all-or-nothing per kind variant.
-- **Measurement encoding details.** `"5 kg"` (space, canonical symbol) per
-  the Swift codec — but the unit-symbol vocabulary per dimension needs to
-  be published somewhere extensions can see (probably on `AttributeInfo` or
-  a `bike.measurementUnits(dimension)` call).
 - **`bike.*` surface** (to be reflected in a future `bike2.d.ts`):
   `attribute(name, config)`, `observeAttributes(handler)` (new info
   shape), `parseAttribute(name, text)` (now host-typed),
@@ -157,11 +156,11 @@ Known gaps to close in the Swift package before consolidation (from the
 
 ## File map
 
-- `attribute2.d.ts` — the type system: `AttributeType` (+ normative wire
+- `attribute.d.ts` — the type system: `AttributeType` (+ normative wire
   encodings), `AttributeValue`, `AttributeSuggest`, the facets,
   `AttributeConfig`, lossless `AttributeInfo`.
-- `picker2.d.ts` — the value-picker shell; kinds = `AttributeType`, options
+- `picker.d.ts` — the value-picker shell; kinds = `AttributeType`, options
   = base + facet; attribute-bound derivation rules.
-- `badge2.d.ts` — badges; type-aware catch-all and default menu;
+- `badge.d.ts` — badges; type-aware catch-all and default menu;
   `env.formatAttribute`/`formatValue`.
-- `summary2.d.ts` — axis reductions; typed via `AttributeType`.
+- `summary.d.ts` — axis reductions; typed via `AttributeType`.

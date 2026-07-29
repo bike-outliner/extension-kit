@@ -15,17 +15,6 @@
  * passed straight to `bike.session.updateRows`, `moveRows`, etc. This works
  * even when the rows were dragged from a different document than the one the
  * script's host window shows.
- *
- * @example
- * ```typescript
- * context.element.addEventListener('bike:rowdragover', (e) => {
- *   if ((e.target as HTMLElement).closest('.drop-zone')) e.preventDefault()
- * })
- * context.element.addEventListener('bike:rowdrop', (e) => {
- *   const { outline, rows } = e.detail
- *   bike.session.updateRows({ outline, rows, attributes: { tagged: '' } })
- * })
- * ```
  */
 
 interface RowDragDetail {

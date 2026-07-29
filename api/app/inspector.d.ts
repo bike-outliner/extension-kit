@@ -1,4 +1,4 @@
-import { View } from './bike'
+import { View } from './workspace'
 import { DOMScript, DOMScriptHandle } from './dom-script'
 import { DOMProtocol } from '../core/dom-protocol'
 

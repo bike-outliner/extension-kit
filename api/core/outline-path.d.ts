@@ -31,6 +31,18 @@ export type SelfOnlyOutlinePath = RelativeOutlinePath
  */
 export type SelfOnlyValuePath = OutlinePath
 
+/**
+ * An OutlinePath VALUE expression: it computes one value from the row
+ * (`@estimate`, `summary("todo")`, `@a + @b`, or a literal like `1`). The
+ * produced type depends on the expression (number, string, boolean, …).
+ *
+ * Relative, but not restricted to the row itself — bounded steps (parent,
+ * child, ancestor, sibling) are allowed. The consumer declares which
+ * traversals it rejects at registration; see {@link SelfOnlyValuePath} for the
+ * stricter form summaries require.
+ */
+export type RelativeValuePath = OutlinePath
+
 /** RowRuns are returned by OutlinePaths that query the `run` axis. */
 export interface RowRun {
   /** Row that contains this run. */

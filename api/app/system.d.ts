@@ -11,19 +11,11 @@ export interface Permissions {
 export type Permission = 'openURL' | 'clipboardRead' | 'clipboardWrite' | 'keychain'
 
 /**
- * Interface for disposables.
+ * Undoes whatever returned it — an observer, a command, a sidebar item.
  *
- * Disposables are used throughout the API to allow for the cleanup of
- * resources (such as event handlers) or removal of additions (such as
- * commands, keybindings, and sidebar items) when they are no longer needed.
- *
- * Disposables are automatically disposed when your extension is
- * deactivated. It is not necessary to manually dispose them. You may wish
- * to keep disposables around if you want to be able to dispose them while
- * your extension is still running.
- *
- * In some cases (such as SidebarItem) the disposable is also a handle that
- * provides API to modify the added item.
+ * Everything an extension registers is disposed automatically when it
+ * deactivates, so keep a Disposable only to undo something earlier than that.
+ * Some (SidebarItem) double as a handle for modifying what they added.
  */
 export interface Disposable {
   dispose(): void

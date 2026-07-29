@@ -128,9 +128,6 @@ export class Outline {
    */
   observeQuery(path: OutlinePath, handler: (value: OutlinePathValue) => void): Disposable
 
-  /** @deprecated Old name kept for compatibility — use `observeQuery`. */
-  streamQuery(path: OutlinePath, handler: (value: OutlinePathValue) => void): Disposable
-
   /**
    * Explain how an outline path will be evaluated.
    *
@@ -144,15 +141,9 @@ export class Outline {
   explainQuery(path: OutlinePath): string
 
   /**
-   * Group outline changes into a single view update.
+   * Group several changes so the view updates once. Optional — use it when
+   * multiple edits should read as a single change.
    *
-   * You don't need to use this method when making changes to the outline. This
-   * just gives you more control over how the view updates when you make
-   * changes. Consider this method when making multiple changes to the outline
-   * that should be treated as a single change in the view.
-   *
-   * @param options Options that determine how the view updates.
-   * @param update Perform changes to the outline in this closure.
    * @returns The return value of the update closure.
    */
   transaction(options: TransactionOptions, update: () => any): any

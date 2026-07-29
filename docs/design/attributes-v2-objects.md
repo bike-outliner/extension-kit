@@ -1,7 +1,7 @@
 # Typed Objects (forward-looking sketch)
 
 Speculative. Not built, not wired. This captures how the attribute type system
-(`attribute2.d.ts` + the native `OutlineAttributes` value layer) could grow
+(`attribute.d.ts` + the native `OutlineAttributes` value layer) could grow
 upward from typed *values* to typed *things* — modeling books, projects, people
 inside an outline without turning Bike into a database.
 
@@ -57,7 +57,6 @@ bike.object('book', {
     author:    { type: 'text' },   // a name is identity enough — see the relations ladder
     published: { type: 'date', time: 'never' },
     pages:     { type: 'number', min: 1 },
-    rating:    { type: 'rating', max: 5 },
   },
 })
 ```
@@ -164,7 +163,7 @@ somehow," and the relationship's meaning lives in surrounding prose that
 queries can't read. And role-shaped relations don't belong in prose anyway —
 reassigning a task shouldn't be text editing. That's rungs 3–4. But rungs 1–3
 cover every example in this document, which is why there is currently **no
-`reference` type in `attribute2.d.ts`** (there was, briefly; it's removed
+`reference` type in `attribute.d.ts`** (there was, briefly; it's removed
 until role-queries earn it).
 
 ### The link graph layer (build once, for links first)
@@ -232,12 +231,13 @@ Extension-owned schemas (code, like `bike.attribute`) and user-defined schemas
 (no code: in-document or settings UI) should both exist — "define a Book type
 for your reading list" must not require writing an extension. User-defined
 means **serializable**, and that has a concrete consequence for
-`attribute2.d.ts` today: `AttributeConfig` contains functions (`shortcuts`,
-`suggestions`, `filter`). Split it:
+`attribute.d.ts` today: `AttributeConfig` contains a function
+(`suggestions` — as of 0.63.0 the only callback; `shortcuts`/`filter` are
+gone). Split it:
 
 - a **declarative core** — everything JSON-representable: `type`, the facets,
   `title`/`description`/`emptyLabel`, `defaultBadge`, `list`;
-- the **callback extras** — `shortcuts`, `suggestions`, `filter`.
+- the **callback extra** — `suggestions`.
 
 Extensions register both; stored object schemas carry only the core. If the
 type system doesn't draw this line, it gets drawn ad hoc later.

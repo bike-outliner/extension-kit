@@ -1,149 +1,210 @@
 /**
- * Attribute definitions: configure how the editor treats a specific attribute.
- * Today that covers the attribute palette and default-badge rendering.
+ * The shared value-type system.
  *
- * The palette (⌘→, the @ button, or a `menu: 'default'` badge) edits row
- * attributes for ANY name; a definition adds what only the owning extension
- * knows:
- *
- * - `shortcuts` — one-step name+value effects ("Due Tomorrow").
- * - `standardValues` — the canonical value set, offered first.
- * - `values` — suggestions given the typed pattern ("Today", "Friday").
- * - `parse` — free text → a committed value ("next fri").
- *
- * Rendering: unclaimed attributes get a generic `name:value` badge from the
- * built-in catch-all badge; `defaultBadge: false` opts an attribute out.
+ * `bike.attribute(name, config)` declares how the editor treats attribute
+ * `name` in the palette, in pickers, and in badges.
  */
+
+import { JSONValue } from '../core/json'
 
 /**
- * Declared value type — a serialization convention readers and writers agree
- * on (row attribute values are always strings):
+ * The attribute value types. Each member's WIRE ENCODING — the canonical string
+ * stored in the row attribute — pickers, badges, summaries, and queries all
+ * read and write these.
  *
- * - `'string'` — any text (the default).
- * - `'number'` — a decimal via `String(n)` ("2", "3.5").
- * - `'date'` — `YYYY-MM-DD` (local calendar day), or a full ISO-8601 UTC
- *   timestamp when timed ("2026-07-24T17:00:00Z").
- * - `'duration'` — `<n><unit>` with unit `m` / `h` / `d` ("30m", "2h",
- *   "1.5h", "1d").
- * - `'flag'` — valueless only: present with the empty string, or absent.
+ * - text        any text, trimmed
+ * - boolean     "true" / "false"
+ * - number      decimal, integers without `.0` ("2", "3.5")
+ * - date        YYYY-MM-DD, or an ISO-8601 UTC timestamp when timed
+ * - time        24-hour HH:mm:ss (HH:mm accepted on input)
+ * - duration    an ISO-8601 duration ("PT30M", "P1DT2H30M", "P2W")
+ * - interval    YYYY-MM-DD/YYYY-MM-DD, start ≤ end
+ * - recurrence  R[n]/P<interval>, plus the non-standard `R/P1W:mon,wed`
+ * - choice      a declared choice's `value` verbatim
+ *
+ * Input is more lenient than the canonical form (ISO week and ordinal dates,
+ * `<start>/<duration>` intervals); canonicalization reduces it.
  */
-export type AttributeType = 'string' | 'number' | 'date' | 'duration' | 'flag'
+export type AttributeType =
+  | 'text'
+  | 'boolean'
+  | 'number'
+  | 'date'
+  | 'time'
+  | 'duration'
+  | 'interval'
+  | 'recurrence'
+  | 'choice'
 
-/** A quick effect offered under the bare `@` popup. */
-export interface AttributeShortcut {
-  /** Stable id within this attribute's shortcuts; defaults to `name`. */
-  id?: string
-  /** Display text, fuzzy-matched ("Due Tomorrow"). */
-  name: string
-  /** The attribute value committed when picked. */
-  value: string
-}
+/** The components of an ISO-8601 duration, in canonical order. */
+export type DurationComponent =
+  | 'years'
+  | 'months'
+  | 'weeks'
+  | 'days'
+  | 'hours'
+  | 'minutes'
+  | 'seconds'
 
-/** A value suggestion for the palette's value stage. */
+/** The segments of a time-of-day editor. */
+export type TimeField = 'hour' | 'minute' | 'second'
+
+/** A named wire value — the one row shape used wherever a value is offered. */
 export interface AttributeValue {
   /** Display text, fuzzy-matched ("Friday"). */
   name: string
-  /** The attribute value committed when picked. */
+  /** The canonical wire value committed when picked. */
   value: string
-  /** Right-aligned popup detail ("Jul 24"). Display only — not matched. */
+  /** Dimmed detail ("Jul 24"). Display only — not matched. */
   detail?: string
+  /**
+   * Also offer this value in the attribute's built-in menu (badge click, row
+   * context menu). Meaningful only on the unfiltered suggestion list; boolean
+   * and choice menus derive their own rows and ignore it.
+   */
+  menu?: boolean
 }
 
-/** A successful free-text parse. */
+/** A successful free-text parse: the canonical wire value plus its human label. */
 export interface AttributeParseResult {
-  /** The attribute value to commit. */
   value: string
-  /** Display label for the fallback row ("Fri, Jul 24"). */
   label: string
 }
 
 /**
- * Configuration for {@link Bike.attribute}. Every member is optional —
- * `bike.attribute('done', {})` simply names the attribute in completion.
- * Callbacks run on the main thread per keystroke while a token popup is
- * live; keep them cheap and pure.
+ * Pattern → suggestion rows, called synchronously per keystroke. An empty
+ * pattern means the unfiltered list — built fresh per call, so date-relative
+ * values roll over.
  */
-export interface AttributeConfig {
-  /**
-   * Display name for shortcut rows and undo labels ("Due"). Defaults to the
-   * capitalized attribute name.
-   */
-  title?: string
-  /**
-   * Declared value type — purely declarative, carried through
-   * {@link AttributeInfo} so other extensions read and write the value the
-   * same way. Default 'string'. A 'flag' attribute is valueless:
-   * registering one with `standardValues`, `values`, `parse`, or `list` is
-   * rejected.
-   */
-  type?: AttributeType
-  /**
-   * Quick effects for the bare `@` popup, grouped above the attribute
-   * names. Built fresh per popup — date-relative values roll over.
-   */
-  shortcuts?: () => AttributeShortcut[]
-  /**
-   * The attribute's small canonical value set ("1"/"2"/"3" for priority).
-   * Static — it travels with the definition (`AttributeInfo`), so the
-   * built-in catch-all badge's menu offers these as pick rows, and completion
-   * offers them ahead of `values(pattern)`. Use `values` instead for
-   * dynamic or open-ended suggestion sets.
-   */
-  standardValues?: AttributeValue[]
-  /**
-   * Value suggestions given the typed pattern (may be empty — `@due:` shows
-   * them all). Merged above the values already used in the document,
-   * deduplicated by committed value.
-   */
-  values?: (pattern: string) => AttributeValue[]
-  /**
-   * Parse free text into a value ("next fri" → 2026-07-24). A successful
-   * parse backs the popup's fallback row ("Due → Fri, Jul 24") in place of
-   * the literal `Set name = text`; return undefined when the text doesn't
-   * resolve.
-   */
-  parse?: (text: string) => AttributeParseResult | undefined
-  /**
-   * Whether the built-in catch-all badge may render this attribute as a
-   * generic `name: value` badge when no dedicated badge does. Default true.
-   * Set false when your extension presents the attribute itself (a
-   * dedicated `bike.badge`, or row styling like `done`) — an EXPLICIT
-   * opt-out; registering a definition alone never changes rendering.
-   */
-  defaultBadge?: boolean
-  /**
-   * `standardValues` is the COMPLETE legal set: completion drops the
-   * literal `Set name = text` fallback (a successful `parse` still backs
-   * it), and sharing extensions may exhaustively switch on the values.
-   * Default false.
-   */
-  strict?: boolean
-  /**
-   * The value is a comma-separated list. The convention readers and writers
-   * agree on: split on ',', trim each item, join with ','. Completion
-   * disables its ','-chain commit in values mode so commas are typable.
-   * Default false.
-   */
-  list?: boolean
-  /**
-   * Present ⇒ a bare valueless `@name` is meaningful, displayed with this
-   * label ("Soon" for due, "Done" for done). Names completion's bare-commit
-   * row and the built-in catch-all badge's valueless rendering.
-   */
-  emptyLabel?: string
-  /** One-line documentation, surfaced through {@link AttributeInfo}. */
-  description?: string
+export type AttributeSuggest = (pattern: string) => AttributeValue[]
+
+// MARK: - Facets
+//
+// A facet is a type's constraint/parameter set, shared between the attribute
+// configuration and the picker options.
+
+export interface TextFacet {
+  placeholder?: string
 }
 
-/** A registered definition snapshot, as reported by `bike.observeAttributes`. */
-export interface AttributeInfo {
+export interface NumberFacet {
+  min?: number
+  max?: number
+  step?: number
+  integer?: boolean
+}
+
+export interface DateFacet {
+  time?: 'optional' | 'required' | 'never'
+}
+
+export interface TimeFacet {
+  fields?: TimeField[]
+}
+
+export interface DurationFacet {
+  components?: DurationComponent[]
+}
+
+export interface ChoiceFacet {
+  choices: AttributeValue[]
+  open?: boolean
+}
+
+// MARK: - Definition
+
+/** The members every attribute definition shares. */
+interface AttributeCommon {
+  /** Display name ("Due"). Defaults to the capitalized attribute name. */
+  title?: string
+  /** One-line documentation, surfaced through {@link AttributeInfo}. */
+  description?: string
+  /** Present ⇒ a bare valueless `@name` is meaningful, displayed with this label. */
+  emptyLabel?: string
+  /** Let the built-in catch-all badge render this attribute. Default true. */
+  defaultBadge?: boolean
+  /** Extra value suggestions, merged above the host's built-in ones. */
+  suggestions?: AttributeSuggest
+  /**
+   * Free-form JSON the host stores and echoes back through
+   * {@link AttributeInfo} — consumers define their own keys. Known ones:
+   * `calendar: false` keeps a date attribute off the calendar extension;
+   * `contextMenu: false` keeps the attribute out of the row context menu's
+   * attribute group.
+   */
+  metadata?: Record<string, JSONValue>
+}
+
+export interface TextAttribute extends AttributeCommon, TextFacet {
+  type: 'text'
+}
+
+export interface BooleanAttribute extends AttributeCommon {
+  type: 'boolean'
+}
+
+export interface NumberAttribute extends AttributeCommon, NumberFacet {
+  type: 'number'
+}
+
+export interface DateAttribute extends AttributeCommon, DateFacet {
+  type: 'date'
+}
+
+export interface TimeAttribute extends AttributeCommon, TimeFacet {
+  type: 'time'
+}
+
+export interface DurationAttribute extends AttributeCommon, DurationFacet {
+  type: 'duration'
+}
+
+export interface IntervalAttribute extends AttributeCommon {
+  type: 'interval'
+}
+
+export interface RecurrenceAttribute extends AttributeCommon {
+  type: 'recurrence'
+}
+
+export interface ChoiceAttribute extends AttributeCommon, ChoiceFacet {
+  type: 'choice'
+}
+
+/** Configuration for `bike.attribute(name, config)` */
+export type AttributeConfig =
+  | TextAttribute
+  | BooleanAttribute
+  | NumberAttribute
+  | DateAttribute
+  | TimeAttribute
+  | DurationAttribute
+  | IntervalAttribute
+  | RecurrenceAttribute
+  | ChoiceAttribute
+
+// MARK: - Info
+
+/** The resolved members every {@link AttributeInfo} carries. */
+export interface AttributeInfoCommon {
   name: string
   title: string
-  type: AttributeType
-  strict: boolean
-  list: boolean
-  emptyLabel?: string
   description?: string
+  emptyLabel?: string
   defaultBadge: boolean
-  standardValues: AttributeValue[]
+  metadata: Record<string, JSONValue>
 }
+
+/** A lossless, defaults-resolved definition snapshot. Switch on `type` for the facet. */
+export type AttributeInfo = AttributeInfoCommon &
+  (
+    | ({ type: 'text' } & TextFacet)
+    | { type: 'boolean' }
+    | ({ type: 'number' } & NumberFacet & { step: number; integer: boolean })
+    | ({ type: 'date' } & Required<DateFacet>)
+    | ({ type: 'time' } & { fields: TimeField[] })
+    | ({ type: 'duration' } & { components: DurationComponent[] })
+    | { type: 'interval' }
+    | { type: 'recurrence' }
+    | ({ type: 'choice' } & { choices: AttributeValue[]; open: boolean })
+  )

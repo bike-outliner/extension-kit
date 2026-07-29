@@ -1,4 +1,4 @@
-import { View } from './bike'
+import { View } from './workspace'
 import { CommandName } from './commands'
 import { Row } from './outline'
 import { Disposable } from './system'

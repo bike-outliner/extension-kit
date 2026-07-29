@@ -1,3 +1,7 @@
+// The wire codecs ride in this bundle so both contexts load them with
+// format: the app JSC evaluates Runtime/format.js, the DOM pages load
+// common.js (whose common.ts imports ./format).
+import './value-codec'
 import { format } from 'date-fns'
 
 /**

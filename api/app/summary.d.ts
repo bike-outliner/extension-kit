@@ -1,40 +1,49 @@
 import { SelfOnlyOutlinePath, SelfOnlyValuePath } from '../core/outline-path'
+import { AttributeType } from './attribute'
 
 /**
- * Summaries: incremental & cached reductions over an outline axis.
+ * Incremental, cached reductions over an outline axis.
  *
- * A summary reduces in one direction (`axis`). For example reduce a row's
- * subtree (`descendant-or-self`, the default) and then it's efficient to read
- * that value later in outline path queries. This example is used to count total
- * and completed tasks in a branch and then display the progress in a badge.
+ * Registered with `bike.summary(name, config)` and read as `summary("name")` in
+ * queries. `where` selects contributing rows, `value` is each one's
+ * contribution, `reduce` combines them over `axis`.
+ *
+ * A typed summary declares `type` and reduces in that wire encoding, emitting
+ * its result in the same encoding — so badges, queries, and row attributes can
+ * all read it. The type also decides which reduces are meaningful: registration
+ * throws for a reduce the type has no order or addition for (summing dates,
+ * ordering choices).
+ *
+ * `count` is always a plain number — `type` is irrelevant to it.
  */
 
 /** How contributions combine over the selected axis. */
 export type SummaryReduce =
-  /** Number of contributing rows. */
+  /** Number of contributing rows. Always a plain number. */
   | 'count'
-  /** Sum of `value` over contributing rows. */
   | 'sum'
-  /** Minimum / maximum of `value` (numeric). */
+  /** Minimum / maximum in the type's own order. */
   | 'min'
   | 'max'
-  /** The `value` of the CLOSEST contributing row in axis order (numeric or string). */
+  /** The closest contributing row's value in axis order. */
   | 'nearest'
-  /** The ordered list of contributing `value`s */
+  /** The contributing values in axis order, joined by `separator` (default `,`). */
   | {
       type: 'list'
-      separator?: string // defaults to `/`
+      separator?: string
     }
 
 /** Config for a named summary. Last registration for a name wins. */
 export interface SummaryConfig {
-  /** Selects the contributing rows. See {@link SelfOnlyOutlinePath}. */
+  /** Selects the contributing rows. */
   where: SelfOnlyOutlinePath
-  /** Each contributing row's value; defaults to the constant `1`. */
+  /** Each contributing row's value. Defaults to the constant `1`. */
   value?: SelfOnlyValuePath
-  /** How contributions combine over the selected axis. */
+  /** How to combine the contributions. Defaults to `count`. */
   reduce: SummaryReduce
-  /** The axis of rows to reduce over relative to the reading row */
+  /** Reduce and report in this wire encoding. Omitted, values reduce as numbers. */
+  type?: AttributeType
+  /** The axis of rows to reduce over, relative to the reading row. Default `descendant-or-self`. */
   axis?:
     | 'self'
     | 'parent'

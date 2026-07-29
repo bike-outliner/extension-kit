@@ -1,40 +1,21 @@
 import { Image, Font, Color } from '../core/graphics'
 import { Insets } from '../core/geometry'
-import { RelativeOutlinePath } from '../core/outline-path'
+import { RelativeOutlinePath, RelativeValuePath } from '../core/outline-path'
 import { EditorSettings } from '../style/editor-style'
 import { EditorTheme } from '../style/editor-theme'
 import { OutlineEditor } from './outline-editor'
 import { Row } from './outline'
+import { AttributeType } from './attribute'
 
 /**
- * Badges: value-aware glyphs rendered trailing a row's text.
+ * Value-aware glyphs rendered trailing a row's text.
  *
- * A style rule can *test* a value in its selector (`.@priority = 1`), but it
- * emits a static style — it can't render the value itself (the number `3`, a
- * due date, a percent complete), only switch styling on or off per case. A
- * badge fills that gap: it injects a trailing-flow decoration whose glyph is
- * computed from the row's live values.
- *
- * It selects rows with a `where` path (same syntax as style rules), reads
- * `inputs` off each match, and hands them to `render`. That's how you surface
- * data inline — a `@priority` badge, a `summary("openTasks")` aggregate, a live
- * `@due` countdown (see `tick`), a progress bar.
- *
- * A badge is DECORATION ONLY. To make it interactive, give it `menu:
- * 'default'` — the built-in attribute menu (filter / standard values /
- * edit / remove) opens on click — or a custom `onClick` handler, typically
- * one that presents a menu with `editor.showMenu(row, { items, anchor:
- * '<badge>' })`. A badge with neither is not clickable.
+ * Badges are registered with `bike.badge(name, config)`. Attributes with no
+ * dedicated badge claims are rendered by the built-in catch-all badge, which a
+ * definition's `defaultBadge: false` opts out of.
  */
 
-/**
- * The presentation context passed to `render`, mirroring the style API's
- * `StyleContext` (minus per-row transients like `consecutivePath` and the
- * style-context `userCache` — a badge module can memoize at module level
- * instead). Everything here is part of the render's memo state: cached specs
- * are flushed whenever any of it changes, so `render` stays a pure function
- * of `(values, env)`.
- */
+/** The context passed to `render`. */
 export interface BadgeEnvironment {
   /** The outline's BASE text font (the stylesheet's `viewport.font`) */
   readonly font: Font
@@ -52,14 +33,13 @@ export interface BadgeEnvironment {
   readonly uiScale: number
   /** Shared geometry for a badge that draws its own rect (a border, a tag) */
   readonly badgeMetrics: BadgeMetrics
+  /** Format a wire value through attribute `name`'s registered definition. */
+  formatAttribute(name: string, wire: string): string
+  /** Format a wire value as a bare type with default facets. */
+  formatValue(type: AttributeType, wire: string): string
 }
 
-/**
- * Badge geometry, proportional to the outline's base text size.
- *
- * Badges don't nessarily need to use these, but if they draw a rect (a border,
- * a tag) they should so every drawn badge in a row matches.
- */
+/** Standard badge geometry, proportional to the outline's base text size. */
 export interface BadgeMetrics {
   /** The badge rect's height. */
   readonly side: number
@@ -73,20 +53,14 @@ export interface BadgeMetrics {
   readonly padding: Insets
 }
 
-/** Context passed to `onClick`: the clicked row and its editor. `key`
- * identifies the clicked image of a keyed multi-image render (absent for
- * single-image badges). */
+/** Context passed to `onClick`. `key` identifies the clicked image of a keyed badge render. */
 export interface BadgeContext {
   readonly editor: OutlineEditor
   readonly row: Row
   readonly key?: string
 }
 
-/**
- * One image of a keyed multi-image render. The key identifies the sub-badge
- * everywhere: `onClick` receives it, and `showMenu` anchors to it via
- * `{ badge, key }` (the catch-all attribute badges key by attribute name).
- */
+/** One image of a keyed multi-image render. Anchors as `{ badge, key }`. */
 export interface KeyedImage {
   key: string
   image: Image
@@ -94,48 +68,14 @@ export interface KeyedImage {
 
 /** A value-aware badge rendered trailing a row's text. */
 export interface BadgeConfig {
-  /**
-   * Relative outline path selecting the rows that show this badge
-   * (`.@priority`). Self-only tests only — unbounded traversals like
-   * `.//task` throw at registration (they'd walk every visible row's
-   * subtree per style pass). Select on a `summary(...)` instead.
-   */
-  where: RelativeOutlinePath
-  /**
-   * Map of result-name → outline-path value expression evaluated on the
-   * row. Omitted, it defaults to `{ <name>: '@<name>' }` — so the badge's
-   * name must be a valid attribute token (registration throws otherwise),
-   * and `render` receives `values.<name>` without declaring it.
-   *
-   * The string `'*'` is the catch-all form: `values` becomes the row's
-   * FULL attribute map (reserved names excluded) — pair it with a
-   * match-any `where` (`.*`) and a keyed multi-image render.
-   */
-  inputs?: Record<string, string> | '*'
-  /** Re-render every `tick` WHOLE seconds (integer >= 1) with `env.now` set; smaller values disable ticking */
+  /** Re-render every `tick` seconds with `env.now` set. */
   tick?: number
-  /**
-   * Render input values to the badge's glyph(s): a single `Image` (the
-   * common case), an array of `KeyedImage` (a multi-image badge — one
-   * glyph per key, displayed in array order), or `null` for no badge.
-   */
+  /** Selects the rows that show this badge. */
+  where: RelativeOutlinePath
+  /** What `render` reads off the row */
+  inputs: Record<string, RelativeValuePath> | 'rowAttributes'
+  /** Render the input values to the badge's glyph(s), or `null` for no badge. */
   render: (values: Readonly<Record<string, string | undefined>>, env: BadgeEnvironment) => Image | KeyedImage[] | null
-  /**
-   * `'default'` opens the built-in attribute menu when a badge glyph is
-   * clicked: Filter / Filter = value, the attribute definition's standard
-   * values as radios, "Value…" (the attribute palette's value stage), and
-   * Remove. The target attribute is the clicked image's key (a keyed
-   * multi-image render) or, unkeyed, the badge's own name. A custom
-   * `onClick` wins when both are set; a badge with neither is not
-   * clickable.
-   */
-  menu?: 'default'
-  /**
-   * Called when a badge glyph is clicked — `context.key` identifies the
-   * clicked image of a keyed render. Typically presents a menu:
-   * `onClick: ({ editor, row, key }) => editor.showMenu(row, { items,
-   * anchor: { badge: '<name>', key }, ... })`. Wins over `menu: 'default'`
-   * when both are set.
-   */
+  /** Called when a badge glyph is clicked. Without one the glyph is inert. */
   onClick?: (context: BadgeContext) => void
 }

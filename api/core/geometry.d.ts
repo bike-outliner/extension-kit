@@ -8,8 +8,6 @@ export class Path {
     transform?: AffineTransform
   ): Path
   static ellipseInRect(rect: Rect, transform?: AffineTransform): Path
-  /** @deprecated Misspelling kept for compatibility — use `ellipseInRect`. */
-  static elipseInRect(rect: Rect, transform?: AffineTransform): Path
 
   constructor()
 
@@ -31,8 +29,6 @@ export class Path {
   normalized(using?: FillRule): Path
   subtracting(other: Path, using?: FillRule): Path
   symmetricDifference(other: Path, using?: FillRule): Path
-  /** @deprecated Misspelling kept for compatibility — use `symmetricDifference`. */
-  symetricDifference(other: Path, using?: FillRule): Path
   union(other: Path, using?: FillRule): Path
 
   moveTo(point: Point, transform?: AffineTransform): void

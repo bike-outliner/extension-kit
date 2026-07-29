@@ -1,5 +1,5 @@
 /**
- * Presented with `editor.showMenu(row, { items, ... })`
+ * Presented with `editor.showMenu(options)`.
  */
 
 import { SFSymbolName } from '../core/bike-globals'
@@ -20,4 +20,9 @@ export interface MenuButtonItem {
 
 export interface MenuSeparatorItem {
   type: 'separator'
+}
+
+export interface ShowMenuOptions {
+  items: MenuItem[]
+  onAction?: (id: string) => void
 }

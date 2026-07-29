@@ -1,45 +1,39 @@
 import { Affinity, AttributedString, Outline, Range, Row, TransactionOptions } from './outline'
 import { OutlinePath } from '../core/outline-path'
 import { Disposable } from './system'
-import { MenuItem } from './menu'
-import { PickerHandle, ShowPickerOptions } from './picker'
-import { View } from './bike'
+import { ShowMenuOptions } from './menu'
+import { PickerSpec } from './picker'
+import { View } from './workspace'
 
 /** OutlineEditor is a view that displays an outline. */
 export interface OutlineEditor extends View {
   /** Edited outline. */
   readonly outline: Outline
 
-  /**
-   * Root of focused outline in editor. Defaults to outline root, but can be
-   * set to "focus in" to a portion of the outline.
-   */
-  focus: Row
+  /** Make this editor the first responder within its window */
+  activate(): void
 
+  /** Root of focused outline in editor. (Defaults to outline root) */
+  focus: Row
   /** Focus in to the given row, or the selected row if none provided. */
   focusIn(row?: Row): void
   /** Focus out one level in the focus stack. */
   focusOut(): void
 
-  /**
-   * Applies a filter to the outline editor display using an OutlinePath.
-   * If the path is relative, it is resolved from the focus row.
-   *
-   * Set a plain path, or `{ path, label, emptyMessage }` — the label
-   * displays in the filter field in place of the raw query while the field
-   * is unfocused. Paths matching a saved sidebar query display that query's
-   * title automatically. The emptyMessage displays centered in the editor
-   * while the filter matches no rows.
-   *
-   * Setter-only: pass `pushLocation: false` when live-refining an existing
-   * filter (e.g. a drag growing a date range) so Back doesn't accumulate a
-   * navigation step per refinement; defaults to true.
-   */
+  /** Filter the display by an OutlinePath, resolved from the focus row when relative. */
   get filter(): { path: OutlinePath; label?: string; emptyMessage?: string } | undefined
   set filter(
     value:
       | OutlinePath
-      | { path: OutlinePath; label?: string; emptyMessage?: string; pushLocation?: boolean }
+      | { 
+        path: OutlinePath;
+        /** Stands in for the raw query in the filter field */
+        label?: string; 
+        /** Message to show when nothing matches */
+        emptyMessage?: string; 
+        /** If false, don't push a new location for each change in the filter */
+        pushLocation?: boolean 
+      }
       | undefined
   )
 
@@ -61,130 +55,42 @@ export interface OutlineEditor extends View {
 
   /** Read editor selection. */
   readonly selection?: Selection
-
-  /**
-   * Observe selection.
-   * @param observer - The closure for new selections.
-   * @param debounce - The debounce delay in milliseconds. (default 1000ms)
-   */
+  /** Observe selection. `debounce` is in milliseconds (default 1000). */
   observeSelection(observer: (selection?: Selection) => void, debounce?: number): Disposable
-
   /** Select rows to create a "block" selection. */
   selectRows(anchor: Row, head?: Row): void
   /** Select a single row's text to create a "text" selection. */
   selectText(row: Row, anchor: number, head?: number): void
   /** Place caret in a single rows text to create a "caret" selection. */
   selectCaret(row: Row, anchor: number, runAffinity?: Affinity, lineAffinity?: Affinity): void
-
-  /**
-   * Reveal the given row in editor.
-   *
-   * Use when you want to move (and maintain) the selection to a row that might
-   * not be visible. Note that when you `select` that row is automatically
-   * revealed so you don't need to call this method.
-   *
-   * @param row - The row to reveal. May focus out and expand rows as needed.
-   * @param revealChildren - Whether to also reveal the row's children.
-   */
+  /** Reveal a row, focusing out and expanding as needed. */
   revealRow(row: Row, revealChildren?: boolean): void
 
-  /**
-   * Make this editor the first responder within its window, bring the
-   * window to the front, and activate the bike application. Use when a
-   * window contains multiple split editors and you want a specific one
-   * to receive keyboard input.
-   */
-  activate(): void
-
-  /**
-   * Group outline changes into a single view update.
-   *
-   * You don't need to use this method when making changes to the editor. This
-   * just gives you more control over how the view updates when you make
-   * changes. Consider this method when making multiple changes to the editor
-   * that should be treated as a single change in the view.
-   *
-   * @param options Options that determine how the view updates.
-   * @param update Perform changes to the outline in this closure.
-   * @returns The return value of the update closure.
-   */
-  transaction(options: TransactionOptions, update: () => any): any
-
-  /**
-   * Show a message in the editor's status bar.
-   *
-   * If a timeout is provided the message auto-dismisses after that duration.
-   * Dispose the returned handle to clear the message early. Disposing only
-   * clears the message if it is still the active one — extensions cannot
-   * accidentally clear each other's messages.
-   *
-   * @param message - The message to display.
-   * @param timeout - Optional auto-dismiss duration in milliseconds.
-   * @returns A Disposable that clears this specific message.
-   */
+  /** Present a menu, centered in the editor unless a placement is given. */
+  showMenu(options: ShowMenuOptions): void
+  showMenu(placement: Placement, options: ShowMenuOptions): void
+  /** Present a value picker, centered in the editor unless a placement is given. */
+  showPicker(spec: PickerSpec): void
+  showPicker(placement: Placement, spec: PickerSpec): void
+  /** Present the built-in type-aware menu for one attribute. */
+  showAttributeMenu(attribute: string): void
+  showAttributeMenu(placement: Placement, attribute: string): void
+  /** Present the row's attribute palette */
+  showAttributePalette(row: Row): void
+  /** Show a message in the editor's status bar. */
   showStatusMessage(message: string, timeout?: number): Disposable
-
-  /**
-   * Present a menu anchored to a row.
-   *
-   * The menu is a STATIC native menu snapshot of `options.items` — see the
-   * `menu` module header. Dismissal is native (Esc, click-out, choosing an
-   * item); a chosen item reports through `onAction` (or dispatches its
-   * `command:` id).
-   *
-   * @param row - The row the menu is anchored to
-   * @param options - The menu's items, anchor, and action handler.
-   */
-  showMenu(row: Row, options: ShowMenuOptions): void
-
-  /**
-   * Present the standalone value-picker shell anchored to a row: a filter
-   * field, a suggestion list, and — when the presentation has a kind — that
-   * kind's picker fixed below (the attribute palette's value-stage UI).
-   *
-   * A lightweight key window (not a menu): non-modal, fully
-   * keyboard-drivable, closed by accept (a suggestion row, a
-   * single-gesture pick, or Return) or cancel (Esc, click-out, dismiss).
-   * Bind to a registered attribute with `options.attribute`, or supply the
-   * list inline — see the module header and per-kind options in
-   * {@link ShowPickerOptions} for each kind's wire encoding.
-   *
-   * @param row - The row the picker is anchored to
-   * @param options - The picker's attribute/kind, suggestions, initial value, anchor, and handlers.
-   * @returns A handle for this presentation, or undefined on invalid options (unknown kind, nothing to show, missing onAccept, row gone).
-   */
-  showPicker(row: Row, options: ShowPickerOptions): PickerHandle | undefined
-
   /** Show autocomplete for current caret if any completions exist */
   showCompletions(): void
 
-  /**
-   * Present the row's attribute palette (the @ button's two-stage
-   * names/values panel). Editing ONE known attribute is
-   * {@link showPicker} with `attribute`.
-   *
-   * @param row - The row the palette edits (and anchors to)
-   */
-  showAttributePalette(row: Row): void
+  /** Group several changes so the view updates once. */
+  transaction(options: TransactionOptions, update: () => any): any
 }
 
-/** Context passed to `showMenu` handlers: the menu's row and its editor. */
-export interface MenuContext {
-  readonly editor: OutlineEditor
-  readonly row: Row
-}
-
-export interface ShowMenuOptions {
-  /** The menu's items. */
-  items: MenuItem[]
-  /**
-   * Badge name, character index, or — for one image of a keyed multi-image
-   * badge — `{ badge, key }` (the key from the badge's `onClick`).
-   * Defaults to end of row text.
-   */
+/** Where a menu or picker appears. Omitted entirely, it centers in the editor. */
+export interface Placement {
+  row: Row
+  /** Badge name, character index, or one image of a keyed badge. Default end of row text. */
   anchor?: string | number | { badge: string; key?: string }
-  /** A menu item was chosen, closing the menu. */
-  onAction?: (id: string, context: MenuContext) => void
 }
 
 /**
