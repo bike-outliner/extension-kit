@@ -36,7 +36,7 @@ Three mechanisms carry that:
 
 Supporting decisions:
 
-- **One named-value shape.** `AttributeValue { name, value, detail?,
+- **One named-value shape.** `AttributeChoice { name, value, detail?,
   menu? }` is the only "offered value" row type — choices, suggestions,
   picker rows. `menu: true` promotes a row into the built-in attribute
   menu (0.63.0 — this replaced the separate `AttributeShortcut` list and
@@ -46,7 +46,7 @@ Supporting decisions:
   `AttributeType` doc in `attribute.d.ts`. Picker kinds and summary docs
   reference it instead of restating it.
 - **One suggestion contract.** `AttributeSuggest = (pattern) =>
-  AttributeValue[]` is used by attribute definitions AND ad-hoc pickers.
+  AttributeChoice[]` is used by attribute definitions AND ad-hoc pickers.
   Sync-only as of 0.63.0: the bridge always called providers synchronously
   and discarded Promises, so the async signature (and the never-wired
   `signal` / provider-vs-window `filter` flag) was removed rather than
@@ -68,7 +68,7 @@ Known gaps to close in the Swift package before consolidation (from the
 
 - `suggestions()` exists only for `date` and isn't dispatched through the
   facade; it should become a facade method returning wire-valued
-  `AttributeValueOption`s for every type (boolean Yes/No, choice options,
+  `AttributeChoice`s for every type (boolean Yes/No, choice options,
   common durations/recurrences/times).
 - `interval` and `recurrence` have no natural-language parse (wire-only).
 - Date NL can't produce a time, so `time: 'required'` + "tomorrow"
@@ -157,8 +157,17 @@ Known gaps to close in the Swift package before consolidation (from the
 ## File map
 
 - `attribute.d.ts` — the type system: `AttributeType` (+ normative wire
-  encodings), `AttributeValue`, `AttributeSuggest`, the facets,
+  encodings), `AttributeChoice`, `AttributeSuggest`, the facets,
   `AttributeConfig`, lossless `AttributeInfo`.
+- `outline.d.ts` — the model boundary, where every attribute is just its
+  wire string: `getAttribute` returns one, `setAttribute` takes one, and
+  the typing lives in the `AttributeType`-keyed value layer
+  (`bike.encodeValue` / `decodeValue`, `bike.parseValue` / `displayValue`,
+  `env.formatAttribute`). 0.64.0 removed the pre-v2 `AttributeValue`
+  (`string | number | Date`) and `AttributeValueType`
+  (`'string' | 'number' | 'date'`) — the first silently coerced a `Date`
+  into a second spelling of the same stamp, the second was never wired to
+  the bridge at all.
 - `picker.d.ts` — the value-picker shell; kinds = `AttributeType`, options
   = base + facet; attribute-bound derivation rules.
 - `badge.d.ts` — badges; type-aware catch-all and default menu;

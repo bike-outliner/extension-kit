@@ -16,9 +16,33 @@ npx bike-ext submit <id>       # Submit extension to registry via PR
 npx bike-ext clean             # Remove build output
 npm run build-runtime          # Build React runtime (runtime/)
 npm run watch-runtime          # Watch React runtime
+npm run check-api              # Typecheck api/*.d.ts WITH lib check (this repo only)
 ```
 
-There is no separate typecheck command — typechecking runs automatically during `build` and `watch` via the `typecheckPlugin`.
+Extension projects have no separate typecheck command — typechecking runs automatically during
+`build` and `watch` via the `typecheckPlugin`.
+
+`test` refuses to run when an extension that ships tests is disabled in Bike. Bike loads a disabled
+extension but never runs it and never says so, so its tests are skipped while the summary still
+reads `ALL TESTS PASSED` — a green suite for a repo whose tests never executed. `checkTestExtensionsEnabled`
+in `lib/test.mjs` reads Bike's `bike.extensions.disabledIds` preference and fails first, naming the
+extensions to enable.
+
+`check-api` is the exception, and the split is deliberate. A consumer project's check runs with
+`skipLibCheck: true` (set in its own `configs/*.json`, and forced by `typecheckPlugin` regardless):
+it cannot fix third-party declarations, and the `file:../extension-kit` symlink makes these api
+files enter the program under two identities — once via the project's `include`, once via the
+`bike/*` path mapping's realpath — which reads as a duplicate `declare const bike`. Neither is
+actionable there, and lib check roughly doubles the check.
+
+Here the `.d.ts` files ARE the product, so `api/{app,dom,style}/tsconfig.json` deliberately do NOT
+set `skipLibCheck`, and `check-api` checks all three contexts with it on (~2s). Run it after
+touching anything in `api/` — and it's a required pre-release step on the Hog Bay release
+checklist (`hogbaycontext/workflows/release-checklist.md`, Code Preparation). Checked from inside this repo the double-identity doesn't arise, so the
+output is real signal. It earned its keep immediately: it caught `api/dom/components.d.ts` declaring
+`declare module 'bike/components' { import … from '../core/bike-globals' }`, illegal in an ambient
+module block, which had silently degraded `SFSymbolName` to an error type and left `SFSymbol`'s
+`name` prop unchecked for every extension using it.
 
 ## Project Structure
 

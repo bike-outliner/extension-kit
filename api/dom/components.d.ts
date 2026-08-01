@@ -1,151 +1,155 @@
-declare module 'bike/components' {
-  import * as React from 'react'
-  import { SFSymbolName } from '../core/bike-globals'
+// The `bike/components` module. A plain module reached through the
+// `bike/components` path mapping, the same way `bike/dom` and `bike/app` are
+// reached — NOT a `declare module 'bike/components'` block, which cannot
+// import through a relative path: `SFSymbolName` would silently resolve to an
+// error type and leave `SFSymbol`'s `name` prop unchecked.
 
-  // SFSymbol
+import * as React from 'react'
+import { SFSymbolName } from '../core/bike-globals'
 
-  /** Renders an SF Symbol using CSS mask-image, colored by `currentColor`. */
-  export function SFSymbol(props: SFSymbolProps): React.JSX.Element
+// SFSymbol
 
-  export interface SFSymbolProps extends React.HTMLAttributes<HTMLSpanElement> {
-    /** SF Symbol name (e.g. "chevron.left", "star.fill") */
-    name: SFSymbolName
-    weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'
-    scale?: 'small' | 'medium' | 'large'
-  }
+/** Renders an SF Symbol using CSS mask-image, colored by `currentColor`. */
+export function SFSymbol(props: SFSymbolProps): React.JSX.Element
 
-  // Checkbox
+export interface SFSymbolProps extends React.HTMLAttributes<HTMLSpanElement> {
+  /** SF Symbol name (e.g. "chevron.left", "star.fill") */
+  name: SFSymbolName
+  weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'
+  scale?: 'small' | 'medium' | 'large'
+}
 
-  /**
-   * A macOS-styled checkbox with label.
-   *
-   * ```tsx
-   * import { Checkbox } from 'bike/components'
-   * <Checkbox checked={value} onChange={setValue}>Show week numbers</Checkbox>
-   * ```
-   */
-  export function Checkbox(props: CheckboxProps): React.JSX.Element
+// Checkbox
 
-  export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
-    /** Label text displayed next to the checkbox */
-    children?: React.ReactNode
-  }
+/**
+ * A macOS-styled checkbox with label.
+ *
+ * ```tsx
+ * import { Checkbox } from 'bike/components'
+ * <Checkbox checked={value} onChange={setValue}>Show week numbers</Checkbox>
+ * ```
+ */
+export function Checkbox(props: CheckboxProps): React.JSX.Element
 
-  // Button
+export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  /** Label text displayed next to the checkbox */
+  children?: React.ReactNode
+}
 
-  /** A macOS-styled capsule button in three sizes. */
-  export function Button(props: ButtonProps): React.JSX.Element
+// Button
 
-  export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    /** Button size (default: "regular") */
-    size?: 'mini' | 'small' | 'regular' | 'large'
-  }
+/** A macOS-styled capsule button in three sizes. */
+export function Button(props: ButtonProps): React.JSX.Element
 
-  // Label
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Button size (default: "regular") */
+  size?: 'mini' | 'small' | 'regular' | 'large'
+}
 
-  /** Text label with system font and color variants. */
-  export function Label(props: LabelProps): React.JSX.Element
+// Label
 
-  export interface LabelProps extends React.HTMLAttributes<HTMLSpanElement> {
-    /** Text color (default: primary/--label) */
-    color?: 'secondary' | 'tertiary'
-    font?: 'headline' | 'subheadline' | 'caption' | 'footnote'
-  }
+/** Text label with system font and color variants. */
+export function Label(props: LabelProps): React.JSX.Element
 
-  // FormRow
+export interface LabelProps extends React.HTMLAttributes<HTMLSpanElement> {
+  /** Text color (default: primary/--label) */
+  color?: 'secondary' | 'tertiary'
+  font?: 'headline' | 'subheadline' | 'caption' | 'footnote'
+}
 
-  /**
-   * A label + content row for inspector-style forms.
-   * Set `--bike-form-label-width` to adjust label column width.
-   */
-  export function FormRow(props: FormRowProps): React.JSX.Element
+// FormRow
 
-  export interface FormRowProps extends React.HTMLAttributes<HTMLDivElement> {
-    /** Label text shown in the left column */
-    label: React.ReactNode
-  }
+/**
+ * A label + content row for inspector-style forms.
+ * Set `--bike-form-label-width` to adjust label column width.
+ */
+export function FormRow(props: FormRowProps): React.JSX.Element
 
-  // FormGroup
+export interface FormRowProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Label text shown in the left column */
+  label: React.ReactNode
+}
 
-  /**
-   * Groups FormRows so their labels auto-size to the widest label using CSS Grid subgrid.
-   */
-  export function FormGroup(props: FormGroupProps): React.JSX.Element
+// FormGroup
 
-  export interface FormGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
+/**
+ * Groups FormRows so their labels auto-size to the widest label using CSS Grid subgrid.
+ */
+export function FormGroup(props: FormGroupProps): React.JSX.Element
 
-  // Box
+export interface FormGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-  /**
-   * A grouped container ("box") matching macOS grouped content — a filled,
-   * hairline-bordered rounded rectangle for visually grouping related controls.
-   * An optional `label` renders a header above the content.
-   *
-   * ```tsx
-   * import { Box, FormGroup, FormRow } from 'bike/components'
-   * <Box label="Row templates">
-   *   <FormGroup>
-   *     <FormRow label="Year"><input type="text" /></FormRow>
-   *   </FormGroup>
-   * </Box>
-   * ```
-   */
-  export function Box(props: BoxProps): React.JSX.Element
+// Box
 
-  export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
-    /** Header shown above the box content */
-    label?: React.ReactNode
-  }
+/**
+ * A grouped container ("box") matching macOS grouped content — a filled,
+ * hairline-bordered rounded rectangle for visually grouping related controls.
+ * An optional `label` renders a header above the content.
+ *
+ * ```tsx
+ * import { Box, FormGroup, FormRow } from 'bike/components'
+ * <Box label="Row templates">
+ *   <FormGroup>
+ *     <FormRow label="Year"><input type="text" /></FormRow>
+ *   </FormGroup>
+ * </Box>
+ * ```
+ */
+export function Box(props: BoxProps): React.JSX.Element
 
-  // Disclosure
+export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Header shown above the box content */
+  label?: React.ReactNode
+}
 
-  /**
-   * A macOS-style disclosure triangle with a label.
-   * Collapsed: shows the label with a right-pointing triangle.
-   * Expanded: shows the label with a down-pointing triangle and reveals children.
-   */
-  export function Disclosure(props: DisclosureProps): React.JSX.Element
+// Disclosure
 
-  export interface DisclosureProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
-    /** Label text shown next to the disclosure triangle */
-    label: React.ReactNode
-    /** Whether the disclosure is expanded (controlled) */
-    expanded?: boolean
-    /** Whether the disclosure starts expanded (uncontrolled, default: false) */
-    defaultExpanded?: boolean
-    /** Called when the expanded state changes */
-    onChange?: (expanded: boolean) => void
-    /** Optional accessory content (e.g. buttons) rendered in the header */
-    accessory?: React.ReactNode
-    /** Where to place the accessory: 'leading' (inline after label, default) or 'trailing' (right side) */
-    accessoryAlignment?: 'leading' | 'trailing'
-  }
+/**
+ * A macOS-style disclosure triangle with a label.
+ * Collapsed: shows the label with a right-pointing triangle.
+ * Expanded: shows the label with a down-pointing triangle and reveals children.
+ */
+export function Disclosure(props: DisclosureProps): React.JSX.Element
 
-  // Separator
+export interface DisclosureProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  /** Label text shown next to the disclosure triangle */
+  label: React.ReactNode
+  /** Whether the disclosure is expanded (controlled) */
+  expanded?: boolean
+  /** Whether the disclosure starts expanded (uncontrolled, default: false) */
+  defaultExpanded?: boolean
+  /** Called when the expanded state changes */
+  onChange?: (expanded: boolean) => void
+  /** Optional accessory content (e.g. buttons) rendered in the header */
+  accessory?: React.ReactNode
+  /** Where to place the accessory: 'leading' (inline after label, default) or 'trailing' (right side) */
+  accessoryAlignment?: 'leading' | 'trailing'
+}
 
-  /** A horizontal divider line matching macOS separator appearance. */
-  export function Separator(props: SeparatorProps): React.JSX.Element
+// Separator
 
-  export interface SeparatorProps extends React.HTMLAttributes<HTMLHRElement> {}
+/** A horizontal divider line matching macOS separator appearance. */
+export function Separator(props: SeparatorProps): React.JSX.Element
 
-  // SegmentedControl
+export interface SeparatorProps extends React.HTMLAttributes<HTMLHRElement> {}
 
-  /** A tab-like segmented control matching NSSegmentedControl appearance. */
-  export function SegmentedControl(props: SegmentedControlProps): React.JSX.Element
+// SegmentedControl
 
-  export interface SegmentedControlItem {
-    /** Value identifier for this segment */
-    value: string
-    label: React.ReactNode
-  }
+/** A tab-like segmented control matching NSSegmentedControl appearance. */
+export function SegmentedControl(props: SegmentedControlProps): React.JSX.Element
 
-  export interface SegmentedControlProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
-    items: SegmentedControlItem[]
-    /** Currently selected value */
-    value?: string
-    /** Called when selection changes */
-    onChange?: (value: string) => void
-    /** Control size (default: "regular") */
-    size?: 'mini' | 'small' | 'regular' | 'large'
-  }
+export interface SegmentedControlItem {
+  /** Value identifier for this segment */
+  value: string
+  label: React.ReactNode
+}
+
+export interface SegmentedControlProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  items: SegmentedControlItem[]
+  /** Currently selected value */
+  value?: string
+  /** Called when selection changes */
+  onChange?: (value: string) => void
+  /** Control size (default: "regular") */
+  size?: 'mini' | 'small' | 'regular' | 'large'
 }

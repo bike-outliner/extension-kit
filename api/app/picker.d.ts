@@ -1,6 +1,6 @@
 import {
   AttributeType,
-  AttributeValue,
+  AttributeChoice,
   AttributeParseResult,
   AttributeSuggest,
   TextFacet,
@@ -38,7 +38,7 @@ export interface AttributeSource {
 /** The picker's values given as a list, rather than coming from an attribute. */
 export interface ListSource {
   /** Suggestion rows, static or called per keystroke. */
-  values?: AttributeValue[] | AttributeSuggest
+  values?: AttributeChoice[] | AttributeSuggest
   /** Free-text parse; return undefined when the text doesn't resolve. */
   parse?: (text: string) => AttributeParseResult | undefined
   /** The offered rows are the complete legal set — no free-text fallback. Default false. */
@@ -65,7 +65,7 @@ export type AttributePickerSpec = PickerSpecCommon & { source: AttributeSource; 
 /** Values only, no embedded editor — so the source must offer rows. */
 export type SuggestionsPickerSpec = PickerSpecCommon & { kind?: undefined } & {
   source: ListSource &
-    ({ values: AttributeValue[] | AttributeSuggest } | { parse: (text: string) => AttributeParseResult | undefined })
+    ({ values: AttributeChoice[] | AttributeSuggest } | { parse: (text: string) => AttributeParseResult | undefined })
 }
 
 /** A plain text field, showing the facet's `placeholder` while empty. */

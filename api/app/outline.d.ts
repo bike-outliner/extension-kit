@@ -242,20 +242,34 @@ export interface Row {
   /** Row's paragraph of text */
   text: AttributedString
 
-  /** Row attributes */
-  readonly attributes: Record<RowAttributeName, string>
+  /**
+   * Row attributes, as the WIRE strings the document stores. Undefined for a
+   * name this row doesn't carry.
+   */
+  readonly attributes: Record<RowAttributeName, string | undefined>
 
   /**
-   * Get attribute by name.
-   * @param type - The type to parse the attribute as. (default string)
+   * Get an attribute's WIRE string, or undefined when the row doesn't carry
+   * it.
+   *
+   * Attributes are stored as wire strings; the typing lives in the value
+   * layer keyed by {@link AttributeType} — `bike.decodeValue(type, wire)` for
+   * a machine-facing JS value, `bike.displayValue(type, wire)` or
+   * `env.formatAttribute(name, wire)` for a human label.
    */
-  getAttribute(name: RowAttributeName, type?: AttributeValueType): any | undefined
+  getAttribute(name: RowAttributeName): string | undefined
 
   /**
-   * Set attribute by name. AttributeValue will be converted to and stored
-   * as a string.
+   * Set an attribute to a WIRE string. Passing anything but a string (other
+   * than null/undefined, which removes) is an error.
+   *
+   * Build typed values with `bike.encodeValue(type, value)`, whose output is
+   * canonical — a Date becomes the same stamp native Toggle Done writes.
+   * Otherwise the caller owns canonicalization: a hand-written `PT90M` is
+   * stored verbatim, where an editor write would have normalized it to
+   * `PT1H30M`.
    */
-  setAttribute(name: RowAttributeName, value: AttributeValue): void
+  setAttribute(name: RowAttributeName, wire: string): void
 
   /** Remove attribute by name. */
   removeAttribute(name: RowAttributeName): void
@@ -355,14 +369,14 @@ export class AttributedString {
    * @param value - The value of the attribute.
    * @param range - The range to add the attribute to (default entire string).
    */
-  addAttribute(name: TextAttributeName, value: AttributeValue, range?: Range): void
+  addAttribute(name: TextAttributeName, value: string, range?: Range): void
 
   /**
    * Add attributes in range.
    * @param attributes - The attributes to add.
    * @param range - The range to add the attributes to (default entire string).
    */
-  addAttributes(attributes: Record<TextAttributeName, AttributeValue>, range?: Range): void
+  addAttributes(attributes: Record<TextAttributeName, string>, range?: Range): void
 
   /**
    * Remove attribute from range.
@@ -431,20 +445,6 @@ export type TextAttributeName =
   | 'a'
   | 'base'
   | string
-
-/**
- * Attribute values can be strings, numbers, dates, or arrays of these
- * types. They are stored as strings in the outline in a format that can be
- * converted back to the original type.
- */
-export type AttributeValue = string | number | Date
-
-/**
- * Attribute values are stored as strings. This type is used when accessing
- * an attribute to convert it in a standard way to one of the supported
- * attribute types.
- */
-export type AttributeValueType = 'string' | 'number' | 'date'
 
 /**
  * Range is a tuple of start and end indexes. The start index is inclusive

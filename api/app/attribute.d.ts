@@ -50,7 +50,7 @@ export type DurationComponent =
 export type TimeField = 'hour' | 'minute' | 'second'
 
 /** A named wire value — the one row shape used wherever a value is offered. */
-export interface AttributeValue {
+export interface AttributeChoice {
   /** Display text, fuzzy-matched ("Friday"). */
   name: string
   /** The canonical wire value committed when picked. */
@@ -76,7 +76,7 @@ export interface AttributeParseResult {
  * pattern means the unfiltered list — built fresh per call, so date-relative
  * values roll over.
  */
-export type AttributeSuggest = (pattern: string) => AttributeValue[]
+export type AttributeSuggest = (pattern: string) => AttributeChoice[]
 
 // MARK: - Facets
 //
@@ -107,7 +107,7 @@ export interface DurationFacet {
 }
 
 export interface ChoiceFacet {
-  choices: AttributeValue[]
+  choices: AttributeChoice[]
   open?: boolean
 }
 
@@ -206,5 +206,5 @@ export type AttributeInfo = AttributeInfoCommon &
     | ({ type: 'duration' } & { components: DurationComponent[] })
     | { type: 'interval' }
     | { type: 'recurrence' }
-    | ({ type: 'choice' } & { choices: AttributeValue[]; open: boolean })
+    | ({ type: 'choice' } & { choices: AttributeChoice[]; open: boolean })
   )
