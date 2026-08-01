@@ -1,3 +1,13 @@
+// Pull the app context's ambient globals (console, setTimeout, …) in with the
+// barrel, so importing `bike/app` is enough to see them — a project whose
+// `configs/tsconfig.app.json` predates the globals.d.ts `include` entry (and any
+// editor that resolves this file through the `bike/app` path mapping) would
+// otherwise report TS2304 for them. Safe to reference from here and nowhere
+// else: the DOM context reaches app types only through direct file imports
+// (`../app/system`, `../app/outline`), never this barrel, so these declarations
+// stay out of the lib.dom program they conflict with.
+/// <reference path="./globals.d.ts" />
+
 export * from './bike'
 export * from './alert'
 export * from './choice-box'
