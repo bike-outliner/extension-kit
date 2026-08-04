@@ -194,8 +194,8 @@ export interface EditorSettings {
   showFocusArrows: boolean
   /** Allow font scaling to better fit viewport  */
   allowFontScaling: boolean
-  /** Hide controls when typing  */
-  hideControlsWhenTyping: boolean
+  /** Which control categories fade while typing. Empty means none do.  */
+  hiddenControlsWhenTyping: HiddenControl[]
   /** Writing focus mode  */
   writingFocusMode?: WritingFocusMode
   /** Typewriter mode (0-1)  */
@@ -209,6 +209,8 @@ export interface EditorSettings {
 }
 
 export type WritingFocusMode = 'paragraph' | 'sentence' | 'word'
+
+export type HiddenControl = 'guides' | 'handles' | 'badges'
 
 /** CaretStyle – The global text caret style */
 export interface CaretStyle {
