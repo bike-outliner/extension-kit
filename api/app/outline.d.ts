@@ -49,9 +49,18 @@ export class Outline {
    * Resolve a link string into a URL.
    *
    * `string` may be any absolute URL (e.g. `"https://example.com"`,
-   * `"bike://root/row"`) or a `#ROWID` shorthand (e.g. `"#calendar"`).
-   * `#ROWID` is expanded into `bike://<this-outline-root>/ROWID`. Anything
-   * else is parsed as an absolute URL.
+   * `"bike://root/row"`) or a `#ROWREF` shorthand (e.g. `"#calendar"`).
+   * `#ROWREF` is expanded into `bike://<this-outline-root>/#ROWREF`, which
+   * selects the row. Anything else is parsed as an absolute URL.
+   *
+   * A row reference in the focus or selection position of a `bike://` URL is
+   * resolved when the link opens, by trying, in order:
+   *
+   * 1. {@link PersistentId} — durable, and the only form Bike itself writes.
+   * 2. {@link RowId} — the session id, reassigned on every load, so it is
+   *    only good within one session. `row.id` is signed, and both the signed
+   *    and unsigned spellings of a session id name the same row.
+   * 3. Row number — 1-based position in outline order.
    *
    * @param string - The link string to resolve.
    * @returns A URL, or undefined if the string is malformed or this
