@@ -107,11 +107,12 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  * <Label color="tertiary" font="footnote">Help text</Label>
  * ```
  */
-export function Label({ color, font, className = '', children, ...rest }: LabelProps) {
+export function Label({ color, font, size, className = '', children, ...rest }: LabelProps) {
   const classes = [
     'bike-label',
     color ? `bike-label--${color}` : '',
     font ? `bike-label--${font}` : '',
+    size ? `bike-label--size-${size}` : '',
     className,
   ].filter(Boolean).join(' ')
   return <span className={classes} {...rest}>{children}</span>
@@ -120,8 +121,12 @@ export function Label({ color, font, className = '', children, ...rest }: LabelP
 export interface LabelProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** Text color (default: primary/--label) */
   color?: 'secondary' | 'tertiary'
-  /** Font style */
+  /** Semantic text style — the label's role (default: body) */
   font?: 'headline' | 'subheadline' | 'caption' | 'footnote'
+  /** Control size, as in Interface Builder: regular 13px, small 11px, mini 9px
+   * (`large` matches `regular` — AppKit scales a large control's metrics, not
+   * its text). Composes with `font`, which supplies family and weight. */
+  size?: 'large' | 'regular' | 'small' | 'mini'
 }
 
 // FormRow
@@ -177,9 +182,28 @@ export function Disclosure({ label, expanded, defaultExpanded = false, onChange,
     onChange?.(next)
   }
 
+  // Publish the triangle's laid-out width as `--bike-disclosure-triangle-width`
+  // so a host can indent the content to line up with the LABEL rather than the
+  // triangle, without hard-coding a number. The symbol sizes itself from the
+  // loaded image, so the width isn't known until after that resolves — hence
+  // the observer rather than a one-shot read. `offsetWidth`, not
+  // getBoundingClientRect: the triangle carries a CSS `scale`, which changes the
+  // visual box but not the space it occupies.
+  const rootRef = React.useRef<HTMLDivElement>(null)
+  React.useEffect(() => {
+    const root = rootRef.current
+    const triangle = root?.querySelector<HTMLElement>('.bike-disclosure__triangle')
+    if (!root || !triangle) return
+    const publish = () => root.style.setProperty('--bike-disclosure-triangle-width', `${triangle.offsetWidth}px`)
+    publish()
+    const observer = new ResizeObserver(publish)
+    observer.observe(triangle)
+    return () => observer.disconnect()
+  }, [isExpanded])
+
   const classes = ['bike-disclosure', className].filter(Boolean).join(' ')
   return (
-    <div className={classes} {...rest}>
+    <div className={classes} ref={rootRef} {...rest}>
       <div className="bike-disclosure__header">
         <button className="bike-disclosure__toggle" onClick={toggle} type="button">
           <SFSymbol className={`bike-disclosure__triangle${isExpanded ? ' bike-disclosure__triangle--expanded' : ''}`} name="chevron.forward" weight="semibold" scale="small" />
@@ -329,4 +353,52 @@ export interface SegmentedControlProps extends Omit<React.HTMLAttributes<HTMLDiv
   onChange?: (value: string) => void
   /** Control size (default: "regular") */
   size?: 'mini' | 'small' | 'regular' | 'large'
+}
+
+// RadioGroup
+
+/**
+ * A vertical group of radio buttons — one mutually exclusive choice, matching
+ * how Interface Builder presents an NSButton radio group.
+ */
+export function RadioGroup<T extends string = string>({ items, value, onChange, name, className = '', ...rest }: RadioGroupProps<T>) {
+  // A DOM radio group is defined by its members sharing a `name`, so default it
+  // to a per-instance id: two groups rendered on one page would otherwise
+  // capture each other's clicks and behave as a single group. Passing `name`
+  // explicitly is for joining an existing form, not for ordinary use.
+  const generatedName = React.useId()
+  const groupName = name ?? generatedName
+  const classes = ['bike-radio-group', className].filter(Boolean).join(' ')
+  return (
+    <div className={classes} role="radiogroup" {...rest}>
+      {items.map((item) => (
+        <label key={item.value} className="bike-radio">
+          <input
+            type="radio"
+            name={groupName}
+            checked={item.value === value}
+            onChange={() => onChange?.(item.value)}
+          />
+          <span className="bike-radio__label">{item.label}</span>
+        </label>
+      ))}
+    </div>
+  )
+}
+
+export interface RadioGroupItem<T extends string = string> {
+  /** Value identifier for this option */
+  value: T
+  /** Display label */
+  label: React.ReactNode
+}
+
+export interface RadioGroupProps<T extends string = string> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  items: RadioGroupItem<T>[]
+  /** Currently selected value */
+  value?: T
+  /** Called when selection changes */
+  onChange?: (value: T) => void
+  /** Shared input name (default: a generated per-instance id) */
+  name?: string
 }

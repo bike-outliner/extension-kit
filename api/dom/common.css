@@ -10,6 +10,9 @@
  *   body        — -apple-system-body (default for all text)
  *   h1          — -apple-system-headline (section titles)
  *   h2          — -apple-system-subheadline (subsection titles)
+ *   input,
+ *   textarea,
+ *   select      — -apple-system-body (form controls don't inherit body's font)
  *
  * Available as CSS classes:
  *   .caption1   — secondary labels, timestamps, metadata
@@ -69,12 +72,16 @@
  *   --container-border            — panel/card borders
  *   --grid                        — grid/table lines
  *
- * Fills:
- *   --system-fill                 — system fill (thinnest)
- *   --secondary-system-fill       — secondary system fill
- *   --tertiary-system-fill        — tertiary system fill
- *   --quaternary-system-fill      — quaternary system fill
- *   --quinary-system-fill         — quinary system fill (thickest)
+ * Fills — translucent overlays, black in light mode and white in dark, so they
+ * darken or lighten whatever is behind them automatically. Listed most to least
+ * prominent. Stacking one over another (e.g. a background-image gradient over a
+ * background-color) deepens the effect and stays correct in both appearances,
+ * which is how to build a pressed or highlighted state without `filter`:
+ *   --system-fill                 — most prominent (alpha ~0.098)
+ *   --secondary-system-fill       — ~0.078
+ *   --tertiary-system-fill        — ~0.047
+ *   --quaternary-system-fill      — ~0.027
+ *   --quinary-system-fill         — faintest (~0.008)
  *
  * Find:
  *   --find-highlight-background   — search match highlight
@@ -117,6 +124,16 @@ h1 {
 
 h2 {
   font: -apple-system-subheadline;
+}
+
+/* Form controls don't inherit `body`'s font in WebKit — left alone they render
+   in the UA control font, which is a different size from every label beside
+   them. `font: inherit` would work too, but naming the system font keeps this
+   correct inside a container that has set a font of its own. */
+input,
+textarea,
+select {
+  font: -apple-system-body;
 }
 
 /* Font utility classes */

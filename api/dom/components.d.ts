@@ -38,7 +38,14 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 
 // Button
 
-/** A macOS-styled capsule button in three sizes. */
+/**
+ * A macOS-styled capsule button.
+ *
+ * `size` scales the text as well as the metrics, on the same
+ * `NSFont.systemFontSize(for:)` scale as `Label`'s `size`: mini 9px, small
+ * 11px, regular and large 13px. `large` shares Regular's text size because
+ * AppKit enlarges a large control's metrics, not its text.
+ */
 export function Button(props: ButtonProps): React.JSX.Element
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -48,13 +55,31 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 // Label
 
-/** Text label with system font and color variants. */
+/**
+ * Text label with system font and color variants.
+ *
+ * Two independent ways to size text, matching the two scales AppKit itself
+ * uses. `font` picks a semantic TEXT STYLE — the label's role, where the size
+ * follows from the role. `size` picks a CONTROL SIZE: the Large / Regular /
+ * Small / Mini scale Interface Builder shows, taken from
+ * `NSFont.systemFontSize(for:)`.
+ *
+ * They compose — `font` supplies the family and weight, `size` overrides the
+ * point size. `<Label font="headline" size="small">` is semibold at 11px.
+ */
 export function Label(props: LabelProps): React.JSX.Element
 
 export interface LabelProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** Text color (default: primary/--label) */
   color?: 'secondary' | 'tertiary'
+  /** Semantic text style — the label's role (default: body) */
   font?: 'headline' | 'subheadline' | 'caption' | 'footnote'
+  /**
+   * Control size, as in Interface Builder: regular 13px, small 11px, mini 9px.
+   * `large` matches `regular` — AppKit scales a large control's metrics, not
+   * its text, so there is no larger label font.
+   */
+  size?: 'large' | 'regular' | 'small' | 'mini'
 }
 
 // FormRow
@@ -108,6 +133,14 @@ export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
  * A macOS-style disclosure triangle with a label.
  * Collapsed: shows the label with a right-pointing triangle.
  * Expanded: shows the label with a down-pointing triangle and reveals children.
+ *
+ * Content layout is adjustable with two custom properties, both no-ops unless
+ * set: `--bike-disclosure-content-indent` insets the content's leading edge,
+ * and `--bike-disclosure-content-spacing-after` adds separation below it. The
+ * component publishes `--bike-disclosure-triangle-width`, so to align content
+ * with the label rather than the triangle, set the indent to
+ * `calc(var(--bike-disclosure-triangle-width) + 4px)` (4px is the header gap).
+ * Bike's extension-settings pane sets both; the inspector sets neither.
  */
 export function Disclosure(props: DisclosureProps): React.JSX.Element
 
@@ -135,7 +168,14 @@ export interface SeparatorProps extends React.HTMLAttributes<HTMLHRElement> {}
 
 // SegmentedControl
 
-/** A tab-like segmented control matching NSSegmentedControl appearance. */
+/**
+ * A tab-like segmented control matching NSSegmentedControl appearance.
+ *
+ * `size` scales the text as well as the metrics, on the same
+ * `NSFont.systemFontSize(for:)` scale as `Button` and `Label`'s `size`: mini
+ * 9px, small 11px, regular and large 13px. `large` shares Regular's text size
+ * because AppKit enlarges a large control's metrics, not its text.
+ */
 export function SegmentedControl(props: SegmentedControlProps): React.JSX.Element
 
 export interface SegmentedControlItem {
@@ -152,4 +192,51 @@ export interface SegmentedControlProps extends Omit<React.HTMLAttributes<HTMLDiv
   onChange?: (value: string) => void
   /** Control size (default: "regular") */
   size?: 'mini' | 'small' | 'regular' | 'large'
+}
+
+// RadioGroup
+
+/**
+ * A vertical group of radio buttons — one mutually exclusive choice, matching
+ * how Interface Builder presents an NSButton radio group. Use it over
+ * `SegmentedControl` when the options are a settings choice rather than a view
+ * switch, and over several `Checkbox`es when exactly one must be selected.
+ *
+ * ```tsx
+ * import { RadioGroup } from 'bike/components'
+ * <RadioGroup
+ *   items={[
+ *     { value: 'pie', label: 'Pie chart' },
+ *     { value: 'fraction', label: 'Fraction' },
+ *     { value: 'none', label: 'None' },
+ *   ]}
+ *   value={style}
+ *   onChange={setStyle}
+ * />
+ * ```
+ *
+ * The type parameter is inferred from `items`, so `onChange` receives that union
+ * rather than a bare `string`.
+ */
+export function RadioGroup<T extends string = string>(props: RadioGroupProps<T>): React.JSX.Element
+
+export interface RadioGroupItem<T extends string = string> {
+  /** Value identifier for this option */
+  value: T
+  /** Display label */
+  label: React.ReactNode
+}
+
+export interface RadioGroupProps<T extends string = string> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  items: RadioGroupItem<T>[]
+  /** Currently selected value */
+  value?: T
+  /** Called when selection changes */
+  onChange?: (value: T) => void
+  /**
+   * Shared `name` for the underlying inputs. Defaults to a generated
+   * per-instance id, which is what keeps two groups on one page from behaving
+   * as a single group — only set this to join an existing form.
+   */
+  name?: string
 }

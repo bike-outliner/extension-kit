@@ -22,6 +22,16 @@ body {
   overflow-y: auto;
   padding: 12px 0;
 }
+
+/* Settings sections read as prose-with-controls rather than a dense inspector,
+   so a Disclosure here indents its content to the label's leading edge (the
+   triangle then reads as a hint in the margin) and leaves a blank line before
+   the next extension's section. Scoped to this host: the same component in the
+   inspector keeps its tight, flush-left layout. */
+#settings-content .bike-disclosure {
+  --bike-disclosure-content-indent: calc(var(--bike-disclosure-triangle-width, 0px) + 4px);
+  --bike-disclosure-content-spacing-after: 1em;
+}
 `
 document.head.appendChild(style)
 

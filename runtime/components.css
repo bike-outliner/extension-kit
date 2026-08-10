@@ -34,47 +34,72 @@
 
 /* Button */
 
+/* Metrics are the measured NSButton (.push) values per NSControl.ControlSize:
+   heights 16 / 20 / 24 / 28 and side padding 8 / 10 / 12 / 14 for
+   mini / small / regular / large.
+   The HEIGHT is set explicitly and the label centered, rather than derived from
+   vertical padding around the text: the line box for `font: -apple-system-body`
+   is whatever WebKit computes `line-height: normal` to be, so padding alone
+   can't land on an exact AppKit height — and it landed short at every size. */
 .bike-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 24px;
   font: -apple-system-body;
   color: var(--label);
   background: var(--system-fill);
   border: none;
   border-radius: 6px;
-  padding: 3px 11px;
+  padding: 0 12px;
   cursor: pointer;
 }
 
-.bike-button:hover {
-  background: var(--system-fill);
-}
-
-.bike-button:active {
-  filter: brightness(0.9);
+/* Pressed, the way a native bordered button behaves: highlighted only while the
+   mouse is BOTH down and over the button, and never when disabled.
+     :active  — set on mouse-down, and only for a press that started here
+     :hover   — drops the highlight if you drag off, restores it if you drag back
+     :enabled — a disabled button never highlights
+   The highlight stacks a second `--system-fill` over the base one. The system
+   fills are translucent — rgba(0,0,0,.098) in light mode, rgba(255,255,255,.098)
+   in dark — so layering roughly doubles the alpha, darkening in light and
+   LIGHTENING in dark, which is what native does. A `filter: brightness(<1)`
+   would move the wrong way in dark mode, dimming the fill instead.
+   Applied as an inset box-shadow rather than a background layer, matching
+   `.bike-segmented__item` — a separate property stacks on top of any fill a
+   variant has set instead of replacing it. */
+.bike-button:enabled:active:hover {
+  box-shadow: inset 0 0 0 999px var(--system-fill);
 }
 
 .bike-button:disabled {
   color: var(--tertiary-label);
   cursor: default;
-  filter: none;
 }
 
-.bike-button:disabled:hover {
-  background: var(--system-fill);
-}
-
+/* Font sizes are NSFont.systemFontSize(for:) — mini 9, small 11, regular 13,
+   large 13. Large carries no font-size of its own because AppKit enlarges a
+   large control's METRICS, not its text, so it keeps Regular's 13px from the
+   `font` shorthand above. Same scale as `Label`'s `size` prop. */
 .bike-button--mini {
   border-radius: 5px;
-  padding: 0px 6px;
+  height: 16px;
+  padding: 0 8px;
+  font-size: 9px;
 }
 
 .bike-button--small {
   border-radius: 5px;
-  padding: 1.5px 9px;
+  height: 20px;
+  padding: 0 10px;
+  font-size: 11px;
 }
 
 .bike-button--large {
   border-radius: 999px;
-  padding: 6px 18px;
+  height: 28px;
+  padding: 0 14px;
 }
 
 /* Label */
@@ -106,6 +131,27 @@
 
 .bike-label--footnote {
   font: -apple-system-footnote;
+}
+
+/* Control-size scale, matching NSControl.ControlSize as Interface Builder
+   presents it (Large / Regular / Small / Mini). Values are exactly
+   NSFont.systemFontSize(for:) — 13 / 13 / 11 / 9.
+   `--size-large` deliberately shares Regular's size: AppKit enlarges a large
+   control's METRICS, not its text, so there is no larger label font.
+   These come after the `font` rules above and set only `font-size`, so the two
+   props compose — `font` supplies the role (family and weight), `size`
+   overrides the point size. `font="headline" size="small"` is semibold 11px. */
+.bike-label--size-large,
+.bike-label--size-regular {
+  font-size: 13px;
+}
+
+.bike-label--size-small {
+  font-size: 11px;
+}
+
+.bike-label--size-mini {
+  font-size: 9px;
 }
 
 /* FormRow */
@@ -218,6 +264,16 @@
   flex-direction: column;
   gap: 8px;
   padding: 4px 0;
+  /* Two host-set knobs, both no-ops by default so existing layouts (the
+     inspector, panels, sheets) are unchanged:
+       --bike-disclosure-content-indent         inset the content's leading edge
+       --bike-disclosure-content-spacing-after  separation below the content
+     To line content up with the LABEL instead of the triangle, set the indent to
+     calc(var(--bike-disclosure-triangle-width) + 4px) — the triangle's width is
+     published by the component, and 4px is the header's gap. Declared after the
+     `padding` shorthand so it wins. */
+  padding-left: var(--bike-disclosure-content-indent, 0);
+  margin-bottom: var(--bike-disclosure-content-spacing-after, 0);
 }
 
 .bike-disclosure__content > * {
@@ -259,19 +315,32 @@
 
 /* SegmentedControl */
 
+/* Track alpha measured off a real NSSegmentedControl: 0.078, black in light mode
+   and white in dark — exactly `--secondary-system-fill`. (It was
+   `--system-fill`, 0.098, slightly too strong.) */
 .bike-segmented {
   display: inline-flex;
-  background: var(--system-fill);
+  background: var(--secondary-system-fill);
   border-radius: 6px;
   overflow: hidden;
 }
 
+/* Measured NSSegmentedControl metrics per NSControl.ControlSize: heights
+   16 / 20 / 24 / 28 (same as NSButton) but slightly tighter side padding —
+   8 / 10 / 11 / 13. Height is set on the ITEM and the container hugs it, for the
+   same reason as Button: `line-height: normal` can't be padded to an exact
+   AppKit height. */
 .bike-segmented__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 24px;
   font: -apple-system-body;
   color: var(--label);
   background: none;
   border: none;
-  padding: 3px 11px;
+  padding: 0 11px;
   cursor: pointer;
   white-space: nowrap;
   position: relative;
@@ -287,17 +356,49 @@
   background: var(--separator);
 }
 
-.bike-segmented__item:hover {
-  background: none;
+/* No `:hover` background rule on purpose. Segments have no hover effect (the
+   base background is already `none`), and a rule saying so would be a
+   class+pseudo-class — specificity (0,2,0) — which out-specifies the single
+   class `--selected` (0,1,0) below and wipes the selected segment's highlight
+   on mouse-over. If a real hover effect is ever wanted, it has to be written to
+   exclude the selected segment, e.g.
+   `.bike-segmented__item:not(.bike-segmented__item--selected):hover`. */
+
+/* Pressed, same rules as `.bike-button`: highlighted only while the mouse is
+   both down and over the segment, and never when disabled.
+   The overlay is an INSET BOX-SHADOW, not a background layer. This selector is
+   (0,4,0) and out-specifies `--selected` (0,1,0) below, so anything written to
+   `background`/`background-image` would replace the selected segment's own fill
+   the moment you pressed it — the specificity trap that broke the selected
+   highlight on hover, one property over. `box-shadow` is a separate channel, so
+   it stacks on top of whatever fill the segment already has: a selected segment
+   deepens from 0.196 and an unselected one from the bare track. */
+.bike-segmented__item:enabled:active:hover {
+  box-shadow: inset 0 0 0 999px var(--system-fill);
 }
 
-.bike-segmented__item:active {
-  filter: brightness(0.9);
-}
-
+/* A real NSSegmentedControl's selected segment measures alpha 0.196 — black in
+   light mode, white in dark — against a 0.078 track. Never an opaque colour,
+   which is why both earlier attempts failed: `--secondary-background`
+   (underPageBackgroundColor) is a mid gray in light and rgb(40,40,40) in dark
+   (a hair off the window background, so it read as a gap), and `--control` is
+   pure white in light, which matched a white panel and read as a gap again.
+   Translucent fills can't match a background by accident — they're defined
+   relative to it.
+   Two layers over the track reach the target: --system-fill (0.098) then
+   --quaternary-system-fill (0.027) composite with 0.078 to ≈0.192, within
+   0.004 of native. */
 .bike-segmented__item--selected {
-  background: var(--secondary-background);
+  background-image:
+    linear-gradient(var(--system-fill), var(--system-fill)),
+    linear-gradient(var(--quaternary-system-fill), var(--quaternary-system-fill));
 }
+
+/* Sizes scale the text as well as the metrics, on the same
+   NSFont.systemFontSize(for:) scale as `Button` and `Label`'s `size` — mini 9,
+   small 11, regular 13, large 13. Large sets no font-size, keeping Regular's
+   13px from `.bike-segmented__item`: AppKit enlarges a large control's METRICS,
+   not its text. */
 
 /* Mini */
 
@@ -306,7 +407,9 @@
 }
 
 .bike-segmented--mini .bike-segmented__item {
-  padding: 0px 6px;
+  height: 16px;
+  padding: 0 8px;
+  font-size: 9px;
 }
 
 /* Small */
@@ -316,7 +419,9 @@
 }
 
 .bike-segmented--small .bike-segmented__item {
-  padding: 1.5px 9px;
+  height: 20px;
+  padding: 0 10px;
+  font-size: 11px;
 }
 
 /* Large */
@@ -326,5 +431,32 @@
 }
 
 .bike-segmented--large .bike-segmented__item {
-  padding: 6px 18px;
+  height: 28px;
+  padding: 0 13px;
+}
+
+/* RadioGroup */
+
+.bike-radio-group {
+  display: flex;
+  flex-direction: column;
+  /* Tighter than the surrounding stack's spacing on purpose: the options must
+     read as one control rather than as separate rows. */
+  gap: 4px;
+}
+
+.bike-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font: -apple-system-body;
+  color: var(--label);
+}
+
+.bike-radio input[type="radio"] {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  flex-shrink: 0;
 }
