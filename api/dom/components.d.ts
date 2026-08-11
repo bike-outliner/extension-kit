@@ -239,4 +239,9 @@ export interface RadioGroupProps<T extends string = string> extends Omit<React.H
    * as a single group — only set this to join an existing form.
    */
   name?: string
+  /**
+   * Dims every option and stops the group responding to clicks. The whole
+   * group is what gets disabled — there is no per-item flag.
+   */
+  disabled?: boolean
 }

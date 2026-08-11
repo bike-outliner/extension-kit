@@ -16,18 +16,28 @@
 
 /* Checkbox */
 
+:root {
+  --bike-checkbox-box-size: 15px;
+  --bike-checkbox-gap: 4px;
+  /* Leading inset for content that BELONGS to a checkbox — a radio group it
+     switches on, say — so the content lines up with the checkbox's LABEL
+     rather than its box. Derived from the two metrics above so it can't drift
+     from them. */
+  --bike-checkbox-content-indent: calc(var(--bike-checkbox-box-size) + var(--bike-checkbox-gap));
+}
+
 .bike-checkbox {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--bike-checkbox-gap);
   cursor: pointer;
   font: -apple-system-body;
   color: var(--label);
 }
 
 .bike-checkbox input[type="checkbox"] {
-  width: 15px;
-  height: 15px;
+  width: var(--bike-checkbox-box-size);
+  height: var(--bike-checkbox-box-size);
   margin: 0;
   flex-shrink: 0;
 }
@@ -459,4 +469,11 @@
   height: 15px;
   margin: 0;
   flex-shrink: 0;
+}
+
+/* Same treatment as `.bike-button:disabled`. Matched through `:has()` because
+   the text is a SPAN sibling of the input, not the disabled element itself. */
+.bike-radio:has(input:disabled) {
+  color: var(--tertiary-label);
+  cursor: default;
 }

@@ -72,6 +72,12 @@ export interface BikeUtilityGlobals extends BikeCommonGlobals {
    * Formats a Date object using a pattern string (date-fns / CLDR-inspired,
    * e.g. `'yyyy-MM-dd'`, `'MMMM d, yyyy'`).
    *
+   * The local week tokens — `w`/`ww` (week of year), `e`/`c` (day of week),
+   * `Y` (week-numbering year) — resolve against {@link systemFirstWeekday},
+   * so `ww` gives the week number this Mac uses. `I`/`II` are ISO by
+   * definition and always count weeks from Monday; prefer `ww` unless you
+   * specifically want ISO.
+   *
    * @see https://date-fns.org/docs/format
    */
   formatDate(date: Date, pattern: string): string

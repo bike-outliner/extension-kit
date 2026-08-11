@@ -1,6 +1,8 @@
 // Extension settings runtime
 // Manages settings items contributed by extensions.
-// Items stack vertically in the order they are added.
+// Items stack vertically in alphabetical order by label — NOT the order they
+// are added, which is extension activation order and therefore depends on how
+// the extensions folder happened to enumerate.
 
 declare global {
   interface Window {
@@ -51,7 +53,14 @@ function addItem(label: string) {
   if (items.has(label)) return
   const container = document.createElement('div')
   container.dataset.settingsLabel = label
-  content.appendChild(container)
+  // Insert before the first section whose label sorts after this one, so the
+  // pane reads the same however the extensions loaded. `localeCompare` rather
+  // than `<` so "Ähnlich" files with the A's and casing doesn't split the list.
+  const next = Array.from(content.children).find((el) => {
+    const other = (el as HTMLElement).dataset.settingsLabel
+    return other != null && other.localeCompare(label) > 0
+  })
+  content.insertBefore(container, next ?? null)
   items.set(label, container)
 }
 

@@ -361,7 +361,7 @@ export interface SegmentedControlProps extends Omit<React.HTMLAttributes<HTMLDiv
  * A vertical group of radio buttons — one mutually exclusive choice, matching
  * how Interface Builder presents an NSButton radio group.
  */
-export function RadioGroup<T extends string = string>({ items, value, onChange, name, className = '', ...rest }: RadioGroupProps<T>) {
+export function RadioGroup<T extends string = string>({ items, value, onChange, name, disabled, className = '', ...rest }: RadioGroupProps<T>) {
   // A DOM radio group is defined by its members sharing a `name`, so default it
   // to a per-instance id: two groups rendered on one page would otherwise
   // capture each other's clicks and behave as a single group. Passing `name`
@@ -369,6 +369,8 @@ export function RadioGroup<T extends string = string>({ items, value, onChange, 
   const generatedName = React.useId()
   const groupName = name ?? generatedName
   const classes = ['bike-radio-group', className].filter(Boolean).join(' ')
+  // `disabled` is destructured out rather than left in `rest`: the group is a
+  // <div>, which has no disabled attribute — it belongs on each input.
   return (
     <div className={classes} role="radiogroup" {...rest}>
       {items.map((item) => (
@@ -377,6 +379,7 @@ export function RadioGroup<T extends string = string>({ items, value, onChange, 
             type="radio"
             name={groupName}
             checked={item.value === value}
+            disabled={disabled}
             onChange={() => onChange?.(item.value)}
           />
           <span className="bike-radio__label">{item.label}</span>
@@ -401,4 +404,6 @@ export interface RadioGroupProps<T extends string = string> extends Omit<React.H
   onChange?: (value: T) => void
   /** Shared input name (default: a generated per-instance id) */
   name?: string
+  /** Dims the whole group and stops it responding to clicks */
+  disabled?: boolean
 }
