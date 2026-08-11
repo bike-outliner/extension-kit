@@ -110,17 +110,25 @@ export type SymbolScale = 'small' | 'medium' | 'large'
 /**
  * Font - Wraps a `NSFontDescriptor`.
  *
- * This class can be a bit mysterious to work with. You are creating a
- * description of a font that you want, but sometimes that described font might
- * not exist. For example the following font might surprise:
+ * You are describing a font you want, and the described face may not exist —
+ * most families ship far fewer variants than you can ask for. Rather than
+ * silently handing back the plain face, Bike resolves the request:
  *
- * ```
- * new Font("Helvetica", 24).withMonospace()
- * ```
+ * - **Bold** and **italic** are SYNTHESIZED when the family has no such face:
+ *   the weight by stroking the glyphs, the slant by shearing them. They stay in
+ *   the family you chose.
+ * - **Monospace** is SUBSTITUTED with the system monospaced face, because it
+ *   asks for a different typeface rather than an emphasis of this one, and it
+ *   can't be faked. Note that no ordinary family — Helvetica and Georgia
+ *   included — has a monospaced variant, so this is the usual outcome. Naming a
+ *   family explicitly with {@link Font.withFace} or {@link Font.withFamily}
+ *   opts out; that's you choosing the typeface.
+ * - **OpenType features** (small caps, fractions, stylistic sets…) are silently
+ *   ignored by fonts that lack them. There's no signal for this.
  *
- * You will likely get Helvetica at 24 points. The `withMonospaced` call will
- * have no effect because there isn't a monospaced version of Helvetica on your
- * computer.
+ * {@link Font.resolve} reports what happened via `synthesizedBold`,
+ * `synthesizedOblique` and `substitutedMonospace`, so a stylesheet can choose
+ * something better than a fake — a contrasting family for `strong` runs, say.
  *
  * Generally if you are confused look into how `NSFontDescriptor` works. This is
  * a light wrapper around that class.
@@ -202,12 +210,30 @@ export class Font {
 
 export type FontAttributes = {
   name: string
+  family: string
   pointSize: number
   ascender: number
   descender: number
   xHeight: number
   xWidth: number
   maximumAdvancement: Size
+  /**
+   * True when the family has no bold face and Bike is faking the weight by
+   * stroking the glyphs. Use it to pick something better than a stroke — for
+   * example a contrasting family for `strong` runs.
+   */
+  synthesizedBold: boolean
+  /**
+   * True when the family has no italic face and Bike is faking the slant with a
+   * shear matrix.
+   */
+  synthesizedOblique: boolean
+  /**
+   * True when the family has no monospaced variant and Bike substituted the
+   * system monospaced face. Unlike bold and italic this is a real font, not a
+   * fake — monospace can't be synthesized.
+   */
+  substitutedMonospace: boolean
   uiScale: number // Size relative to the 14pt baseline
 }
 
