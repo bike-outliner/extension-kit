@@ -472,6 +472,7 @@ export type RowType =
   | 'unordered'
   | 'ordered'
   | 'task'
+  | 'log'
   | 'hr'
 
 /**

@@ -30,7 +30,7 @@ type Markdown = string
 
 type SessionRowType =
   | 'body' | 'heading' | 'task' | 'note'
-  | 'quote' | 'code' | 'hr' | 'ordered' | 'unordered'
+  | 'quote' | 'code' | 'hr' | 'ordered' | 'unordered' | 'log'
 
 interface SessionTextRun {
   string: string

@@ -81,6 +81,7 @@ export interface RowThemes {
   readonly blockquote: TextContainerTheme
   readonly codeblock: TextContainerTheme
   readonly task: TextContainerTheme
+  readonly log: TextContainerTheme
   readonly orderedList: TextContainerTheme
   readonly unorderedList: TextContainerTheme
   readonly horizontalRule: TextContainerTheme
