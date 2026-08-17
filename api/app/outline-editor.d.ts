@@ -47,6 +47,15 @@ export interface OutlineEditor extends View {
   /** True if row is expanded */
   isExpanded(row: Row): boolean
   /** True if row is collapsed */
+  /**
+   * Set task state through the maintained path: a running clock stops on
+   * close, tasks that keep a log record the change, and completed tasks sort
+   * to the end of their run. Prefer this over `setAttribute('status', …)`,
+   * which is a raw data edit that gets none of that. Rows may be any set;
+   * omit for the live selection.
+   */
+  setRowStatus(status: 'todo' | 'started' | 'done' | 'canceled', rows?: Row[]): void
+
   isCollapsed(row: Row): boolean
   /** Expand the given rows with given options. */
   expand(rows?: Row[], options?: FoldOptions): void
