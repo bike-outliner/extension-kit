@@ -17,6 +17,15 @@ export class Image {
   withScale(scale: number): Image
   withComposite(image: Image): Image
   /**
+   * Lay `image` out to the right of this one, vertically centered on each
+   * other — a symbol beside its label, for instance. Unlike
+   * {@link Image.withComposite}, which overlays.
+   *
+   * @param spacing Gap between the two images (default 0)
+   * @returns A new image as wide as both plus `spacing`, as tall as the taller
+   */
+  withHStack(image: Image, spacing?: number): Image
+  /**
    * @returns A new image drawn over a rounded-rect backdrop sized to this
    * image plus the background's padding
    */
