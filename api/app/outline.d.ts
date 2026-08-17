@@ -246,6 +246,27 @@ export interface Row {
   /** Persistent id, generating one if needed */
   readonly ensuredPersistentId: PersistentId
 
+  /**
+   * This row's log — the `log`-typed child holding its history — or
+   * undefined when it keeps none.
+   *
+   * Entries inside are ordinary rows carrying `log-*` attributes by
+   * convention, so recording history is plain row insertion once you have
+   * the container. There is no entry API because entries need no type: a
+   * feature brings its own `log-*` names, and `log-date` is the one field
+   * every entry carries.
+   */
+  readonly log?: Row
+
+  /**
+   * The log, creating it as the last child when absent.
+   *
+   * A MUTATION that reads like a lookup, same shape as
+   * `ensuredPersistentId` — call it inside a transaction when it is part of
+   * a larger edit.
+   */
+  readonly ensuredLog: Row
+
   /** Row's type, defaults to body */
   type: RowType
   /** Row's paragraph of text */
