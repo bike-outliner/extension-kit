@@ -121,16 +121,32 @@ interface AttributeCommon {
   description?: string
   /** Present ⇒ a bare valueless `@name` is meaningful, displayed with this label. */
   emptyLabel?: string
-  /** Let the built-in catch-all badge render this attribute. Default true. */
+  /**
+   * SEED the catch-all badge: whether it draws an automatic tag for this
+   * attribute when nothing else presents it. Default true; say false when your
+   * extension draws its own badge.
+   *
+   * A seed, not a rule — the user's Badge column in Settings ▸ Extensions ▸
+   * Bike ▸ Attributes overrides it in both directions.
+   */
   defaultBadge?: boolean
   /** Extra value suggestions, merged above the host's built-in ones. */
   suggestions?: AttributeSuggest
   /**
    * Free-form JSON the host stores and echoes back through
    * {@link AttributeInfo} — consumers define their own keys. Known ones:
-   * `calendar: false` keeps a date attribute off the calendar extension;
-   * `contextMenu: false` keeps the attribute out of the row context menu's
-   * attribute group.
+   *
+   * - `calendar: false` keeps a date attribute off the calendar extension.
+   * - `user: false` says this is a field your feature writes and reads, not
+   *   one anyone sets by hand (the `log-*` fields on a log entry, the clock's
+   *   duration). Such a field is never suggested, never recorded in a row's
+   *   log, and does not appear in the Attributes settings table at all. Rows
+   *   that carry it still show it, and it stays removable.
+   *
+   * Everything else is the USER's to decide, per attribute, in that table —
+   * including whether changes are recorded, which an earlier `log: true` key
+   * used to declare here. That key is gone; declaring an attribute no longer
+   * says anything about its history.
    */
   metadata?: Record<string, JSONValue>
 }

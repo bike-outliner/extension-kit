@@ -33,6 +33,14 @@ export class Outline {
   readonly persistentMetadata: JSONStore
 
   /**
+   * Every row-attribute name used anywhere in this outline, sorted, with
+   * reserved names excluded.
+   *
+   * A full scan of the outline — ask on a user action, not per keystroke.
+   */
+  readonly attributeNames: string[]
+
+  /**
    * Archive this outline.
    *
    * @param format - The archive format (default bike).
