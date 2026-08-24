@@ -34,9 +34,7 @@ export class Outline {
 
   /**
    * Every row-attribute name used anywhere in this outline, sorted, with
-   * reserved names excluded.
-   *
-   * A full scan of the outline — ask on a user action, not per keystroke.
+   * reserved names excluded. Requires a full scan of the outline.
    */
   readonly attributeNames: string[]
 
