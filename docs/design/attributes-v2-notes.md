@@ -40,7 +40,7 @@ Supporting decisions:
   menu? }` is the only "offered value" row type — choices, suggestions,
   picker rows. `menu: true` promotes a row into the built-in attribute
   menu (0.63.0 — this replaced the separate `AttributeShortcut` list and
-  the palette's bare-`@` shortcut rows). v1's `PickerValue` /
+  the Attributes Editor's bare-`@` shortcut rows). v1's `PickerValue` /
   `PickerChoiceOption` are gone.
 - **Wire encodings are normative in exactly one place** — the
   `AttributeType` doc in `attribute.d.ts`. Picker kinds and summary docs

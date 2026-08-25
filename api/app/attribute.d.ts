@@ -2,7 +2,7 @@
  * The shared value-type system.
  *
  * `bike.attribute(name, config)` declares how the editor treats attribute
- * `name` in the palette, in pickers, and in badges.
+ * `name` in the Attributes Editor, in pickers, and in badges.
  */
 
 import { JSONValue } from '../core/json'

@@ -25,7 +25,7 @@ export function registerEstimate() {
 }
 ```
 
-That one line buys the whole value layer. Bike now knows `estimate` holds an [ISO-8601 duration](../api/app/attribute.d.ts) (`PT30M`, `P1DT2H`), so it parses free text natively — typing `90m` or `1.5h` in the attribute palette stores `PT1H30M` — offers standard duration suggestions, and formats values for display as `1h 30m` in the viewer's locale. You never write a parser or a formatter.
+That one line buys the whole value layer. Bike now knows `estimate` holds an [ISO-8601 duration](../api/app/attribute.d.ts) (`PT30M`, `P1DT2H`), so it parses free text natively — typing `90m` or `1.5h` in the Attributes Editor stores `PT1H30M` — offers standard duration suggestions, and formats values for display as `1h 30m` in the viewer's locale. You never write a parser or a formatter.
 
 Registration is **configuration, not behavior**: declaring the attribute doesn't change how rows render. That's the badge's job.
 
@@ -54,7 +54,7 @@ export function registerEstimate() {
 
 `where: '.@estimate'` selects the rows that get a badge, those with an `estimate` attribute. `render` runs per selected row and returns the glyph (or `null` for no badge). It receives `values` (the row's attribute values — `values.estimate` here, since a badge reads its own attribute by default) and `env`, the row's inherited text presentation.
 
-`values` are always raw **wire** strings (`"PT1H30M"`). Format them with `env.formatAttribute(name, wire)`, which runs the same native, locale-aware display layer the palette and pickers use — never by hand. For a value that isn't a registered attribute's (a computed input, a summary result), use `env.formatValue(type, wire)` instead.
+`values` are always raw **wire** strings (`"PT1H30M"`). Format them with `env.formatAttribute(name, wire)`, which runs the same native, locale-aware display layer the Attributes Editor and pickers use — never by hand. For a value that isn't a registered attribute's (a computed input, a summary result), use `env.formatValue(type, wire)` instead.
 
 Building the text from `env.font` and `env.color.alphaSet(0.6)` makes the badge match the surrounding text at 60% opacity.
 

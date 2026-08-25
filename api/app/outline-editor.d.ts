@@ -75,8 +75,8 @@ export interface OutlineEditor extends View {
   /** Present the built-in type-aware menu for one attribute. */
   showAttributeMenu(attribute: string): void
   showAttributeMenu(placement: Placement, attribute: string): void
-  /** Present the row's attribute palette */
-  showAttributePalette(row: Row): void
+  /** Present the row’s Attributes Editor */
+  showAttributesEditor(row: Row): void
   /** Show a message in the editor's status bar. */
   showStatusMessage(message: string, timeout?: number): Disposable
   /** Show autocomplete for current caret if any completions exist */
