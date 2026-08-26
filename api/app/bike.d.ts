@@ -9,6 +9,7 @@ import { Keybindings } from './keybindings'
 import { AttributeConfig, AttributeInfo, AttributeParseResult, AttributeType } from './attribute'
 import { BadgeConfig } from './badge'
 import { SummaryConfig } from './summary'
+import { ReconcileConfig } from './reconcile'
 import { Input } from './input'
 import { OutlineEditor } from './outline-editor'
 import { PanelOptions, PanelHandle } from './dom-script'
@@ -49,6 +50,8 @@ declare global {
     summary(name: string, config: SummaryConfig): Disposable
     /** Declare how the editor treats an attribute everywhere. See `AttributeConfig`. */
     attribute(name: string, config: AttributeConfig): Disposable
+    /** Register a rule that derives changes from each outline transaction. See `ReconcileConfig`. */
+    reconcile(name: string, config: ReconcileConfig): Disposable
     /** Observe current and future attribute definitions. */
     observeAttributes(handler: (infos: AttributeInfo[]) => void): Disposable
     /** Parse free text as a value of the named attribute ("next fri", "2h 30m"). */
