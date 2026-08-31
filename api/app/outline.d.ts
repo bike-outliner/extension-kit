@@ -297,7 +297,8 @@ export interface Row {
 
   /**
    * Set an attribute to a WIRE string. Passing anything but a string (other
-   * than null/undefined, which removes) is an error.
+   * than null/undefined, which removes) is an error, as is a name
+   * {@link RowAttributeName} rejects.
    *
    * Build typed values with `bike.encodeValue(type, value)`, whose output is
    * canonical — a Date becomes the same stamp native Toggle Done writes.
@@ -307,7 +308,11 @@ export interface Row {
    */
   setAttribute(name: RowAttributeName, wire: string): void
 
-  /** Remove attribute by name. */
+  /**
+   * Remove attribute by name. More permissive than {@link setAttribute}: any
+   * name a document can actually hold may be removed, including one an import
+   * introduced that `setAttribute` would refuse to create.
+   */
   removeAttribute(name: RowAttributeName): void
 
   /** Row's level in the outline. Root is 0. */
@@ -462,8 +467,20 @@ export class AttributedString {
 export type PersistentId = string
 
 /**
- * Row attributes names can be any valid HTML attribute string. When encoded to
- * HTML they will be prefixed with `data-`.
+ * Row attribute names are UNPREFIXED. Bike adds the `data-` prefix itself when
+ * it writes `.bike` and HTML, and strips it on read, so a name that starts
+ * with `data-` would be saved doubled (`data-data-x`) and read back as
+ * something else — it is rejected rather than mangled.
+ *
+ * Also rejected: `id`, `text`, `type`, `created` and `modified`, which are row
+ * properties with fields of their own rather than attributes; `indent`, which
+ * is Bike's own layout state; and anything the `.bike` writer could not emit —
+ * an empty name, or one containing whitespace, `"`, `'`, `=`, `<`, `>`, `&`,
+ * `/`, or starting with a digit, `-` or `.`.
+ *
+ * {@link Row.setAttribute} throws on a rejected name.
+ * {@link Row.removeAttribute} is deliberately more permissive, so a name a
+ * document picked up elsewhere can always be taken back out.
  */
 export type RowAttributeName = string
 
