@@ -245,12 +245,12 @@ export interface Row {
   readonly outline: Outline
   /** Numeric row id, unique within outline but not persistent across saves */
   readonly id: RowId
-  /** URL link for this row combining outline and row persistent ids */
-  readonly url: URL
-  /** Persistent id */
+  /** Persistent id, or undefined when this row has none */
   persistentId?: PersistentId
-  /** Persistent id, generating one if needed */
-  readonly ensuredPersistentId: PersistentId
+  /** This row's persistent id, minting one when it has none. */
+  ensurePersistentId(): PersistentId
+  /** A `bike://` link to this row, naming both the outline and the row by persistent id. */
+  url(): URL
 
   /**
    * This row's log — the `log`-typed child holding its history — or
@@ -263,15 +263,8 @@ export interface Row {
    * every entry carries.
    */
   readonly log?: Row
-
-  /**
-   * The log, creating it as the last child when absent.
-   *
-   * A MUTATION that reads like a lookup, same shape as
-   * `ensuredPersistentId` — call it inside a transaction when it is part of
-   * a larger edit.
-   */
-  readonly ensuredLog: Row
+  /** This row's log, creating it as the last child when absent. */
+  ensureLog(): Row
 
   /** Row's type, defaults to body */
   type: RowType
@@ -285,8 +278,7 @@ export interface Row {
   readonly attributes: Record<RowAttributeName, string | undefined>
 
   /**
-   * Get an attribute's WIRE string, or undefined when the row doesn't carry
-   * it.
+   * Get an attribute's WIRE string, or undefined.
    *
    * Attributes are stored as wire strings; the typing lives in the value
    * layer keyed by {@link AttributeType} — `bike.decodeValue(type, wire)` for

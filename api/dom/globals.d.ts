@@ -19,7 +19,7 @@ declare const bike: import('../core/bike-globals').BikeUtilityGlobals & {
    * `fetch()`.
    *
    * An app context handing srcs to its DOM half should send the outline
-   * root's persistent id along (`outline.root.ensuredPersistentId`) so the
+   * root's persistent id along (`outline.root.ensurePersistentId()`) so the
    * DOM side can build these URLs.
    *
    * @param outlineId - The outline's persistent id (`SessionOutline.persistentId`).
