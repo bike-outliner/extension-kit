@@ -28,21 +28,7 @@ reads `ALL TESTS PASSED` — a green suite for a repo whose tests never executed
 in `lib/test.mjs` reads Bike's `bike.extensions.disabledIds` preference and fails first, naming the
 extensions to enable.
 
-`check-api` is the exception, and the split is deliberate. A consumer project's check runs with
-`skipLibCheck: true` (set in its own `configs/*.json`, and forced by `typecheckPlugin` regardless):
-it cannot fix third-party declarations, and the `file:../extension-kit` symlink makes these api
-files enter the program under two identities — once via the project's `include`, once via the
-`bike/*` path mapping's realpath — which reads as a duplicate `declare const bike`. Neither is
-actionable there, and lib check roughly doubles the check.
-
-Here the `.d.ts` files ARE the product, so `api/{app,dom,style}/tsconfig.json` deliberately do NOT
-set `skipLibCheck`, and `check-api` checks all three contexts with it on (~2s). Run it after
-touching anything in `api/` — and it's a required pre-release step on the Hog Bay release
-checklist (`hogbaycontext/workflows/release-checklist.md`, Code Preparation). Checked from inside this repo the double-identity doesn't arise, so the
-output is real signal. It earned its keep immediately: it caught `api/dom/components.d.ts` declaring
-`declare module 'bike/components' { import … from '../core/bike-globals' }`, illegal in an ambient
-module block, which had silently degraded `SFSymbolName` to an error type and left `SFSymbol`'s
-`name` prop unchecked for every extension using it.
+`check-api` deliberately runs WITH lib check (`api/{app,dom,style}/tsconfig.json` don't set `skipLibCheck`), because here the `.d.ts` files are the product. Consumer projects force `skipLibCheck` (their `file:` symlink makes the api files appear twice). Run `check-api` after touching anything in `api/`; it is a required pre-release step (`hogbaycontext/workflows/release-checklist.md`).
 
 ## Project Structure
 
@@ -68,6 +54,7 @@ extension-kit/
 │   ├── common.ts           #   Exposes React/ReactDOM as window globals
 │   ├── components.tsx      #   bike/components implementations
 │   ├── format.ts           #   Shared formatting helpers
+│   ├── value-codec.ts      #   bike.encodeValue/decodeValue wire codecs
 │   ├── sheet.tsx           #   Sheet UI template
 │   ├── inspector.tsx       #   Inspector UI template
 │   ├── panel.tsx           #   Panel UI template (+ panel.html)
@@ -100,16 +87,6 @@ App and DOM communicate via `postMessage`/`onmessage` on `DOMScriptHandle` (app 
 4. **installExtensionPlugin** — Copies built extensions to Bike's Extensions directory; only added to the build when the `--install` flag is passed
 
 Output format is IIFE bundles. Production uses external sourcemaps + minification; dev uses inline sourcemaps.
-
-## Code Style
-
-- 2-space indentation
-- Single quotes
-- Semicolons
-- ES module imports (`import`/`export`)
-- Build tooling files are `.mjs` (plain JavaScript)
-- API type definitions are `.d.ts`
-- `runtime/` uses `.ts` and `.tsx`
 
 ## Key Types
 
