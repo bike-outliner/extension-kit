@@ -2,208 +2,107 @@ import { JSONStore } from '../core/json'
 import { OutlinePath, OutlinePathValue } from '../core/outline-path'
 import { Disposable, URL } from './system'
 
-/** Outline is a tree of rows. */
+/** Tree of rows. */
 export class Outline {
-  /** Root row of the outline (not visible in editor). */
+  /** Not visible in the editor. */
   readonly root: Row
 
-  /**
-   * Create a new outline.
-   *
-   * Generally users create outlines themselves when they create
-   * documents. Use this constructor to create a temporary outline for
-   * processing. For example you can use this constructor to copy rows
-   * from an existing outline to the clipboard:
-   *
-   * 1. Query the existing outline
-   * 2. Create a new outline from the query results
-   * 3. Use `archive()` on the new outline to export the data
-   */
+  /** Creates a detached outline, e.g. to archive query results. */
   constructor(rows?: RowSource)
 
-  /** Runtime metadata for the outline. */
+  /** Not saved. */
   readonly runtimeMetadata: JSONStore
 
   /**
-   * Persistent metadata for the outline.
-   *
-   * Stored in file format frontmatter/metadata. Not stored for Plain Text
-   * documents unless the key `bikemd` is set to `true`.
+   * Saved in file frontmatter/metadata. Not saved for plain text documents
+   * unless key `bikemd` is `true`.
    */
   readonly persistentMetadata: JSONStore
 
-  /**
-   * Every row-attribute name used anywhere in this outline, sorted, with
-   * reserved names excluded. Requires a full scan of the outline.
-   */
+  /** Sorted, reserved names excluded. Scans the whole outline. */
   readonly attributeNames: string[]
 
-  /**
-   * Archive this outline.
-   *
-   * @param format - The archive format (default bike).
-   */
+  /** @param format Default `bike`. */
   archive(format?: OutlineFormat): OutlineArchive
 
-  /**
-   * Get the row by id.
-   * @param id - The numeric Row.ID or PersistentId of the row to get.
-   */
   getRowById(id: RowId | PersistentId): Row | undefined
 
   /**
-   * Resolve a link string into a URL.
+   * Resolves an absolute URL or a `#ROWREF` shorthand, which expands to
+   * `bike://<this-outline-root>/#ROWREF`.
    *
-   * `string` may be any absolute URL (e.g. `"https://example.com"`,
-   * `"bike://root/row"`) or a `#ROWREF` shorthand (e.g. `"#calendar"`).
-   * `#ROWREF` is expanded into `bike://<this-outline-root>/#ROWREF`, which
-   * selects the row. Anything else is parsed as an absolute URL.
+   * Row references in `bike://` URLs resolve on open, trying in order: a
+   * {@link PersistentId} (the only form Bike writes), a session
+   * {@link RowId} (signed or unsigned spelling), then a 1-based row number.
    *
-   * A row reference in the focus or selection position of a `bike://` URL is
-   * resolved when the link opens, by trying, in order:
-   *
-   * 1. {@link PersistentId} — durable, and the only form Bike itself writes.
-   * 2. {@link RowId} — the session id, reassigned on every load, so it is
-   *    only good within one session. `row.id` is signed, and both the signed
-   *    and unsigned spellings of a session id name the same row.
-   * 3. Row number — 1-based position in outline order.
-   *
-   * @param string - The link string to resolve.
-   * @returns A URL, or undefined if the string is malformed or this
-   *   outline's root has no persistent id.
+   * @returns Undefined if the string is malformed or the root has no
+   *   persistent id.
    */
   resolveLink(string: string): URL | undefined
 
   /**
-   * Resolve an attachment src to the attachment's metadata.
-   *
-   * `src` is the `embed` text attribute of an attachment run (e.g.
-   * `'assets/photo.png'`). Attachments added this session resolve to
-   * staged copies, so the URL is readable before the document saves.
-   *
-   * @param src - The embed src to resolve.
-   * @returns The attachment's metadata, or undefined when the src is
-   *   invalid, this outline has no document, or no attachment file exists.
+   * @param src An attachment run's `embed` attribute, e.g. `assets/photo.png`.
+   *   Unsaved attachments resolve to staged copies.
+   * @returns Undefined when `src` is invalid, the outline has no document, or
+   *   no file exists.
    */
   attachmentMetadata(src: string): AttachmentMetadata | undefined
 
-  /**
-   * Read an attachment's raw bytes.
-   *
-   * @param src - The embed src of the attachment.
-   * @returns A Promise resolving to the attachment's bytes; rejects when
-   *   the attachment can't be resolved (see `attachmentMetadata`) or read.
-   */
+  /** Rejects when the attachment can't be resolved or read. */
   attachmentBytes(src: string): Promise<Uint8Array>
 
   /**
-   * Insert rows into the outline.
-   *
-   * @param rows - The source of the rows to insert. (Always copied)
-   * @param parent - The parent row to insert the rows into. (Default Root)
-   * @param before - The optional child row to insert before.
+   * @param rows Always copied.
+   * @param parent Default root.
    */
   insertRows(rows: RowSource, parent?: Row, before?: Row): Row[]
 
-  /**
-   * Move rows within the outline. These rows must already be in the
-   * outline.
-   *
-   * @param rows - The existing rows to move.
-   * @param parent - The existing parent row to move the rows into.
-   * @param before - The optional child row to insert before.
-   */
+  /** Rows and parent must already be in this outline. */
   moveRows(rows: Row[], parent: Row, before?: Row): void
 
-  /**
-   * Remove rows from the outline.
-   * @param rows - The existing rows to remove.
-   */
   removeRows(rows: Row[]): void
 
-  /**
-   * Query the outline immediately.
-   */
   query(path: OutlinePath): OutlinePathValue
 
-  /**
-   * Query the outline asynchronously.
-   * @param handler - The handler to call when result value is ready.
-   */
   scheduleQuery(path: OutlinePath, handler: (value: OutlinePathValue) => void): Disposable
 
   /**
-   * Query the outline asynchronously and continuously.
-   *
-   * Queries are debounced as the outline changes. If the outline changes
-   * quickly you may not see intermediate results, but you will always get
-   * results for the final outline state.
-   *
-   * @param handler - The handler to call when a result value is ready.
+   * Re-runs as the outline changes, debounced. Intermediate states may be
+   * skipped; the final state is always reported.
    */
   observeQuery(path: OutlinePath, handler: (value: OutlinePathValue) => void): Disposable
 
-  /**
-   * Explain how an outline path will be evaluated.
-   *
-   * Returns detailed information about the path's abstract syntax tree,
-   * parse sequence, and any parsing errors. Useful for debugging and
-   * understanding complex queries.
-   *
-   * @param path - The outline path to explain.
-   * @returns A string describing the AST, parse sequence, and errors.
-   */
+  /** Describes the path's AST, parse sequence, and errors. */
   explainQuery(path: OutlinePath): string
 
   /**
-   * Group several changes so the view updates once. Optional — use it when
-   * multiple edits should read as a single change.
-   *
-   * @returns The return value of the update closure.
+   * Groups changes so the view updates once.
+   * @returns The value returned by `update`.
    */
   transaction(options: TransactionOptions, update: () => any): any
 
-  /**
-   * Prevent the next edit from coalescing with the previous in undo stack
-   */
+  /** Keeps the next edit from coalescing with the previous undo entry. */
   breakUndoCoalescing(): void
 
-  /**
-   * Observe changes.
-   */
   observeChanges(handler: (change: OutlineChange) => void): Disposable
 
-  /**
-   * Register a handler called once, when this outline's document closes —
-   * immediately before the document's `onClose`.
-   *
-   * @param handler - Called once when the outline closes.
-   * @returns A Disposable that unregisters the handler.
-   */
+  /** Called once when the document closes, just before the document's `onClose`. */
   onClose(handler: () => void): Disposable
 }
 
 export type OutlineArchive = { data: string; format: OutlineFormat }
 export type OutlineFormat = 'bike' | 'opml' | 'plaintext'
 
-/** Read-only metadata for a resolved attachment (embed asset). */
 export interface AttachmentMetadata {
-  /** The attachment's resolved file URL (staged copy when unsaved). */
+  /** File URL; a staged copy when unsaved. */
   readonly url: URL
-  /**
-   * The attachment's MIME type, derived from its file extension
-   * (`'application/octet-stream'` when unknown).
-   */
+  /** From the file extension; `application/octet-stream` when unknown. */
   readonly mimeType: string
 }
 
 /**
- * Describes changes made to an outline.
- *
- * Changes to outline structure are grouped into changes of contiguous and
- * ordered sibling rows. Only top level siblings are reported. For example when
- * siblings are removed you will get an event for the top level removed
- * siblings, but not for descendants of those siblings.
+ * Structural changes are grouped into runs of contiguous siblings. Only the
+ * top-level siblings are reported, not their descendants.
  */
 export type OutlineChange =
   | { type: 'beginTransaction' }
@@ -215,7 +114,6 @@ export type OutlineChange =
   | { type: 'reload'; oldOutline: Outline; newOutline: Outline }
   | { type: 'endTransaction' }
 
-/** Describes change made to a specific Row. */
 export type RowChange =
   | { type: 'setPersistentId'; oldPersistentId: PersistentId | null; newPersistentId: PersistentId | null }
   | { type: 'setType'; oldType: RowType; newType: RowType }
@@ -227,11 +125,7 @@ export type RowChange =
       insertedText: AttributedString
     }
   | {
-      // In a few cases row type+text changes are dependent on each other. For
-      // example if you set a row type to `hr` it also replaces the text. Or if
-      // you insert text into a `hr` typed row it converts that row to type
-      // `body`. These linked changes are represented atomically using this
-      // replacedTextAndSetType change type.
+      // Linked type and text change, e.g. setting type `hr` replaces the text.
       type: 'replacedTextAndSetType'
       at: number
       replacedText: AttributedString
@@ -240,143 +134,92 @@ export type RowChange =
       newType: RowType
     }
 
-/** A row is a paragraph of text that can also have children rows. */
+/** A paragraph of text with child rows. */
 export interface Row {
   readonly outline: Outline
-  /** Numeric row id, unique within outline but not persistent across saves */
+  /** Unique within the outline; not persistent across loads. */
   readonly id: RowId
-  /** Persistent id, or undefined when this row has none */
   persistentId?: PersistentId
-  /** This row's persistent id, minting one when it has none. */
+  /** Mints a persistent id when absent. */
   ensurePersistentId(): PersistentId
-  /** A `bike://` link to this row, naming both the outline and the row by persistent id. */
+  /** `bike://` link naming the outline and row by persistent id. */
   url(): URL
 
   /**
-   * This row's log — the `log`-typed child holding its history — or
-   * undefined when it keeps none.
-   *
-   * Entries inside are ordinary rows carrying `log-*` attributes by
-   * convention, so recording history is plain row insertion once you have
-   * the container. There is no entry API because entries need no type: a
-   * feature brings its own `log-*` names, and `log-date` is the one field
-   * every entry carries.
+   * The `log`-typed child holding this row's history. Entries are ordinary
+   * rows with `log-*` attributes; every entry has `log-date`.
    */
   readonly log?: Row
-  /** This row's log, creating it as the last child when absent. */
+  /** Creates the log as the last child when absent. */
   ensureLog(): Row
 
-  /** Row's type, defaults to body */
+  /** Default `body`. */
   type: RowType
-  /** Row's paragraph of text */
   text: AttributedString
 
-  /**
-   * Row attributes, as the WIRE strings the document stores. Undefined for a
-   * name this row doesn't carry.
-   */
+  /** Wire strings as stored. */
   readonly attributes: Record<RowAttributeName, string | undefined>
 
   /**
-   * Get an attribute's WIRE string, or undefined.
-   *
-   * Attributes are stored as wire strings; the typing lives in the value
-   * layer keyed by {@link AttributeType} — `bike.decodeValue(type, wire)` for
-   * a machine-facing JS value, `bike.displayValue(type, wire)` or
-   * `env.formatAttribute(name, wire)` for a human label.
+   * Wire string. Decode with `bike.decodeValue(type, wire)`, or label with
+   * `bike.displayValue(type, wire)` / `env.formatAttribute(name, wire)`.
    */
   getAttribute(name: RowAttributeName): string | undefined
 
   /**
-   * Set an attribute to a WIRE string. Passing anything but a string (other
-   * than null/undefined, which removes) is an error, as is a name
-   * {@link RowAttributeName} rejects.
-   *
-   * Build typed values with `bike.encodeValue(type, value)`, whose output is
-   * canonical — a Date becomes the same stamp native Toggle Done writes.
-   * Otherwise the caller owns canonicalization: a hand-written `PT90M` is
-   * stored verbatim, where an editor write would have normalized it to
-   * `PT1H30M`.
+   * Throws for a non-string (null/undefined removes) or a rejected
+   * {@link RowAttributeName}. Stored verbatim: use `bike.encodeValue` for
+   * canonical values (a hand-written `PT90M` is not normalized to `PT1H30M`).
    */
   setAttribute(name: RowAttributeName, wire: string): void
 
-  /**
-   * Remove attribute by name. More permissive than {@link setAttribute}: any
-   * name a document can actually hold may be removed, including one an import
-   * introduced that `setAttribute` would refuse to create.
-   */
+  /** Accepts any name a document can hold, including ones `setAttribute` rejects. */
   removeAttribute(name: RowAttributeName): void
 
-  /** Row's level in the outline. Root is 0. */
+  /** Root is 0. */
   readonly level: number
-  /** Ancestors of this row */
   readonly ancestors: Row[]
-  /** Ancestors of this row including self */
   readonly ancestorsWithSelf: Row[]
-  /** Parent row, only undefined for outline root. */
+  /** Undefined only for the root. */
   readonly parent?: Row
   readonly prevSibling?: Row
   readonly nextSibling?: Row
   readonly firstChild?: Row
   readonly lastChild?: Row
 
-  /** First leaf in branch rooted at this row */
   readonly firstLeaf: Row
-  /** Last leaf in branch rooted at this row */
   readonly lastLeaf: Row
-  /** Children of this row */
   readonly children: Row[]
-  /** Descendants of this row */
   readonly descendants: Row[]
-  /** Descendants of this row including self */
   readonly descendantsWithSelf: Row[]
-  /** Previous branch */
   readonly prevBranch?: Row
-  /** Next branch */
   readonly nextBranch?: Row
-  /** Previous row in outline order */
   readonly prevInOutline?: Row
-  /** Next row in outline order */
   readonly nextInOutline?: Row
 
-  /** True if row is an ancestor of other row. */
+  /** True if `row` is an ancestor of this row. */
   isAncestor(row: Row): boolean
-  /** True if row is a descendant of other row. */
+  /** True if `row` is a descendant of this row. */
   isDescendant(row: Row): boolean
 }
 
 /**
- * AttributedString for rich text editing.
- *
- * Many commonly used attributes are "marker" attributes. They are used to
- * mark up text with semantic meaning, and just used empty string for
- * associated value. For example, "strong" is used to mark up text that
- * should be displayed as bold, but the actual font is determined by the
- * editor's stylesheets.
+ * Rich text. Marker attributes such as `strong` use an empty string value;
+ * stylesheets decide how they render.
  */
 export class AttributedString {
-  /**
-   * Create an AttributedString from a Markdown string.
-   */
   static fromMarkdown(markdown: string): AttributedString
 
-  /**
-   * Create an AttributedString from an HTML string (should be a `<p>` element).
-   */
+  /** @param html A `<p>` element. */
   static fromHTML(html: string): AttributedString
 
-  /** Character contents */
   string: string
 
-  /** Character count */
   count: number
 
   /**
-   * Get attribute at index.
-   * @param attribute - The name of the attribute.
-   * @param index - The index to get the attribute at.
-   * @param affinity - The affinity to disambiguate run boundaries (default upstream).
-   * @param effectiveRange - The range of the attribute returned by reference.
+   * @param affinity Disambiguates run boundaries. Default `upstream`.
+   * @param effectiveRange Filled in with the attribute's range.
    */
   attributeAt(
     attribute: TextAttributeName,
@@ -386,9 +229,8 @@ export class AttributedString {
   ): string | undefined
 
   /**
-   * Get attributes at index.
-   * @param affinity - The affinity to disambiguate run boundaries (default upstream).
-   * @param effectiveRange - The range of the attributes returned by reference.
+   * @param affinity Disambiguates run boundaries. Default `upstream`.
+   * @param effectiveRange Filled in with the attributes' range.
    */
   attributesAt(
     index: number,
@@ -396,91 +238,41 @@ export class AttributedString {
     effectiveRange?: Range
   ): Record<TextAttributeName, string>
 
-  /**
-   * Add attribute in range.
-   * @param name - The name of the attribute.
-   * @param value - The value of the attribute.
-   * @param range - The range to add the attribute to (default entire string).
-   */
+  /** @param range Default entire string. */
   addAttribute(name: TextAttributeName, value: string, range?: Range): void
 
-  /**
-   * Add attributes in range.
-   * @param attributes - The attributes to add.
-   * @param range - The range to add the attributes to (default entire string).
-   */
+  /** @param range Default entire string. */
   addAttributes(attributes: Record<TextAttributeName, string>, range?: Range): void
 
-  /**
-   * Remove attribute from range.
-   * @param name - The name of the attribute.
-   * @param range - The range to remove the attribute from (default entire string).
-   */
+  /** @param range Default entire string. */
   removeAttribute(name: TextAttributeName, range?: Range): void
 
-  /**
-   * Return new attributed string from range.
-   * @param range - The range to get the substring from.
-   */
   substring(range: Range): AttributedString
 
-  /**
-   * Insert string or attributed text at index.
-   */
   insert(position: number, text: string | AttributedString): void
 
-  /**
-   * Replace range with string or attributed text.
-   */
   replace(range: Range, text: string | AttributedString): void
 
-  /**
-   * Append string or attributed text.
-   */
   append(text: string | AttributedString): void
 
-  /**
-   * Delete text in range.
-   */
   delete(range: Range): void
 
-  /**
-   * Convert this attributed string to Markdown.
-   */
   toMarkdown(): string
 
-  /**
-   * Convert this attributed string to HTML.
-   */
   toHTML(): string
 }
 
-/** Persistent identifier optionally associated with rows */
 export type PersistentId = string
 
 /**
- * Row attribute names are UNPREFIXED. Bike adds the `data-` prefix itself when
- * it writes `.bike` and HTML, and strips it on read, so a name that starts
- * with `data-` would be saved doubled (`data-data-x`) and read back as
- * something else — it is rejected rather than mangled.
- *
- * Also rejected: `id`, `text`, `type`, `created` and `modified`, which are row
- * properties with fields of their own rather than attributes; `indent`, which
- * is Bike's own layout state; and anything the `.bike` writer could not emit —
- * an empty name, or one containing whitespace, `"`, `'`, `=`, `<`, `>`, `&`,
- * `/`, or starting with a digit, `-` or `.`.
- *
- * {@link Row.setAttribute} throws on a rejected name.
- * {@link Row.removeAttribute} is deliberately more permissive, so a name a
- * document picked up elsewhere can always be taken back out.
+ * Unprefixed; Bike adds and strips `data-` in `.bike`/HTML.
+ * {@link Row.setAttribute} rejects: names starting with `data-`, a digit, `-`
+ * or `.`; `id`, `text`, `type`, `created`, `modified`, `indent`; empty names;
+ * names containing whitespace, `"`, `'`, `=`, `<`, `>`, `&`, `/`.
  */
 export type RowAttributeName = string
 
-/**
- * Text attribute names can be any string. Common built in text attributes such
- * as "strong" and "em" are represented as inline tags in HTML (.bike format).
- * Custom attributes in spans.
- */
+/** Any string. Built-ins are HTML tags in `.bike`; custom names are spans. */
 export type TextAttributeName =
   | 'em'
   | 'strong'
@@ -491,10 +283,7 @@ export type TextAttributeName =
   | 'base'
   | string
 
-/**
- * Range is a tuple of start and end indexes. The start index is inclusive
- * and the end index is exclusive.
- */
+/** Start inclusive, end exclusive. */
 export type Range = [RangeStartIndex, RangeEndIndex]
 export type RangeStartIndex = number
 export type RangeEndIndex = number
@@ -511,19 +300,12 @@ export type RowType =
   | 'log'
   | 'hr'
 
-/**
- * Affinity determines how the selection behaves when the caret is at a
- * position with two possible meanings. For example at the end of a wrapped
- * line (or same position could be start of next wrapped line).
- */
+/** Which side an ambiguous position binds to, e.g. end of a wrapped line vs start of the next. */
 export type Affinity = 'upstream' | 'downstream'
 
 /**
- * Use RowSource when creating a new outline or inserting rows.
- *
- * RowSource will be copied into new rows in the outline. If any of the row
- * source IDs already exist in the outline new IDs will be generated and any
- * links imported will be updated to point to the new IDs.
+ * Copied into new rows. Ids that already exist in the outline are regenerated
+ * and imported links updated.
  */
 export type RowSource =
   | string[]
@@ -533,11 +315,7 @@ export type RowSource =
   | OutlineArchive
   | OutlinePathValue
 
-/**
- * Rows can't be created directly. Use a RowTemplate when you need to create
- * new rows, and the template values will be inserted into the row that the
- * outline creates for you internally.
- */
+/** Values for a new row; rows can't be constructed directly. */
 export type RowTemplate = {
   persistentId?: string
   type?: RowType
@@ -546,48 +324,34 @@ export type RowTemplate = {
   format?: 'plain' | 'markdown'
 }
 
-/**
- * TransactionOptions determine how the view updates when changes are made to
- * the outline.
- */
 export type TransactionOptions =
   | 'default'
   | {
-      /** Label for the transaction, used in undo history. */
+      /** Undo menu label. */
       label?: string
-      /** Animate transactions changes when set. */
       animate?:
         | 'none'
         | 'default'
         | {
-            /** Spring timing function to use for the animation. */
             spring: Spring
-            /** Caret animation behavior. */
             caret?: CaretAnimation
           }
     }
 
-/** Spring timing functions. */
 export type Spring =
-  /** Spring timing used when typing */
+  /** Typing. */
   | 'char'
-  /** Spring timing used when moving rows up/down etc (default) */
+  /** Moving rows. Default. */
   | 'row'
-  /** Spring timing used when expanding and collapsing rows */
+  /** Expand and collapse. */
   | 'fold'
-  /** Spring timing used when focus in/out */
+  /** Focus in and out. */
   | 'navigation'
 
-/** Caret animation behavior */
 export type CaretAnimation =
-  /** Caret slides from current position to new position */
   | 'slide'
-  /**
-   * Caret immediately jumps to new position in row and then animates with that
-   * row to final position (default)
-   */
+  /** Jumps to its new position in the row, then moves with the row. Default. */
   | 'slideWithRow'
-  /** Caret immediately jumps to final position and bounces */
+  /** Jumps to the final position and bounces. */
   | 'bounce'
-  /** Caret immediately jumps to final position and large bounces */
   | 'largeBounce'

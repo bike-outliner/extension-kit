@@ -1,59 +1,26 @@
 # Testing Extensions Tutorial
 
-Write tests for your extensions using the built-in test harness.
-
-- Entry points: `tests/*.test.ts`
-- Tests run in the app context (`bike/app` API)
-- `describe`, `it`, and `assert` are ambient globals provided by the test
-  harness (typed by the extension kit — no import needed)
-
-## Setup
-
-This tutorial assumes that you have completed the [DOM Context
-Tutorial](dom-context-tutorial.md). Your extension should already have a
-`tests/` folder with a sample test file.
+Tests are `tests/*.test.ts` files in an extension. They run in the app context
+(`bike/app`) and are built with the extension. `describe`, `it` and `assert` are
+typed globals; there is nothing to import.
 
 ## Running Tests
 
-To run tests open terminal and run:
-
 ```
-npx bike-ext test              # Build, install, and run all extension tests in package
-npx bike-ext test tutorial     # Build, install, and run tests for a specific extension
+npx bike-ext test              # all extensions in the package
+npx bike-ext test tutorial     # one extension
 ```
 
-The test command builds and installs the extension to test into Bike. It then
-launches Bike in a special test mode that runs the tests and prints results to
-the terminal. The process exits with code 0 if all tests pass, or 1 if there are
-any failures.
+`test` builds and installs, launches Bike in test mode, and prints the results.
+It exits 0 if every test passes and 1 otherwise. It refuses to run when an
+extension under test is disabled in Bike. Set `BIKE_PATH` if it can't find
+Bike.app.
 
-Use `BIKE_PATH` environment variable to specify the exact path to Bike.app if
-the test command is not finding it.
-
-You can also run tests from Bike > Logs Explorer. Click the **Run Tests** button
-and test results are displayed in the log. Note: The core extensions tests are
-not included with Bike, so if you want to run them you will need to build and
-install the core extensions from source.
+Bike > Logs Explorer > **Run Tests** runs the installed tests and logs the
+results. Core extension tests don't ship with Bike; build them from source to
+run them.
 
 ## Writing Tests
-
-Test files use TypeScript with the `.test.ts` extension. Place them in a
-`tests/` subfolder of your extension. They are compiled during the build step
-along with the rest of your extension:
-
-```
-my-extension.bkext
-├── app/
-├── manifest.json
-└── tests/
-    └── my-extension.test.ts
-```
-
-The `describe`, `it`, and `assert` functions are provided by the test harness.
-Type declarations for these functions are included in the extension kit, so you
-get autocomplete and type checking.
-
-This example shows common testing patterns:
 
 ```typescript
 describe("My Tests", () => {
@@ -79,16 +46,13 @@ describe("My Tests", () => {
 })
 ```
 
-Async tests run sequentially — each test waits for the previous one to complete.
-Modifications to the outline persist across tests, so you can set up state in
-one test and make assertions on it in later tests. You can also use
-`bike.testEditor()` to get a fresh outline.
+Tests run in order; each async test finishes before the next starts. Outline
+changes persist between tests. `bike.testEditor()` resets the test document and
+returns its editor.
 
 ## Testing the Archive Done Command
 
-If you followed the [App Context Tutorial](app-context-tutorial.md), you can
-test the `tutorial:archive-done` command. This example sets up an outline with
-task rows, marks some as done, runs the command, and verifies the results:
+This tests the [App Context Tutorial](app-context-tutorial.md) command:
 
 ```typescript
 import { Row } from 'bike/app'

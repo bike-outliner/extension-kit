@@ -1,28 +1,14 @@
 /**
- * Types for receiving native row drags in DOM extensions.
- *
- * When outline rows are dragged over an extension webview (inspector item,
- * panel, or sheet), Bike dispatches synthetic DOM events on the element under
- * the cursor. The events bubble, so a delegated listener on your script's
- * root element works well.
- *
- * Acceptance mirrors HTML5 drag-and-drop: call `preventDefault()` on
- * `bike:rowdragenter` or `bike:rowdragover` to accept the drop. If nothing
- * accepts, the drag's cursor shows "not allowed" and no `bike:rowdrop` fires.
- *
- * The payload ids are in `bike.session`'s id spaces — `outline` is the source
- * outline's persistent id and `rows` are live session ids — so they can be
- * passed straight to `bike.session.updateRows`, `moveRows`, etc. This works
- * even when the rows were dragged from a different document than the one the
- * script's host window shows.
+ * Row drags over a DOM script dispatch bubbling `bike:rowdrag*` events on the
+ * element under the cursor. As in HTML5, `preventDefault()` on `rowdragenter`
+ * or `rowdragover` accepts; otherwise no `bike:rowdrop` fires. Ids are
+ * `bike.session` ids, from any document.
  */
 
 interface RowDragDetail {
-  /** Persistent id of the outline the dragged rows belong to. */
   outline: OutlineId
-  /** Session ids of the dragged rows. */
   rows: SessionId[]
-  /** Drag location in client coordinates. */
+  /** Client coordinates. */
   clientX: number
   clientY: number
 }
@@ -30,12 +16,9 @@ interface RowDragDetail {
 type RowDragEvent = CustomEvent<RowDragDetail>
 
 interface GlobalEventHandlersEventMap {
-  /** Drag moved onto a new element. `preventDefault()` = accept the drop. */
   'bike:rowdragenter': RowDragEvent
-  /** Drag moved within an element. `preventDefault()` = accept the drop. */
   'bike:rowdragover': RowDragEvent
-  /** Drag left the element (or the webview; coordinates may be -1,-1). */
+  /** Coordinates may be -1,-1 when leaving the webview. */
   'bike:rowdragleave': RowDragEvent
-  /** Accepted drop. Fires on the element under the cursor. */
   'bike:rowdrop': RowDragEvent
 }

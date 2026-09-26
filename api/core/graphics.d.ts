@@ -4,7 +4,7 @@ import { SFSymbolName } from './bike-globals'
 /** Opaque cache passed to `resolve()` methods by the styling system. */
 export interface Cache {}
 
-/** Image - Used for Decoration content */
+/** Decoration content. */
 export class Image {
   static none(): Image
   static fromText(text: Text): Image
@@ -17,18 +17,11 @@ export class Image {
   withScale(scale: number): Image
   withComposite(image: Image): Image
   /**
-   * Lay `image` out to the right of this one, vertically centered on each
-   * other — a symbol beside its label, for instance. Unlike
-   * {@link Image.withComposite}, which overlays.
-   *
-   * @param spacing Gap between the two images (default 0)
-   * @returns A new image as wide as both plus `spacing`, as tall as the taller
+   * Places `image` to the right, vertically centered. {@link Image.withComposite}
+   * overlays instead.
+   * @param spacing Default 0.
    */
   withHStack(image: Image, spacing?: number): Image
-  /**
-   * @returns A new image drawn over a rounded-rect backdrop sized to this
-   * image plus the background's padding
-   */
   withBackground(background: ImageBackground): Image
   resolve(cache: Cache): {
     width: number
@@ -36,28 +29,18 @@ export class Image {
   }
 }
 
-/**
- * A rounded-rect fill/border drawn behind an image by
- * {@link Image.withBackground}, sized to the image plus `padding` — so
- * content that can't be measured in the extension (text, symbols) never
- * needs explicit backdrop dimensions.
- */
+/** Rounded rect drawn behind an image, sized to the image plus `padding`. */
 export interface ImageBackground {
-  /** Backdrop fill color. */
   fill?: Color
-  /** Border color. */
   stroke?: Color
-  /** Border line width, drawn inside the backdrop bounds (default 1). */
+  /** Drawn inside the bounds. Default 1. */
   strokeWidth?: number
-  /** Corner radius, clamped to half the smaller dimension (default 0). */
+  /** Clamped to half the smaller dimension. Default 0. */
   cornerRadius?: number
-  /** Space around the image: one number for all edges, or per-edge Insets (default 0). */
+  /** Default 0. */
   padding?: number | Insets
 }
 
-/**
- * Text - Text with a font, color, and string. Use as decoration image content.
- */
 export class Text {
   font: Font
   color: Color
@@ -65,9 +48,6 @@ export class Text {
   constructor(string: string, font?: Font, color?: Color)
 }
 
-/**
- * Shape - Path with stroke and color. Use as decoration image content.
- */
 export class Shape {
   path: Path
   line: ShapeLine
@@ -97,10 +77,7 @@ export interface ShapeStroke {
   end: number
 }
 
-/**
- * SymbolConfiguration – Wraps NSImage.SymbolConfiguration. Use as decoration
- * image content
- */
+/** Wraps `NSImage.SymbolConfiguration`. */
 export class SymbolConfiguration {
   constructor(name: SFSymbolName, variableValue?: number)
 
@@ -113,34 +90,14 @@ export class SymbolConfiguration {
   preferringHierarchical(): SymbolConfiguration
 }
 
-/** SymbolScale – Use font for symbol size, then adjust with symbol scale */
+/** Adjusts symbol size relative to its font. */
 export type SymbolScale = 'small' | 'medium' | 'large'
 
 /**
- * Font - Wraps a `NSFontDescriptor`.
- *
- * You are describing a font you want, and the described face may not exist —
- * most families ship far fewer variants than you can ask for. Rather than
- * silently handing back the plain face, Bike resolves the request:
- *
- * - **Bold** and **italic** are SYNTHESIZED when the family has no such face:
- *   the weight by stroking the glyphs, the slant by shearing them. They stay in
- *   the family you chose.
- * - **Monospace** is SUBSTITUTED with the system monospaced face, because it
- *   asks for a different typeface rather than an emphasis of this one, and it
- *   can't be faked. Note that no ordinary family — Helvetica and Georgia
- *   included — has a monospaced variant, so this is the usual outcome. Naming a
- *   family explicitly with {@link Font.withFace} or {@link Font.withFamily}
- *   opts out; that's you choosing the typeface.
- * - **OpenType features** (small caps, fractions, stylistic sets…) are silently
- *   ignored by fonts that lack them. There's no signal for this.
- *
- * {@link Font.resolve} reports what happened via `synthesizedBold`,
- * `synthesizedOblique` and `substitutedMonospace`, so a stylesheet can choose
- * something better than a fake — a contrasting family for `strong` runs, say.
- *
- * Generally if you are confused look into how `NSFontDescriptor` works. This is
- * a light wrapper around that class.
+ * Wraps `NSFontDescriptor`. Missing bold/italic faces are synthesized; missing
+ * monospace substitutes the system monospaced face unless a family is set with
+ * {@link Font.withFace} or {@link Font.withFamily}; unsupported OpenType
+ * features are silently ignored. {@link Font.resolve} reports which happened.
  */
 export class Font {
   static systemBody(): Font
@@ -155,10 +112,7 @@ export class Font {
   static systemTitle2(): Font
   static systemTitle3(): Font
 
-  /**
-   * @param name Font family, e.g. "Helvetica"
-   * @param pointSize e.g. 12
-   */
+  /** @param name Font family, e.g. "Helvetica". */
   constructor(name: string, pointSize: number)
 
   withFamily(family: string): Font
@@ -167,12 +121,7 @@ export class Font {
 
   withPointSize(pointSize: number): Font
 
-  /**
-   * Multiply the point size by a factor — relative sizing when the base's
-   * absolute size isn't knowable (e.g. a badge's `env.font`).
-   * @param scale - The point size multiplier, ex. 0.8
-   * @returns A new font with the scaled point size
-   */
+  /** Multiplies the point size. */
   withScale(scale: number): Font
 
   withWeight(weight: FontWeight): Font
@@ -195,10 +144,10 @@ export class Font {
 
   withSlashedZero(): Font
 
-  /** Oldstyle (lowercase) figures */
+  /** Lowercase figures. */
   withOldstyleFigures(): Font
 
-  /** Lining (uppercase) figures */
+  /** Uppercase figures. */
   withLiningFigures(): Font
 
   withSuperscript(): Font
@@ -207,11 +156,7 @@ export class Font {
 
   withOrdinals(): Font
 
-  /**
-   * Enable an OpenType stylistic set (ss01–ss20). Out-of-range values are ignored.
-   * @param n - The stylistic set number (1–20)
-   * @returns A new font with the stylistic set enabled
-   */
+  /** OpenType `ss01`–`ss20`. Out-of-range `n` is ignored. */
   withStylisticSet(n: number): Font
 
   resolve(cache: Cache): FontAttributes
@@ -226,27 +171,16 @@ export type FontAttributes = {
   xHeight: number
   xWidth: number
   maximumAdvancement: Size
-  /**
-   * True when the family has no bold face and Bike is faking the weight by
-   * stroking the glyphs. Use it to pick something better than a stroke — for
-   * example a contrasting family for `strong` runs.
-   */
+  /** No bold face; weight faked by stroking glyphs. */
   synthesizedBold: boolean
-  /**
-   * True when the family has no italic face and Bike is faking the slant with a
-   * shear matrix.
-   */
+  /** No italic face; slant faked by shearing. */
   synthesizedOblique: boolean
-  /**
-   * True when the family has no monospaced variant and Bike substituted the
-   * system monospaced face. Unlike bold and italic this is a real font, not a
-   * fake — monospace can't be synthesized.
-   */
+  /** No monospaced variant; the system monospaced face was used. */
   substitutedMonospace: boolean
-  uiScale: number // Size relative to the 14pt baseline
+  /** Size relative to 14pt. */
+  uiScale: number
 }
 
-/** FontWeight */
 export type FontWeight =
   | 'ultraLight'
   | 'thin'
@@ -259,18 +193,14 @@ export type FontWeight =
   | 'black'
 
 /**
- * Color space for mixing operations.
- *
- * `srgb`, `hsl`, `oklab` and `oklch` match the CSS `color-mix()` spaces. `okhsl` and
- * `okhsv` are Ottosson's Oklab-backed HSL/HSV — not CSS spaces, but useful when you want
- * equal saturation or lightness steps to read as equal.
+ * `srgb`, `hsl`, `oklab`, `oklch` match CSS `color-mix()`. `okhsl` and `okhsv`
+ * are Ottosson's Oklab-based HSL/HSV (not CSS).
  */
 export type ColorSpace = 'srgb' | 'hsl' | 'oklab' | 'oklch' | 'okhsl' | 'okhsv'
 
-/** WCAG contrast targets */
+/** WCAG level or a custom ratio. */
 export type ContrastTarget = 'aa' | 'aaLarge' | 'aaa' | 'aaaLarge' | number
 
-/** Color - Wraps an underlying CGColor. */
 export class Color {
   static none(): Color
   static black(): Color
@@ -319,14 +249,12 @@ export class Color {
   static systemTeal(): Color
   static systemYellow(): Color
 
-  /**
-   * @param white 0-1
-   */
+  /** @param white 0-1 */
   static gray(white: number): Color
 
   /**
-   * Create color from HSL, matching the CSS `hsl()` function.
-   * @param hue Degrees. Wraps, so -30 and 330 are the same hue.
+   * Matches CSS `hsl()`.
+   * @param hue Degrees, wrapping.
    * @param saturation 0-1
    * @param lightness 0-1
    * @param alpha 0-1
@@ -334,7 +262,7 @@ export class Color {
   static hsla(hue: number, saturation: number, lightness: number, alpha?: number): Color
 
   /**
-   * Create color in OKLab perceptually uniform space, matching the CSS `oklab()` function.
+   * Matches CSS `oklab()`.
    * @param l 0-1
    * @param a ~-0.4 to 0.4
    * @param b ~-0.4 to 0.4
@@ -343,29 +271,18 @@ export class Color {
   static oklab(l: number, a: number, b: number, alpha?: number): Color
 
   /**
-   * Create color in OKLch perceptually uniform space, matching the CSS `oklch()` function.
-   *
-   * Values outside the sRGB gamut are gamut-mapped when drawn, preserving hue — so a
-   * chroma higher than the display can show reduces chroma rather than shifting color.
+   * Matches CSS `oklch()`. Out-of-gamut values reduce chroma, preserving hue.
    * @param l 0-1
    * @param c 0-0.4
-   * @param h Degrees. Wraps, so -30 and 330 are the same hue.
+   * @param h Degrees, wrapping.
    * @param alpha 0-1
    */
   static oklch(l: number, c: number, h: number, alpha?: number): Color
 
-  /**
-   * Pick a color based on the current appearance (light vs dark mode).
-   * Resolves to `light` in light appearance and `dark` in dark appearance,
-   * automatically updating when the system appearance changes.
-   * @param light - The color to use in light mode
-   * @param dark - The color to use in dark mode
-   */
+  /** Follows the current appearance. */
   static lightDark(light: Color, dark: Color): Color
 
-  /**
-   * @param image Tile pattern image used when filling
-   */
+  /** @param image Tiled when filling. */
   static pattern(image: Image): Color
 
   /**
@@ -376,60 +293,39 @@ export class Color {
    */
   constructor(red: number, green: number, blue: number, alpha?: number)
 
-  /**
-   * Replace alpha with `value` (0-1). Result alpha is clamped to [0, 1].
-   */
+  /** Clamped to 0–1. */
   alphaSet(value: number): Color
 
-  /**
-   * Add `amount` to alpha. Positive opacifies, negative fades. Clamped to [0, 1].
-   */
+  /** Adds to alpha, clamped to 0–1. */
   alphaOffset(amount: number): Color
 
-  /**
-   * Multiply alpha by `factor`. Clamped to [0, 1].
-   */
+  /** Multiplies alpha, clamped to 0–1. */
   alphaMultiplied(factor: number): Color
 
-  /**
-   * Bump oklch lightness by `amount` (typical range 0–1). Negative values darken.
-   */
+  /** Adds to oklch lightness (0–1 scale). */
   lightened(amount: number): Color
 
-  /**
-   * Drop oklch lightness by `amount`. Equivalent to `lightened(-amount)`.
-   */
+  /** `lightened(-amount)`. */
   darkened(amount: number): Color
 
-  /**
-   * Multiply oklch chroma by `factor`. Values > 1 increase saturation.
-   */
+  /** Multiplies oklch chroma. */
   saturated(factor: number): Color
 
-  /**
-   * Divide oklch chroma by `factor`. Equivalent to `saturated(1 / factor)`.
-   */
+  /** `saturated(1 / factor)`. */
   desaturated(factor: number): Color
 
-  /**
-   * Rotate oklch hue by `degrees`. Wraps modulo 360°.
-   */
+  /** Rotates oklch hue. */
   hueShifted(degrees: number): Color
 
   /**
-   * Mix this color with another (CSS color-mix).
-   * @param fraction - Mix amount (0 = this, 1 = color)
-   * @param colorSpace Color space for mixing (default oklab)
-   *
-   * Hue-bearing spaces (`hsl`, `oklch`, `okhsl`, `okhsv`) take the shorter arc, and carry
-   * the other color's hue when one side is gray.
+   * CSS `color-mix()`. Hue spaces take the shorter arc; a gray side takes the
+   * other color's hue.
+   * @param fraction 0 = this, 1 = `color`.
+   * @param colorSpace Default `oklab`.
    */
   mixed(color: Color, fraction: number, colorSpace?: ColorSpace): Color
 
-  /**
-   * Select best contrasting color from candidates (CSS color-contrast).
-   * @param target - WCAG target or custom ratio
-   */
+  /** Best-contrasting candidate (CSS `color-contrast()`). */
   contrasted(candidates: Color[], target?: ContrastTarget): Color
 
   resolve(cache: Cache): {

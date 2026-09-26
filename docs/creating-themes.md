@@ -1,7 +1,7 @@
 # Creating Themes
 
-Themes customize the colors, materials, and typography of Bike's interface. They
-are JSON files with the `.bktheme` extension. Themes are configuration files for the more complex [editor styles](style-context-tutorial.md).
+Themes are `.bktheme` JSON files that set the colors, materials and typography
+that [editor styles](style-context-tutorial.md) read.
 
 - [Theme Schema](../schemas/theme-schema.json) — full schema reference
 
@@ -26,83 +26,34 @@ Create a file called `my-theme.bktheme`:
 }
 ```
 
-Bike loads themes from its themes folder.
+Put it in the folder that Bike > Settings > Appearance > Open Themes Folder…
+opens, then choose it in that page's Light Theme popup. Themes reload on save.
+Errors and warnings appear in Bike > Logs Explorer.
 
-Use Bike > Settings > Appearance > Open Themes Folder… to open it in the Finder.
-Place your `my-theme.bktheme` file there. It will then appear in the Light Theme
-popup in that same settings page.
+### `colors.background`
 
-Once selected in the popup, your theme is active and you should see the text
-color and editor background change. Themes are live-reloaded as you edit them,
-so make changes and your outline editor should update immediatly when you save.
-
-Note: As you develop your theme, you should keep Bike > Logs Explorer open to
-see any errors or warnings about your theme.
-
-### Editor Styles vs Themes
-
-Themes are a higher-level way to customize the look of Bike, while editor styles
-provide more fine-grained control. A theme defines a palette of colors and
-materials, and then editor styles reference those colors and materials to style
-specific parts of the editor.
-
-### Special case: `colors.background` property
-
-The `colors.background` property is a semantic color — it is used by the editor
-style for contrast and blending calculations (e.g. selection highlighting), but
-it does not paint the editor's visual background. To change the editor
-background, set `materials.editor` instead. Materials are more expressive than a
-flat color — they support flat colors, but also gradients, and system materials.
-
-You will generally want to set `colors.background` to a color that represents
-the `editor` material, even if that material is not a flat color. This ensures
-that text and other elements that use the `background` color for contrast
-calculations will still work correctly.
+`colors.background` doesn't paint anything. Editor styles use it for contrast
+and blending (e.g. selection). `materials.editor` paints the editor background.
+Set `colors.background` to a color representative of that material, even if the
+material is a gradient or system material.
 
 ## Theme Naming
 
-The theme's display name is derived from its filename. The filename (without
-`.bktheme`) is split on `-` and each word is capitalized:
-
-- `my-theme.bktheme` → "My Theme"
-- `solarized-light.bktheme` → "Solarized Light"
-
-When a theme is included in an extension, its display name is prefixed with the
-extension name. For example, `solarized-light.bktheme` in `bike.bkext` appears
-as "Bike: Solarized Light".
+The display name is the filename split on `-` and capitalized:
+`solarized-light.bktheme` → "Solarized Light". In an extension it is prefixed
+with the extension name: "Bike: Solarized Light".
 
 ## Theme Metadata
 
-The `metadata` section provides optional information about your theme:
-
-```json
-{
-  "metadata": {
-    "version": "1.0.0",
-    "author": "Hog Bay Software",
-    "appearance": "light"
-  }
-}
-```
-
-The `appearance` field controls when the theme is available:
-- `"light"` — Theme only available when Bike is in light mode
-- `"dark"` — Theme only available when Bike is in dark mode
-- `"any"` — Theme available in both modes (the default if omitted)
-
-If you are creating paired light/dark themes, make two separate `.bktheme`
-files with the appropriate appearance set for each.
+`metadata` is optional: `version`, `author`, `appearance`. `appearance` is
+`"light"`, `"dark"` or `"any"` (default) and limits which mode offers the theme.
+Paired light/dark themes are two files.
 
 ## Colors
 
-The `colors` section defines colors used throughout the theme. There are two
-kinds of colors: semantic colors that Bike uses directly, and custom colors
-that you define for your own use.
+`colors` holds semantic colors that Bike uses, plus custom colors of your own.
 
 ### Semantic Colors
-
-Semantic colors control specific parts of the UI, such as `text` used above.
-Set the ones you want to change:
 
 ```json
 {
@@ -124,13 +75,11 @@ Set the ones you want to change:
 }
 ```
 
-See the [theme schema](../schemas/theme-schema.json) for the full list of
-semantic colors and their descriptions.
+The [theme schema](../schemas/theme-schema.json) lists them all.
 
 ### Custom Colors and References
 
-You can define custom colors and reference them elsewhere using the `$name`
-syntax. This keeps your palette in one place:
+Any color value can reference another color in `colors` as `$name`:
 
 ```json
 {
@@ -148,12 +97,7 @@ syntax. This keeps your palette in one place:
 }
 ```
 
-Any color property in the theme can use a `$reference` to a color defined in
-this section.
-
 ### Color Formats and Functions
-
-Themes support multiple color formats and functions:
 
 | Format | Example |
 |--------|---------|
@@ -169,57 +113,22 @@ Themes support multiple color formats and functions:
 | macOS named | `text`, `accent`, `systemBlue`, `labelSecondary` |
 | CSS named | `red`, `cornflowerblue`, `transparent` |
 
-The macOS named colors adapt automatically to light and dark mode.
-
-The `light-dark` function picks the first color in light mode and the second in
-dark mode.
-
-Relative color syntax (`rgb(from ...)`, also `hsl`, `oklab`, `oklch`) derives a
-new color from a base color. Each channel and the alpha slot accepts the
-channel keyword (passthrough), a literal value, or a simple calc like
-`calc(alpha * 0.5)`. Dynamic base colors stay dynamic — the transform is
-applied per appearance.
-
-The `color-mix` function blends two colors together. You can reference custom
-colors in the mix:
-
-```json
-{
-  "colors": {
-    "primary": "#3498db",
-    "highlight": "color-mix(in oklch, $primary 70%, white)"
-  }
-}
-```
-
-Mixing accepts `srgb`, `hsl`, `oklab`, `oklch`, `okhsl` and `okhsv`. The first four
-match CSS. `okhsl` and `okhsv` are Ottosson's Oklab-backed HSL and HSV: they are not
-CSS spaces, but their lightness is toe-corrected, so a ramp built in `okhsl` has
-evenly-spaced steps where the same ramp in `oklch` bunches up near white.
-
-Colors outside what the display can show — easy to write by hand in `oklch`, or to
-land on by raising lightness at constant chroma — are mapped back into gamut with
-their hue preserved. Chroma is reduced instead of the color shifting to a different
-hue, which is what clamping the red, green and blue channels separately would do.
-
-The `color-contrast` function selects the color with the highest contrast
-against a base color, useful for ensuring readability:
-
-```json
-{
-  "colors": {
-    "background": "#fdf6e3",
-    "autoText": "color-contrast($background vs black, white)"
-  }
-}
-```
+- macOS named colors adapt to light and dark mode.
+- `light-dark(a, b)` uses `a` in light mode and `b` in dark mode.
+- Relative colors (`rgb`, `hsl`, `oklab`, `oklch` with `from`): each channel
+  and alpha takes the channel keyword, a literal, or a simple `calc`. Dynamic
+  base colors stay dynamic.
+- `color-mix` spaces: `srgb`, `hsl`, `oklab`, `oklch`, plus `okhsl` and `okhsv`
+  (Ottosson's Oklab HSL/HSV, not CSS). Their lightness steps are even, where
+  `oklch` ramps bunch up near white.
+- `color-contrast(base vs a, b, …)` picks the candidate with the most contrast
+  against `base`.
+- Out-of-gamut colors are mapped into gamut by reducing chroma, keeping hue.
 
 ## Materials
 
-Materials control the visual surface of different areas of the window. A
-material is an object with an optional `fill`, `borders`, and `cornerRadius`.
-If `fill` is omitted the area paints nothing — useful for borders-only
-materials, or to let the area behind show through.
+A material paints a window area. It has optional `fill`, `borders` and
+`cornerRadius`; without `fill` the area paints nothing.
 
 ```json
 {
@@ -238,12 +147,9 @@ materials, or to let the area behind show through.
 
 ### Fills
 
-A fill is a color, gradient, glass effect, system material, or active/inactive
-pair.
+A fill is a color, gradient, glass, system material, or active/inactive pair.
 
 #### Colors
-
-The simplest fill is a color:
 
 ```json
 {
@@ -256,7 +162,6 @@ The simplest fill is a color:
 
 #### Gradients
 
-Linear and radial gradients use color stops positioned from 0 to 1:
 
 ```json
 {
@@ -275,15 +180,12 @@ Linear and radial gradients use color stops positioned from 0 to 1:
 }
 ```
 
-For linear gradients, `angle` specifies the direction in degrees (0 = top to
-bottom, 90 = left to right). For radial gradients, use `"type": "radial"` with
-`centerX` and `centerY` (0 to 1) to position the center.
+Stops run from 0 to 1. Linear `angle` is in degrees (0 = top to bottom, 90 =
+left to right). `"type": "radial"` takes `centerX` and `centerY` (0 to 1).
 
 #### Glass
 
-Glass fills create a translucent, blurred effect. Use `"clear"` for more
-transparency or `"regular"` for a more opaque look. An optional `tintColor`
-shifts the hue:
+`style` is `"clear"` or `"regular"` (more opaque). `tintColor` is optional.
 
 ```json
 {
@@ -301,7 +203,6 @@ shifts the hue:
 
 #### System
 
-System fills use macOS native appearances:
 
 ```json
 {
@@ -317,13 +218,12 @@ System fills use macOS native appearances:
 }
 ```
 
-The `style` can be `"header"`, `"titlebar"`, or `"windowBackground"`. Set
-`followsActive` to `true` if the material should change when the window becomes
-inactive. Use `opacity` (0 to 1) to adjust the material's opacity.
+`style` is `"header"`, `"titlebar"` or `"windowBackground"`. `followsActive`
+changes the material when the window is inactive. `opacity` is 0 to 1.
 
 #### Active
 
-An active fill selects between two fills based on window state:
+Chooses a fill by window state:
 
 ```json
 {
@@ -341,22 +241,16 @@ An active fill selects between two fills based on window state:
 
 ### Borders
 
-Per-edge 1pt border colors: `top`, `bottom`, `leading`, `trailing`. Only one
-side of a shared edge should set a color, otherwise the strokes stack into a
-2pt line.
+1pt colors per edge: `top`, `bottom`, `leading`, `trailing`. Set a shared
+edge on one side only, or the strokes stack to 2pt.
 
 ### Corner Radius
 
-A number applies to all four corners. An object sets per-corner radii using
-`topLeading`, `topTrailing`, `bottomLeading`, and `bottomTrailing` (omitted
-corners are 0). Borders follow the rounded corners.
-
-Borders and corners on edges that sit at the window's outer boundary are
-suppressed automatically.
+A number sets all corners. An object sets `topLeading`, `topTrailing`,
+`bottomLeading`, `bottomTrailing` (omitted = 0). Borders follow the corners.
+Borders and corners at the window's outer edge are suppressed.
 
 ### Material Targets
-
-You can set materials for these window areas:
 
 - `window` — the overall window background
 - `titlebar` — the title bar area
@@ -370,9 +264,8 @@ You can set materials for these window areas:
 
 ## Rows
 
-The `rows` section styles different row types. Each row type supports `color`,
-`backgroundColor`, `fontFamily`, `fontAdjust`, `fontWeight`, `fontTraits`,
-`underline`, and `strikethrough`.
+`rows` styles row types. Each accepts `color`, `backgroundColor`, `fontFamily`,
+`fontAdjust`, `fontWeight`, `fontTraits`, `underline` and `strikethrough`.
 
 ```json
 {
@@ -384,49 +277,24 @@ The `rows` section styles different row types. Each row type supports `color`,
       "color": "$orange",
       "fontWeight": "semibold"
     },
-    "note": {
-      "color": "$secondaryText",
-      "fontTraits": ["italic"]
-    },
-    "blockquote": {
-      "color": "$cyan",
-      "fontTraits": ["italic"]
-    },
     "codeblock": {
       "color": "$green",
       "backgroundColor": "$base2",
       "fontFamily": "SF Mono",
       "fontTraits": ["monospace"]
-    },
-    "task": {
-      "color": "$text"
-    },
-    "orderedList": {
-      "color": "$text"
-    },
-    "unorderedList": {
-      "color": "$text"
-    },
-    "horizontalRule": {
-      "color": "$base1"
     }
   }
 }
 ```
 
-The `fontAdjust` property is a multiplier relative to the base font size. Use
-`1.5` to make headings 50% larger, or `0.85` to make notes slightly smaller.
-
-The `fontWeight` values are: `ultraLight`, `thin`, `light`, `regular`,
-`medium`, `semibold`, `bold`, `heavy`, `black`.
-
-The `fontTraits` array can include: `italic`, `bold`, `expanded`, `condensed`,
-`monospace`.
+- `fontAdjust` multiplies the base font size (`1.5`, `0.85`).
+- `fontWeight`: `ultraLight`, `thin`, `light`, `regular`, `medium`, `semibold`,
+  `bold`, `heavy`, `black`.
+- `fontTraits`: `italic`, `bold`, `expanded`, `condensed`, `monospace`.
 
 ## Runs
 
-The `runs` section styles inline text formatting. It uses the same properties
-as rows.
+`runs` styles inline formatting with the same properties as rows.
 
 ```json
 {
@@ -436,21 +304,6 @@ as rows.
     },
     "emphasis": {
       "fontTraits": ["italic"]
-    },
-    "strikethrough": {
-      "color": "$secondaryText",
-      "strikethrough": {
-        "single": true
-      }
-    },
-    "code": {
-      "color": "$magenta",
-      "fontFamily": "SF Mono",
-      "fontTraits": ["monospace"],
-      "backgroundColor": "$base2"
-    },
-    "mark": {
-      "backgroundColor": "rgba(181, 137, 0, 0.25)"
     },
     "link": {
       "color": "$blue",
@@ -464,8 +317,6 @@ as rows.
 
 ### Underline and Strikethrough Options
 
-The `underline` and `strikethrough` properties accept an object with line
-styling options:
 
 ```json
 {
@@ -478,18 +329,13 @@ styling options:
 }
 ```
 
-Available options: `single`, `thick`, `double` for line weight, and
-`patternDot`, `patternDash`, `patternDashDot`, `patternDashDotDot` for
-patterns. Set `byWord` to apply the line only under words, skipping spaces.
+Weight: `single`, `thick`, `double`. Pattern: `patternDot`, `patternDash`,
+`patternDashDot`, `patternDashDotDot`. `byWord` skips spaces.
 
 ## Extension Themes
 
-Themes can also be included in extensions, allowing you to bundle custom themes
-with your extension's functionality. Or enabling you to publish you theme in the
-extension registry, making it easy for users to discover and install your theme
-directly from Bike.
-
-Place `.bktheme` files in the `theme/` folder of your extension:
+Themes in an extension's `theme/` folder install with it, and the extension
+registry can distribute them:
 
 ```
 my-extension.bkext
@@ -499,10 +345,9 @@ my-extension.bkext
 │   └── my-dark-theme.bktheme
 ```
 
-Themes are loaded directly from extension bundles. In Bike's theme menus, extension themes appear prefixed with the extension name. For example, `solarized.bktheme` in `bike.bkext` appears as "Bike: Solarized". See [Creating Extensions](creating-extensions.md) for more on building and installing extensions.
+See [Creating Extensions](creating-extensions.md).
 
 ## Resources
 
 - [Solarized](https://github.com/bike-outliner/core-extensions/blob/main/src/bike.bkext/theme/solarized.bktheme) — a complete theme example
 - [Theme Schema](../schemas/theme-schema.json) — full property reference
-- [Style Context Tutorial](style-context-tutorial.md) — for more advanced styling with code

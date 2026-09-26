@@ -1,9 +1,3 @@
-/**
- * Options and results for `bike.showAlert` — a window or application modal
- * alert with optional input fields. Demonstrated by kitchensink.bkext's
- * `kitchensink:show-alert-demo`.
- */
-
 export interface AlertOptions {
   title?: string
   message?: string
@@ -18,14 +12,14 @@ export interface AlertField {
   label?: string
   placeholder?: string
   defaultValue?: string | boolean | number
-  /** The choices of a `dropdown` field. */
+  /** For `dropdown` fields. */
   dropdownOptions?: string[]
 }
 
 export interface AlertResult {
-  /** The title of the button that dismissed the alert. */
+  /** Title of the dismissing button. */
   button: string
-  /** Field values at dismissal, keyed by each field's `id`. */
+  /** Keyed by field `id`. */
   values: Record<string, string | boolean | number>
 }
 

@@ -1,22 +1,17 @@
 # Attachments Tutorial
 
-Bike outlines can embed file attachments. Extensions get read-only access to attachment data: metadata and bytes in the app context, and a URL scheme for displaying attachments in DOM views.
+Extensions can read attachments: metadata and bytes in the app context, and a
+display URL in DOM views. Attachments are added by the user, not by extensions.
 
 - [App Context API](../api/app/) and [DOM Context API](../api/dom/)
-- Attachments are runs of row text carrying an `embed` text attribute (the *src*).
-- The API is read-only — attachments are added by the user (drag and drop), not by extensions.
-- Import the API using `import { SYMBOL } from 'bike/app'`.
-
-## Setup
-
-This tutorial assumes that you have [created an extension](creating-extensions.md) and are running `npx bike-ext watch --install`. Drag a file or two into a test outline so there's something to find.
 
 ## Finding Attachments
 
-An attachment lives in a row's text as a run whose `embed` attribute is the attachment src (e.g. `'assets/photo.png'`). Query attachment runs with the `run::` axis:
+An attachment is a run of row text whose `embed` attribute is the attachment
+src (e.g. `'assets/photo.png'`). Query them with the `run::` axis:
 
 ```typescript
-import { RowRun } from 'bike/app'
+import { Outline, RowRun } from 'bike/app'
 
 function attachmentSrcs(outline: Outline): string[] {
   const result = outline.query('//*/run::@embed')
@@ -25,11 +20,9 @@ function attachmentSrcs(outline: Outline): string[] {
 }
 ```
 
-Each element is a `RowRun`: `run.row` is the containing row, `run.runAttributes['embed']` is the src you'll hand to the attachment APIs below.
+`run.row` is the containing row.
 
 ## Reading Metadata
-
-`outline.attachmentMetadata(src)` resolves a src to the attachment's file:
 
 ```typescript
 const meta = outline.attachmentMetadata(src)
@@ -38,11 +31,14 @@ if (meta) {
 }
 ```
 
-It returns `undefined` when the src doesn't resolve — an invalid src, an outline with no document, or a missing attachment file. Attachments added this session resolve to staged copies, so the URL is readable before the document saves.
+Returns `undefined` for an invalid src, an outline with no document, or a
+missing file. Attachments added this session resolve to staged copies, so they
+are readable before the document is saved.
 
 ## Reading Bytes
 
-`outline.attachmentBytes(src)` reads the attachment's contents as a `Promise<Uint8Array>`:
+`outline.attachmentBytes(src)` returns a `Promise<Uint8Array>`. It rejects when
+the src can't be resolved or read, so catch errors for user content:
 
 ```typescript
 bike.commands.addCommands({
@@ -64,20 +60,14 @@ bike.commands.addCommands({
 })
 ```
 
-The promise rejects when the src can't be resolved or the file can't be read, so `await` inside try/catch (or `.catch`) when srcs come from user content.
-
 ## Displaying Attachments in DOM Views
 
-DOM scripts (sheets, panels, inspector items) can't read files, but they can display attachments directly. In the DOM context, `bike.attachmentURL(src)` builds a `bike-attachment://` URL that Bike's WebView serves from the attachment file:
+DOM scripts can't read files, but `bike.attachmentURL(outlineId, src)` returns a
+`bike-attachment://` URL that the web view serves. From the app context, send
+the srcs together with the outline id (`outline.root.ensurePersistentId()`):
 
 ```tsx
 // dom/panel.tsx
-const url = bike.attachmentURL(src)
+const url = bike.attachmentURL(outlineId, src)
 return <img src={url} />
 ```
-
-Pass the src strings from your app context to the DOM view over `postMessage` — the app side finds the attachments (as above), the DOM side renders them.
-
-## Next Steps
-
-Follow the [DOM Context Tutorial](dom-context-tutorial.md) to build the panel that displays them.

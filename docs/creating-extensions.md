@@ -1,19 +1,9 @@
 # Creating Extensions
 
-Extensions introduce new commands, views, styles, and more. Sensitive features
-are safeguarded by a permission system.
+Extensions add commands, views, styles and themes. Sensitive APIs require
+manifest permissions. Start with the [README](../README.md) quick start.
 
-## Getting Started
-
-Start by following the quick start instructions in the [extension kit
-README](../README.md). After following those instructions you will have a new
-`my-extension` running in Bike.
-
-## Extension Development Overview
-
-You've set up the kit and built and installed a new extension. Now we'll take a
-closer look at how extensions are structured and what they can do. Here's a
-generic extension structure:
+## Structure
 
 ```
 extension.bkext
@@ -33,195 +23,69 @@ extension.bkext
 │   └── theme2.bktheme
 ```
 
-Each extension has a `manifest.json` file which contains the version,
-permissions, and other metadata. (The extension's id and display name aren't in
-the manifest — both are derived from the `.bkext` folder name.) Properties are
-documented in the extension kit:
-[schemas/manifest.schema.json](../schemas/manifest.schema.json).
+`manifest.json` holds the version, permissions and other metadata; see
+[schemas/manifest.schema.json](../schemas/manifest.schema.json). The id and
+display name come from the `.bkext` folder name. It is the only required file.
 
-Each subfolder corresponds to a different context where the extension code can
-run. These contexts are run separately and have different available APIs. An
-extension might not need to use all contexts, and you can safely delete the
-folder of each unused context.
+Each other folder is a separate context with its own API. Delete the folders
+you don't use.
 
-### App Context (Application Logic)
+### App Context
 
-- Code runs in Bike's native app environment.
-- Interact with outlines, clipboard, networking, etc.
-- Some APIs require appropriate `manifest.json` permissions (`"clipboardRead"`, `"clipboardWrite"`, `"openURL"`, `"keychain"`)
-- Import the API using `import { SYMBOL } from 'bike/app'`.
+- `import { … } from 'bike/app'`
+- Commands, keybindings, outlines, clipboard, networking.
+- Some APIs need manifest permissions (`clipboardRead`, `clipboardWrite`, `openURL`, `keychain`).
 
-### DOM Context (DOM/HTML Views)
+### DOM Context
 
-- Code runs in web views embedded in Bike's UI.
-- Web views are sandboxed and have no network access.
-- These views are loaded dynamically using app context APIs.
-- Indirect access to outline/editor via session API or message protocol.
-- Import the API using `import { SYMBOL } from 'bike/dom'`.
+- `import { … } from 'bike/dom'`
+- Sandboxed web views (no network access), presented from the app context.
+- Reaches outlines through `bike.session` or messages to the app context.
 
-### Style Context (Outline Editor Styles)
+### Style Context
 
-- Used to define custom stylesheets for Bike's outline editor.
-- Use outline paths to match outline elements and apply styles.
-- Most extensions will not add styles; delete the style folder if unused.
-- Import the API using `import { SYMBOL } from 'bike/style'`.
+- `import { … } from 'bike/style'`
+- Outline editor styles: rules match outline paths and set style properties.
 
-### Tests
+### Tests and Themes
 
-- Test files live in the `tests/` subfolder with a `.test.ts` extension.
-- Tests run in the app context (`bike/app` API) and run against a real outline.
-- Run tests with `npx bike-ext test` or from Bike's Logs Explorer.
-- See [Testing Extensions Tutorial](testing-extensions-tutorial.md) for details.
+- `tests/*.test.ts` run in the app context. See [Testing Extensions](testing-extensions-tutorial.md).
+- `theme/*.bktheme` appear in Bike's theme menus. See [Creating Themes](creating-themes.md).
 
-The app context and DOM context communicate using the `postMessage` and
-`onmessage` methods. The message protocol is defined in `dom/protocols.ts`. The
-common pattern involves performing work in the app context, such as querying the
-outline or making network requests, and then sending the results to the DOM
-context for display.
+App and DOM contexts exchange messages with `postMessage`/`onmessage`, typed by
+`dom/protocols.ts`.
 
-There is also a `theme` folder. Themes are configuration files used by the style
-context. Any themes included with an extension will show up in Bike's themes
-menus when the extension is installed. Themes can also be installed in Bike
-independent of an extension.
+## Development
 
-## Extension Development Process
+Open the `my-extensions` folder itself in VS Code, not an individual extension
+folder, so type checking works.
 
-Open your `my-extensions` folder in Visual Studio Code and follow along with the
-rest of this tutorial to learn about the development process. Make sure to open
-that folder itself, not just the individual extension folder–otherwise type
-checking won't work correctly within VS Code.
+| Command | Result |
+|---------|--------|
+| `npx bike-ext new <id>` | Creates `src/<id>.bkext` from the template. |
+| `npx bike-ext build <id>` | Typechecks and bundles into `out/`. Bike loads only built extensions. |
+| `npx bike-ext build <id> --install` | Also copies to `~/Library/Containers/com.hogbaysoftware.Bike/Data/Library/Application Support/Bike/Extensions`; Bike reloads it. |
+| `npx bike-ext watch <id> --install` | Rebuilds and reinstalls on save. The tutorials assume this is running. |
 
-### Open Terminal
+### Debugging
 
-You need a terminal open to run extension kit commands. You can use the
-Terminal.app that comes with macOS, or you can use the Terminal that's built
-into Visual Studio Code.
-
-### Create Extension
-
-To create a new extension, run the command:
-
-```
-npx bike-ext new <id>
-```
-
-The new extension is created for you in `src/`. This command is just creating
-the folder structure; you could also create a new extension by creating the
-extension folder and files manually.
-
-### Configure Manifest 
-
-Each extension has a `manifest.json` that controls metadata and behavior.
-Properties are documented in
-[schemas/manifest.schema.json](../schemas/manifest.schema.json).
-
-### Build Extension
-
-To build your extension, run the command:
-
-```
-npx bike-ext build my-extension
-```
-
-This is an important step. It compiles your TypeScript code, checks for errors,
-and prepares the extension for use in Bike. Bike can only load built extensions.
-Your built extension is placed in the `out/` folder. You need to run this
-command after making changes to your extension's code.
-
-To also install the built extensions into Bike, pass the `--install` flag:
-
-```
-npx bike-ext build my-extension --install
-```
-
-The `--install` flag copies built extensions from the `out/` folder to Bike's
-extensions folder at
-`~/Library/Containers/com.hogbaysoftware.Bike/Data/Library/Application
-Support/Bike/Extensions`. They are automatically (re)loaded by Bike. You can
-also install extensions by copying them to that folder manually, but using the
-`--install` flag is more convenient during development.
-
-### Watch Mode
-
-To rebuild your extension automatically when you save changes:
-
-```
-npx bike-ext watch my-extension --install
-```
-
-A background process monitors your extension for changes. The rest of the
-tutorials assume you are in watch mode with `--install`, so as soon as you save
-changes, the results are loaded into Bike.
-
-### Debug Extension
-
-There are two important sources for debugging your extension.
-
-#### Logging
-
-To view Bike's Log Explorer:
-
-- Choose the menu Bike > Logs Explorer
-
-Do that now and you should see in the logs that your extension is installed and
-activated. You will also see a notice originating from your extension's call to
-`console.log` in the activate function.
-
-It's a good idea to keep the logs explorer open while developing your extension.
-It should also log any errors that occur in your extension.
-
-#### Safari Debugger
-
-For more complex debugging tasks, use Safari's debugger. This allows you to step
-line by line over your extension code and inspect variables.
-
-To enable Safari's debugger:
-
-- Go to Safari > Settings > Advanced and check "Show features for web developers".
-- Go to Safari > Develop > Inspect Apps and Devices to see active contexts.
-- Start Bike 2 and it should show in the Safari window from the previous step.
-
-In that window, it will show all of Bike's JavaScript contexts. Click on a
-context to open it. Then you can set breakpoints, examine variables, etc.
-
-#### Probe & Evaluate with Automation Tools
-
-Bike offers multiple ways to inspect editor and outline state. Run commands. And even run app context scripts: `bike` CLI, `bike mcp` MCP sever for AI agents, AppleScript, and App Intents (Shortcuts). For example from the command line you can perform a command that your extension declares and then inspect editor/outline state.
-
-The following example shows how to do these thigns in AppleScript, but the new `bike` CLI is another good option with similar capabilities.
+- **Logs:** Bike > Logs Explorer shows install, activation, `console.log` output
+  and errors.
+- **Safari debugger:** enable Safari > Settings > Advanced > "Show features for
+  web developers", then Safari > Develop > Inspect Apps and Devices lists
+  Bike's JavaScript contexts. Select one to set breakpoints.
+- **Automation:** the `bike` CLI (and `bike mcp` for AI agents) reads editor and
+  outline state, performs commands, and evaluates app context scripts. See
+  [Session Automation](session-automation.md).
 
 ```sh
-# Check Bike version
-osascript -l JavaScript -e '
-Application("Bike").evaluate({ script: "bike.version" })
-'
-
-# Inspect registered commands
-osascript -l JavaScript -e '
-Application("Bike").evaluate({ script: "bike.commands.toString()" })
-'
-
-# Pass input parameters (must use "input" key, value must be a string)
-osascript -l JavaScript -e '
-Application("Bike").evaluate({
-  input: "Hello!",
-  script: "(input) => { return bike.version + \": \" + input }"
-})
-'
-
-# Use classes that need importing
-osascript -l JavaScript -e '
-Application("Bike").evaluate({
-  script: "const { Outline } = require(\"bike/app\"); new Outline([\"A\", \"B\"]).root.children.length"
-})
-'
+bike get commands
+echo 'bike.version' | bike evaluate script --file -
+echo '(input) => bike.version + ": " + input' | bike evaluate script --file - --input "Hello"
 ```
 
-Key points for `evaluate`:
-
-- Input and output are **strings only** — use `JSON.stringify`/`JSON.parse` for complex objects
-- Use `var` (not `const`/`let`) if you need values to persist across multiple `evaluate` calls
-- Wrap `osascript -e` values in single quotes, then use double quotes inside the script.
+`evaluate script` runs plain JavaScript (no TypeScript or `import`; use
+`require('bike/app')`). Promise results are awaited.
 
 ## Next Steps
 

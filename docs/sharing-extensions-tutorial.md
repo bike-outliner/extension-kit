@@ -13,7 +13,7 @@ npx bike-ext build my-extension
 npx bike-ext package my-extension
 ```
 
-This creates a `.bkext.zip` for the extension `out/packages/`.
+This creates a `.bkext.zip` in `out/packages/`.
 
 ## Create a GitHub Release for the Extension
 
