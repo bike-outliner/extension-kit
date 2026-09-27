@@ -233,8 +233,7 @@ interface BikeSession {
     prepend?: Markdown | SessionTextRun[]
     type?: SessionRowType
     attributes?: Record<string, string | null>
-    /** `@ensure` assigns an id only if missing. */
-    persistentId?: PersistentId | '@ensure'
+    persistentId?: PersistentId | '@ensure' // `@ensure` assign id only if needed.
   }): Promise<RowUpdateResult[]>
   
   deleteRows(params: { outline?: OutlineRef; rows: RowRef[] }): Promise<{ deleted: number }>

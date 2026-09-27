@@ -4,16 +4,33 @@ export { JSONValue } from '../core/json'
 export { Message, DOMProtocol } from '../core/dom-protocol'
 
 /**
- * Passed to the DOM script's `activate(context)`. `common.css` provides system
- * font classes and light/dark CSS custom properties.
+ * DOMExtensionContext is passed to DOMScript's activate function.
+ *
+ * DOM scripts have access to the system font classes and CSS custom properties
+ * defined in `common.css`. Use these to match macOS system appearance and adapt to light/dark mode.
+ *
+ * Example:
+ *
+ * ```ts
+ * import { DOMExtensionContext } from "bike/dom";
+ * export async function activate(context: DOMExtensionContext) {
+ *   context.element.textContent = "Hello World!";
+ * }
+ * ```
  */
 export interface DOMExtensionContext<P extends DOMProtocol = DOMProtocol>
   extends Record<string, any> {
-  /** Render into this element. */
+  /** The element where the extension should display */
   element: HTMLElement
 
+  /**
+   * Receive messages from the app context.
+   */
   onmessage?: (message: P['toDOM']) => void
 
+  /**
+   * Send messages to the app context.
+   */
   postMessage: (message: P['toApp']) => void
 
 }

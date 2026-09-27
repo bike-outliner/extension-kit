@@ -103,7 +103,7 @@ interface AttributeCommon {
   description?: string
   /** When set, a valueless `@name` is valid and displays this label. */
   emptyLabel?: string
-  /** Render with the built-in catch-all badge. Default true. */
+  /** Let the built-in catch-all badge render this attribute. Default true. */
   defaultBadge?: boolean
   /** Listed above the built-in suggestions. */
   suggestions?: AttributeSuggest
@@ -111,8 +111,9 @@ interface AttributeCommon {
    * Arbitrary JSON echoed back in {@link AttributeInfo}. Known keys:
    *
    * - `calendar: false`: not shown by the calendar extension.
-   * - `user: false`: written only by code. Never suggested, logged, or listed
-   *   in the Attributes settings table; still shown on rows and removable.
+   * - `user: false` says this is a field your extension writes and reads, not
+   *   one anyone sets by hand. Never suggested, logged, or listed in the
+   *   Attributes settings table; still shown on rows and removable.
    */
   metadata?: Record<string, JSONValue>
 }

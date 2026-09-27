@@ -4,7 +4,7 @@ import { SFSymbolName } from './bike-globals'
 /** Opaque cache passed to `resolve()` methods by the styling system. */
 export interface Cache {}
 
-/** Decoration content. */
+/** Image - Used for Decoration content */
 export class Image {
   static none(): Image
   static fromText(text: Text): Image
@@ -41,6 +41,9 @@ export interface ImageBackground {
   padding?: number | Insets
 }
 
+/**
+ * Text - Text with a font, color, and string. Use as decoration image content.
+ */
 export class Text {
   font: Font
   color: Color
@@ -48,6 +51,9 @@ export class Text {
   constructor(string: string, font?: Font, color?: Color)
 }
 
+/**
+ * Shape - Path with stroke and color. Use as decoration image content.
+ */
 export class Shape {
   path: Path
   line: ShapeLine
@@ -77,7 +83,10 @@ export interface ShapeStroke {
   end: number
 }
 
-/** Wraps `NSImage.SymbolConfiguration`. */
+/**
+ * SymbolConfiguration – Wraps NSImage.SymbolConfiguration. Use as decoration
+ * image content
+ */
 export class SymbolConfiguration {
   constructor(name: SFSymbolName, variableValue?: number)
 
@@ -90,14 +99,19 @@ export class SymbolConfiguration {
   preferringHierarchical(): SymbolConfiguration
 }
 
-/** Adjusts symbol size relative to its font. */
+/** SymbolScale – Use font for symbol size, then adjust with symbol scale */
 export type SymbolScale = 'small' | 'medium' | 'large'
 
 /**
- * Wraps `NSFontDescriptor`. Missing bold/italic faces are synthesized; missing
- * monospace substitutes the system monospaced face unless a family is set with
- * {@link Font.withFace} or {@link Font.withFamily}; unsupported OpenType
- * features are silently ignored. {@link Font.resolve} reports which happened.
+ * Font - Wraps a `NSFontDescriptor`.
+ *
+ * Missing bold/italic faces are synthesized; missing monospace substitutes the
+ * system monospaced face unless a family is set with {@link Font.withFace} or
+ * {@link Font.withFamily}; unsupported OpenType features are silently ignored.
+ * {@link Font.resolve} reports which happened.
+ *
+ * Generally if you are confused look into how `NSFontDescriptor` works. This is
+ * a light wrapper around that class.
  */
 export class Font {
   static systemBody(): Font
@@ -112,7 +126,10 @@ export class Font {
   static systemTitle2(): Font
   static systemTitle3(): Font
 
-  /** @param name Font family, e.g. "Helvetica". */
+  /**
+   * @param name Font family, e.g. "Helvetica"
+   * @param pointSize e.g. 12
+   */
   constructor(name: string, pointSize: number)
 
   withFamily(family: string): Font
@@ -144,10 +161,10 @@ export class Font {
 
   withSlashedZero(): Font
 
-  /** Lowercase figures. */
+  /** Oldstyle (lowercase) figures */
   withOldstyleFigures(): Font
 
-  /** Uppercase figures. */
+  /** Lining (uppercase) figures */
   withLiningFigures(): Font
 
   withSuperscript(): Font
@@ -177,10 +194,10 @@ export type FontAttributes = {
   synthesizedOblique: boolean
   /** No monospaced variant; the system monospaced face was used. */
   substitutedMonospace: boolean
-  /** Size relative to 14pt. */
-  uiScale: number
+  uiScale: number // Size relative to the 14pt baseline
 }
 
+/** FontWeight */
 export type FontWeight =
   | 'ultraLight'
   | 'thin'
@@ -198,7 +215,7 @@ export type FontWeight =
  */
 export type ColorSpace = 'srgb' | 'hsl' | 'oklab' | 'oklch' | 'okhsl' | 'okhsv'
 
-/** WCAG level or a custom ratio. */
+/** WCAG contrast targets */
 export type ContrastTarget = 'aa' | 'aaLarge' | 'aaa' | 'aaaLarge' | number
 
 export class Color {
@@ -249,7 +266,9 @@ export class Color {
   static systemTeal(): Color
   static systemYellow(): Color
 
-  /** @param white 0-1 */
+  /**
+   * @param white 0-1
+   */
   static gray(white: number): Color
 
   /**
@@ -282,7 +301,9 @@ export class Color {
   /** Follows the current appearance. */
   static lightDark(light: Color, dark: Color): Color
 
-  /** @param image Tiled when filling. */
+  /**
+   * @param image Tile pattern image used when filling
+   */
   static pattern(image: Image): Color
 
   /**
@@ -321,11 +342,14 @@ export class Color {
    * CSS `color-mix()`. Hue spaces take the shorter arc; a gray side takes the
    * other color's hue.
    * @param fraction 0 = this, 1 = `color`.
-   * @param colorSpace Default `oklab`.
+   * @param colorSpace Color space for mixing (default oklab)
    */
   mixed(color: Color, fraction: number, colorSpace?: ColorSpace): Color
 
-  /** Best-contrasting candidate (CSS `color-contrast()`). */
+  /**
+   * Best-contrasting candidate (CSS `color-contrast()`).
+   * @param target - WCAG target or custom ratio
+   */
   contrasted(candidates: Color[], target?: ContrastTarget): Color
 
   resolve(cache: Cache): {

@@ -87,6 +87,7 @@ export class AffineTransform {
   translatedBy(x: number, y: number): AffineTransform
 }
 
+/** Insets - Wraps a NSEdgeInsets. */
 export class Insets {
   static zero(): Insets
 

@@ -4,36 +4,54 @@ import { Insets, Rect, Point, Size } from '../core/geometry'
 import { EditorTheme } from './editor-theme'
 
 /**
- * Defines an editor style: layers of rules, each an outline path plus a
- * function that modifies the style of matching elements. Matching rules run in
- * definition order (no specificity), each seeing the previous rule's result.
+ * Defines EditorStyle – Ordered list of style rules.
  *
- * Styles are cached, so a rule must be a pure function of its inputs; never
- * read global mutable state.
+ * Each rule is a function with an associated outline path. The rule's function
+ * is called when the outline path matches the element being styled. The rule's
+ * function is passed a style object that it may modify. That style object is
+ * then passed on to the next matching rule.
  *
+ * Rules should be ordered from least specific to most specific. The first rule
+ * sets the general style, following rules modify that style for specific
+ * situations. Unlike CSS there is no specificity calculation, rules are always
+ * processed in the order they are defined.
+ *
+ * Style objects are cached. The same set of inputs to a rule's function should
+ * always generate the same style object modifications. Never use global mutable
+ * state in rule logic or you will get unexpected results. Unlike CSS, you can
+ * read the incoming rule state, and make decisions based on that state.
+ *
+ * Rules are organized into layers. Use `defineEditorStyleModifier` to inject
+ * new rules into existing editor style layers.
+ *
+ * Example (new editor style):
  * ```ts
  * let style = defineEditorStyle("my-style", "My Style")
+ *
  * style.layer("base", (row, run, caret, viewport) => {
- *   row(`.*`, (context, row) => {
+ *   row(`.*`, (editor, row) => {
  *     row.padding = new Insets(10, 10, 10, 28)
  *   })
- *   run('.@emphasized', (context, run) => {
- *     run.font = run.font.withItalics()
+ *   run('.@emphasized', (editor, text) => {
+ *     text.font = text.font.withItalics()
  *   })
  * })
  * ```
- * @param id Unique style id.
- * @param displayName User-visible name.
+ * @param displayName - User visible editor style name
  */
 export declare function defineEditorStyle(id: EditorStyleId, displayName: string): EditorStyle
 
 /**
- * Merges rules into the layers of existing editor styles.
+ * EditorStyleModifier – Insert rules into existing EditorStyles.
  *
- * @param id Unique modifier id.
- * @param displayName User-visible name.
- * @param matchingEditorStyleIds Style ids to modify. Omitted, applies to all
- *   editor styles.
+ * Rules defined here are merged into existing styles whose `id` matches
+ * `matchingEditorStyleIds`. If that matcher is not set then these rules are
+ * merged into all editor styles. editor styles that are modified.
+ *
+ * @param displayName - User visible editor style modifier name
+ * @param matchingEditorStyleIds - Regular expression to match editor style
+ *   ids that this modifier should be applied to. If not set then this modifier
+ *   is applied to all editor styles.
  */
 export declare function defineEditorStyleModifier(
   id: EditorStyleId,
@@ -43,28 +61,65 @@ export declare function defineEditorStyleModifier(
 
 export interface EditorStyle {
   /**
-   * Adds rules to a layer. Layers are ordered by first use; calling again with
-   * the same name appends to that layer.
+   * Add/Modify an editor style rules layer.
+   *
+   * Layers are ordered by when they are first named. The rules within a layer
+   * are ordered by definition order. If `layer` is called multiple times with
+   * the same name, the new rules are added to the end of the existing layer.
+   *
+   * The purpose of layers is to group rules together, and allow later style
+   * modifiers to insert rules into known locations.
+   *
+   * Example:
+   * ```ts
+   * editorStyle.layer("base", (row, run, caret, viewport) => {
+   *   row(`.*`, (editor, row) => {
+   *     row.padding = new Insets(10, 10, 10, 28)
+   *   })
+   * })
+   * ```
    */
   layer(
     name: RulesLayerName,
     rulesCallback: (
+      /**
+       * Define a row rule.
+       */
       row: (
         match: RelativeOutlinePath,
         apply: (context: StyleContext, row: RowStyle) => void
       ) => void,
+      /**
+       * Define a text run rule.
+       */
       run: (
         match: RelativeOutlinePath,
         apply: (context: StyleContext, run: TextRunStyle) => void
       ) => void,
+      /**
+       * Define a caret rule. Generally this only needs to be used once per
+       * editor style, by convention it is defined in the base layer.
+       */
       caret: (apply: (context: StyleContext, caret: CaretStyle) => void) => void,
+      /**
+       * Define a viewport rule. Generally this only needs to be used once per
+       * editor style, by convention it is defined in the base layer.
+       */
       viewport: (apply: (context: StyleContext, viewport: ViewportStyle) => void) => void,
       /**
-       * Copies another style's layer rules, e.g. `include('bike',
-       * 'run-formatting')`. Copied immediately, so rules modifiers add later
-       * are not included.
-       * @param fromId Source editor style id.
-       * @param fromLayer Source layer.
+       * Include rules from another editor style layer.
+       *
+       * For example, you might want to `include('bike', 'run-formatting')` to
+       * add the standard run formatting rules. This saves typing and means
+       * you'll get updated run-formatting rules when the standard Bike style
+       * changes.
+       *
+       * The includes added immediately and won't contain any rules added later
+       * by modifiers. Expectation is you will only include rules from the
+       * standard `bike` editor style, or some future standard style that also
+       * ships with Bike.
+       *
+       * @param fromLayer Rules layer to import
        */
       include: (fromId: EditorStyleId, fromLayer: RulesLayerName) => void
     ) => void
@@ -73,6 +128,12 @@ export interface EditorStyle {
 
 export type EditorStyleId = string
 
+/**
+ * RulesLayerName - The name of a rules layer.
+ *
+ * The name is used to identify the layer when defining rules. The name is also
+ * used to identify the layer when modifying existing styles.
+ */
 export type RulesLayerName =
   | 'base' // Default rows/runs (*) formatting
   | 'row-formatting' // Row type formatting
@@ -85,26 +146,35 @@ export type RulesLayerName =
   | 'highlights' // Highlight formatting
   | string
 
-/** Passed to rule `apply` functions. */
+/**
+ * StyleContext – Context passed to stylesheet `apply` functions.
+ *
+ * Use this in rule definitions to determine the applied style values. Cache
+ * values derived from this context in `userCache` to avoid recomputing them.
+ * Anytime this context changes the `userCache` is also invalidated.
+ */
 export interface StyleContext {
   os: 'macOS' | 'iOS'
-  /** Editor has keyboard focus. */
+  /** True when editor has keyboard focus  */
   isKey: boolean
-  /** Mouse cursor hidden while typing. */
+  /** True when editor is typing (mouse hidden)  */
   isTyping: boolean
+  /** True when editor is filtering  */
   isFiltering: boolean
+  /** True when in dark mode  */
   isDarkMode: boolean
+  /** True when in full screen mode  */
   isFullScreen: boolean
   /** Window chrome hidden; document fills the window. */
   isFullWindow: boolean
-  /** Selection is being dragged. */
+  /** True when dragging selection  */
   isDragSource: boolean
   viewportSize: Size
   /** Overlapping chrome (floating toolbar, status bar) within `viewportSize`. */
   viewportContentInsets: Insets
   settings: EditorSettings
   theme: EditorTheme
-  /** Cleared whenever this context changes. */
+  /** Cache for values derived from this editor state */
   userCache: Map<string, any>
   /**
    * Consecutive same-type sibling counts from the outermost same-type ancestor
@@ -115,19 +185,23 @@ export interface StyleContext {
 }
 
 export interface EditorSettings {
+  /** Show caret line  */
   showCaretLine: boolean
+  /** Show guide lines  */
   showGuideLines: boolean
+  /** Show focus arrows  */
   showFocusArrows: boolean
-  /** Scale fonts to fit the viewport. */
+  /** Allow font scaling to better fit viewport  */
   allowFontScaling: boolean
   /** Control categories that fade while typing. */
   hiddenControlsWhenTyping: HiddenControl[]
+  /** Writing focus mode  */
   writingFocusMode?: WritingFocusMode
-  /** 0–1. */
+  /** Typewriter mode (0-1)  */
   typewriterMode?: number
-  /** Body font. */
+  /** Body font  */
   font: Font
-  /** In characters. */
+  /** Line width (characters)  */
   lineWidth?: number
   lineHeightMultiple: number
   rowSpacingMultiple: number
@@ -137,11 +211,12 @@ export type WritingFocusMode = 'paragraph' | 'sentence' | 'word'
 
 export type HiddenControl = 'guides' | 'handles' | 'badges'
 
+/** CaretStyle – The global text caret style */
 export interface CaretStyle {
   color: Color
   width: number
   blinkStyle: CaretBlinkStyle
-  /** Caret line background. */
+  /** The caret line background color  */
   lineColor: Color
   messageFont: Font
   messageColor: Color
@@ -149,43 +224,67 @@ export interface CaretStyle {
   loadedAttributesColor: Color
 }
 
+/** CaretBlinkStyle - Caret blink style */
 export type CaretBlinkStyle = 'discrete' | 'continuous' | 'none'
 
+/** ViewportStyle – The global viewport style */
 export interface ViewportStyle {
+  /** The viewport insets  */
   padding: Insets
   /**
-   * Used for contrast and blending; doesn't paint. The painted background is
-   * the theme's `materials.editor`.
+   * The viewport semantic background color.
+   *
+   * This color is used for contrast and blending calculations, but does not
+   * paint the actual background of the viewport. To change the visual
+   * background, use the `materials.editor` property in the theme.
    */
   backgroundColor: Color
   /** Base text font before row rules. Row-independent badges render with it. */
   font: Font
 }
 
-/** Applies to the matched row only, not its children. */
+/**
+ * RowStyle – The style for a row in the outline.
+ *
+ * Row style only applies to an individual row, not to the rows contained by
+ * this row.
+ */
 export interface RowStyle extends DecorationContainer {
-  /** 0–1. */
+  /** Opacity (0-1) */
   opacity: number
-  /** Creates indentation. */
+  /** The row padding. Generally used to create outline indentation */
   padding: Insets
   text: TextStyle
 }
 
+/**
+ * TextStyle - The style for row text.
+ */
 export interface TextStyle extends TextContainer {
   scale: number
   lineHeightMultiple: number
 }
 
+/**
+ * TextRunStyle – The style for text runs.
+ */
 export interface TextRunStyle extends TextContainer {
-  /** Enclosing text's scale. */
+  /** Enclosing text's scale */
   readonly scale: number
   /**
-   * Used only when the run is a single embed character (e.g. hr). Values 0–1
-   * are a fraction of line width/height; > 1 are points. Default 1.
+   * Embed size.
+   *
+   * Ignored unless text run contains a single embed/attachment character.
+   * Currently only used when implementing hr's. The size values are interpreted
+   * based on the range of the value (default 1):
+   *
+   * 1. 0-1: Interpreted as a percentage of line width/height.
+   * 2. > 1: Interpreted as a fixed point size.
    */
   embedSize: Size
 }
 
+/** Ligature - Text ligature style */
 export type Ligature = 'default' | 'none' | 'all'
 
 /** Wraps `NSUnderlineStyle`. */
@@ -201,11 +300,14 @@ export interface TextLineStyle {
   byWord: boolean
 }
 
+/**
+ * TextContainer - Common text style properties shared by TextStyle and TextRunStyle
+ */
 export interface TextContainer extends DecorationContainer {
   font: Font
-  /** Default 0. */
+  /** The run kerning (default 0) */
   kerning: number
-  /** Default 0. */
+  /** The run tracking (default 0) */
   tracking: number
   ligature: Ligature
   baselineOffset: number
@@ -217,81 +319,123 @@ export interface TextContainer extends DecorationContainer {
   padding: Insets
 }
 
-/** Row, row text, or text run. `layout` positions relative to the container. */
+/**
+ * DecorationContainer - An object to which visual decorations are attached.
+ * Row, Row text, and Row text runs are all decoration containers. Decoration
+ * containers provide methods to add and modify decorations and provide the
+ * layout object that's used to position the decorations relative to the
+ * container.
+ */
 export interface DecorationContainer {
-  /** Adds or modifies the decoration with `id`. */
+  /**
+   * Add/Modify decoration by id.
+   */
   decoration(id: string, modify: (decoration: Decoration, layout: Layout) => void): void
 
-  /** Modifies every existing decoration. */
+  /**
+   * List and modify all existing decorations.
+   */
   decorations(modify: (decoration: Decoration, layout: Layout) => void): void
 }
 
 /**
- * Visual layer attached to a row, row text, or text run; wraps `CAShapeLayer`.
- * Decorations don't affect layout (make room with padding and margins), except
- * `flow: 'trailing'` decorations that wrap past the last text line, which add
- * row height.
+ * Decoration - Add visual decorations to outline.
  *
- * `mergable` decorations with equal styling and touching frames combine: text
- * run decorations in consecutive runs merge into one shape (text selection);
- * row and text decorations in consecutive rows adjust their `corners.radius`
- * corners to form one rounded shape (block selection).
+ * Decorations are attached to rows, row texts, or row text runs. They can have
+ * a background color, border, and corner radius. They can also have image
+ * content. Decorations do not affect layout, you need to make space for them
+ * using row and text padding and margins.
+ *
+ * Decorations can be marked `mergable`. Similar mergable decorations may be
+ * combined into a single shape. The exact merging behavior depends on where the
+ * decoration is attached:
+ *
+ * - Text run decorations are merged when they appear in consecutive text runs,
+ *   have equal styling, and touching/close frames.
+ *
+ *   The frames of the merged decorations are combined into a single shape that
+ *   is the union of all the individual run decoration frames. This shapes
+ *   corners will be rounded via the `corners.radius` property. See text
+ *   selection for intended use/behavior.
+ *
+ * - Row and text decorations are merged when they appear in consecutive rows,
+ *   have equal styling, and touching/close frames.
+ *
+ *   Row and text decorations are not merged into a single shape. Instead their
+ *   corners are modified to match the preceding and following decoration
+ *   corners to create a larger rounded shape. This will only have a visible
+ *   effect when `border.radius` is applied. See block selection for intended
+ *   use/behavior.
+ *
+ * Decorations closely wrap a `CAShapeLayer`. Look into the `CAShapeLayer`
+ * documentation for more information on the possibilities.
  */
 export interface Decoration {
-  /** Default false. */
+  /** Hidden (default false) */
   hidden: boolean
-  /** 0–1. */
+  /** Opacity (0-1) */
   opacity: number
   border: DecorationBorder
+  /** Corners */
   corners: DecorationCorners
   shadow: DecorationShadow
   contents: DecorationContents
-  /** Background color. */
+  /** Background color */
   color: Color
-  /** Radians. Default 0. */
+  /** Radian rotation (default 0) */
   rotation: number
-  /** Default 0. */
+  /** Depth ordering (default 0) */
   zPosition: number
-  /** Point on the decoration placed at `x`, `y`, 0–1. Default 0.5, 0.5. */
+  /** Relative (0-1) Position on decoration that is positioned (default to center, 0.5, 0.5) */
   anchor: Point
-  /** Default container center. */
+  /** The x value (default container center) */
   x: LayoutValue
-  /** Default container center. */
+  /** The y value (default container center) */
   y: LayoutValue
-  /** Default fills container. */
+  /** The width value (default fill container) */
   width: LayoutValue
-  /** Default fills container. */
+  /** The height value (default fill container) */
   height: LayoutValue
+  /** Whether the decoration can be merged with similar (see interface docs) */
   mergable: boolean
-  /** Line fragments shown on when text wraps. Default `all`. */
+  /** Which line fragment(s) to show the decoration on when text wraps (default 'all') */
   fragmentPlacement: 'all' | 'first' | 'last'
-  /** Flows after the row's last text line; `x` and `y` are ignored. */
+  /** Flow with other decoration after the row's last text line (x, y ignored when set) */
   flow?: 'trailing'
-  /** Flow order. Default 0. */
+  /** Flow ordering (default 0). */
   order?: number
-  /** Performed on click. */
+  /** Optional command name to perform when activated (clicked) */
   commandName?: string
+  /** Optional interaction capabilities */
   capabilities?: ('drag-row' | 'accept-drop')[]
 
-  /** Animated properties on update. All default true. */
+  /** The properties to animate when using updating decoration */
   readonly transitions: {
-    color: boolean
-    borderColor: boolean
-    borderWidth: boolean
-    corners: boolean
-    opacity: boolean
-    rotation: boolean
-    position: boolean
-    size: boolean
-    contents: boolean
-    /** Sets all to false. */
-    clear(): void
+    color: boolean // (default true)
+    borderColor: boolean // (default true)
+    borderWidth: boolean // (default true)
+    corners: boolean // (default true)
+    opacity: boolean // (default true)
+    rotation: boolean // (default true)
+    position: boolean // (default true)
+    size: boolean // (default true)
+    contents: boolean // (default true)
+    clear(): void // set all to false
   }
 }
 
 /**
- * Values for a decoration's `x`, `y`, `width`, `height`. Child layouts narrow
- * the reference, e.g. `layout.firstLine.bottom` vs the row's `layout.bottom`.
+ * Layout - Decorations are positioned with layouts.
+ *
+ * The layout provides access to layout values which are assigned to the
+ * decorations x, y, width, and height. Layout values can be used on own, or
+ * combined with each other in various ways.
+ *
+ * Layouts also provide access to child layouts such as `text`, `firstLine` and
+ * `lastLine`. For example to get the layout value for the bottom of the first
+ * line of a row you could use `layout.firstLine.bottom`. While in the same
+ * context `layout.bottom` would give the layout value for the bottom of the
+ * row.
  */
 export interface Layout {
   text: Layout
@@ -310,24 +454,35 @@ export interface Layout {
   fixed(value: number): LayoutValue
 }
 
-/** Resolved to a number during layout. */
+/**
+ * LayoutValue - A logical layout value that is resolved to a number by the
+ * layout process and then used to set a Decoration's x, y, width, and height
+ * properties.
+ */
 export interface LayoutValue {
+  /** Min of this and value. */
   min(value: number | LayoutValue): LayoutValue
+  /** Max of this and value. */
   max(value: number | LayoutValue): LayoutValue
+  /** This scaled by value. */
   scale(value: number | LayoutValue): LayoutValue
+  /** This offset by value. */
   offset(value: number | LayoutValue): LayoutValue
+  /** This minus value. */
   minus(value: number | LayoutValue): LayoutValue
 }
 
+/** DecorationBorder - Wraps CALayer border */
 export interface DecorationBorder {
   color: Color
   width: number
 }
 
+/** DecorationShadow - Wraps CALayer shadow */
 export interface DecorationShadow {
   color: Color
   opacity: number
-  /** Blur radius. */
+  /** Shadow blur radius */
   radius: number
   offset: {
     width: number
@@ -335,31 +490,37 @@ export interface DecorationShadow {
   }
 }
 
-/** Each corner flag defaults true. */
+/** DecorationCorners - Wraps CALayer corner */
 export interface DecorationCorners {
   radius: number
-  /** Top right. */
+  /** Apply radius to top right corner (default true) */
   maxXMaxYCorner: boolean
-  /** Bottom right. */
+  /** Apply radius to bottom right corner (default true) */
   maxXMinYCorner: boolean
-  /** Top left. */
+  /** Apply radius to top left corner (default true) */
   minXMaxYCorner: boolean
-  /** Bottom left. */
+  /** Apply radius to bottom left corner (default true) */
   minXMinYCorner: boolean
 }
 
-/** Wraps `CALayer` contents properties. */
+/**
+ * DecorationContents - Wraps CALayer contents values.
+ *
+ * Decoration content is eventually an bitmap image, but you can construct that
+ * image from text, shapes, and symbols. In addition to standard images.
+ */
 export interface DecorationContents {
+  /** Contents Image */
   image: Image
-  /** Portion of the image to use. */
+  /** Contents Rect, portion of contents to use */
   rect: Rect
-  /** Portion of the image to stretch. */
+  /** Contents Center, portion of contents to stretch */
   center: Rect
-  /** How to position and scale the image. */
+  /** Contents Gravity, how to position and scale contents */
   gravity: ContentsGravity
 }
 
-/** Wraps `CALayerContentsGravity`. */
+/** ContentsGravity - Wraps CALayerContentsGravity */
 export type ContentsGravity =
   | 'bottom'
   | 'bottomLeft'

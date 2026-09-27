@@ -9,13 +9,14 @@ import { AttributeType } from './attribute'
 
 /** Passed to `render`. */
 export interface BadgeEnvironment {
-  /** Base text font (the stylesheet's `viewport.font`). */
+  /** The outline's BASE text font (the stylesheet's `viewport.font`) */
   readonly font: Font
-  /** Base text color (`theme.colors.text`). */
+  /** The outline's BASE text color (same as `theme.colors.text`) */
   readonly color: Color
   /** Epoch seconds; set only when `tick` is. */
   readonly now?: number
   readonly os: 'macOS' | 'iOS'
+  /** Editor Settings */
   readonly settings: EditorSettings
   /** Resolved for the current appearance. */
   readonly theme: EditorTheme
@@ -28,7 +29,7 @@ export interface BadgeEnvironment {
   formatValue(type: AttributeType, wire: string): string
 }
 
-/** Standard geometry for badges that draw their own rect, scaled to the base text size. */
+/** Standard badge geometry, proportional to the outline's base text size. */
 export interface BadgeMetrics {
   /** Rect height. */
   readonly side: number
@@ -36,7 +37,7 @@ export interface BadgeMetrics {
   readonly strokeWidth: number
   /** Label point size, a step below the base font. */
   readonly fontSize: number
-  /** Around `fontSize` text to reach `side`. */
+  /** Padding around a `fontSize` to achieve the badge rect's `side` height. */
   readonly padding: Insets
 }
 

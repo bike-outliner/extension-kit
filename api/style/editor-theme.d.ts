@@ -2,16 +2,39 @@ import { Color, Font, FontWeight } from '../core/graphics'
 import { TextStyle, TextRunStyle } from './editor-style'
 
 /**
- * Values from the active `.bktheme` file, read as `context.theme`, e.g.
- * `context.theme.rows.heading.apply(row.text)`.
+ * EditorTheme - The scripting API for Bike theme files (.bktheme).
+ *
+ * This interface provides access to colors and text styles defined in JSON
+ * theme files so that they can be accessed programmatically from the editor style that uses them.
+ *
+ * Access theme values in style scripts via `context.theme`:
+ *
+ * ```typescript
+ * row('.heading', (context, row) => {
+ *   context.theme.rows.heading.apply(row.text)
+ * })
+ *
+ * run('.@strong', (context, text) => {
+ *   context.theme.runs.strong.apply(text)
+ * })
+ * ```
  */
 export interface EditorTheme {
+  /** Colors defined in the theme's "colors" section */
   readonly colors: ColorTheme
+
+  /** Row text themes defined in the theme's "rows" section */
   readonly rows: RowThemes
+
+  /** Run text themes defined in the theme's "runs" section */
   readonly runs: RunThemes
 }
 
-/** Unspecified colors have defaults. */
+/**
+ * ColorTheme - Colors accessible via `theme.colors`.
+ *
+ * All colors have sensible defaults if not specified in the theme.
+ */
 export interface ColorTheme {
   // Core colors
   readonly text: Color
@@ -41,10 +64,16 @@ export interface ColorTheme {
   readonly spelling: Color
   readonly replacement: Color
 
-  /** Custom theme color by name. */
+  /** Access custom colors defined in the theme by name. Returns undefined if not found. */
   get(name: string): Color | undefined
 }
 
+/**
+ * RowThemes - Row text themes accessible via `theme.rows`.
+ *
+ * Each row type has a TextContainerTheme that can be applied to row text styling.
+ * All row themes have sensible defaults.
+ */
 export interface RowThemes {
   readonly body: TextContainerTheme
   readonly heading: TextContainerTheme
@@ -58,6 +87,12 @@ export interface RowThemes {
   readonly horizontalRule: TextContainerTheme
 }
 
+/**
+ * RunThemes - Run text themes accessible via `theme.runs`.
+ *
+ * Each run type has a TextContainerTheme that can be applied to run text styling.
+ * All run themes have sensible defaults.
+ */
 export interface RunThemes {
   readonly strong: TextContainerTheme
   readonly emphasis: TextContainerTheme
@@ -67,21 +102,44 @@ export interface RunThemes {
   readonly link: TextContainerTheme
 }
 
+/**
+ * TextContainerTheme - Styling properties for rows and runs defined in themes.
+ *
+ * All properties are optional. When a property is undefined, the style
+ * should generally not apply a value. Use the `apply()` method to
+ * conveniently apply all defined properties to a text style.
+ */
 export interface TextContainerTheme {
   readonly color?: Color
+  /** Background color behind text */
   readonly backgroundColor?: Color
+  /** Font family name (e.g., "SF Mono", "Helvetica") */
   readonly fontFamily?: string
-  /** Font size multiplier, e.g. 1.2. */
+  /** Font size multiplier (e.g., 1.2 = 20% larger than base) */
   readonly fontAdjust?: number
   readonly fontWeight?: FontWeight
   readonly fontTraits?: FontTrait[]
   readonly underline?: TextLineTheme
   readonly strikethrough?: TextLineTheme
 
-  /** Sets the defined properties on `style`; undefined ones are left unchanged. */
+  /**
+   * Apply this theme's properties to a text style.
+   *
+   * Only defined properties are applied - undefined properties leave
+   * the text style unchanged. This allows themes to selectively override
+   * specific aspects of styling.
+   *
+   * @param style - The text style to modify (TextStyle for rows, TextRunStyle for runs)
+   */
   apply(style: TextStyle | TextRunStyle): void
 }
 
+/**
+ * TextLineTheme - Styling properties for underline and strikethrough.
+ *
+ * All properties are optional. When a property is undefined, the style
+ * should generally not apply a value.
+ */
 export interface TextLineTheme {
   readonly color?: Color
   readonly single?: boolean
@@ -91,7 +149,9 @@ export interface TextLineTheme {
   readonly patternDash?: boolean
   readonly patternDashDot?: boolean
   readonly patternDashDotDot?: boolean
+  /** Apply style word by word */
   readonly byWord?: boolean
 }
 
+/** Font traits that can be applied to text */
 export type FontTrait = 'italic' | 'bold' | 'expanded' | 'condensed' | 'monospace'

@@ -1,11 +1,13 @@
 /**
- * Granted in `manifest.json` `permissions`; fixed at runtime. Network access
- * is governed separately by `host_permissions`.
+ * Permissions are used to control access to sensitive APIs such as the
+ * clipboard and web requests. They are set in the extension manifest and
+ * cannot be changed by the extension code.
  */
 export interface Permissions {
   contains(permission: Permission): boolean
 }
 
+/** Permissions that can be granted through `manifest.json`. */
 export type Permission = 'openURL' | 'clipboardRead' | 'clipboardWrite' | 'keychain'
 
 /** Undoes whatever returned it. Everything is disposed when the extension deactivates. */
@@ -29,16 +31,17 @@ export class URL {
   readonly absoluteString: string
 
   /**
-   * Opens in the default application.
+   * Open this URL in the system's default application.
    * @requires `openURL` permission
    */
   open(configuration: URLOpenConfiguration): void
 }
 
+/** Configuration for opening a URL. */
 type URLOpenConfiguration = {
-  /** Activate the opening app. Default true. */
+  /** Whether to activate the application (default: true) */
   activate?: boolean
-  /** Default true. */
+  /** Whether to prompt the user if needed (default: true) */
   promptsUserIfNeeded?: boolean
 }
 

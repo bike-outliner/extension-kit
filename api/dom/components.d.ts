@@ -6,10 +6,11 @@ import { SFSymbolName } from '../core/bike-globals'
 
 // SFSymbol
 
-/** Colored by `currentColor`. */
+/** Renders an SF Symbol using CSS mask-image, colored by `currentColor`. */
 export function SFSymbol(props: SFSymbolProps): React.JSX.Element
 
 export interface SFSymbolProps extends React.HTMLAttributes<HTMLSpanElement> {
+  /** SF Symbol name (e.g. "chevron.left", "star.fill") */
   name: SFSymbolName
   weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'
   scale?: 'small' | 'medium' | 'large'
@@ -30,20 +31,22 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 export function Button(props: ButtonProps): React.JSX.Element
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Same scale as `Label.size`. Default `regular`. */
+  /** Button size (default: "regular") */
   size?: 'mini' | 'small' | 'regular' | 'large'
 }
 
 // Label
 
 /**
+ * Text label with system font and color variants.
+ *
  * `font` sets family and weight; `size` overrides the point size, e.g.
  * `<Label font="headline" size="small">` is semibold 11px.
  */
 export function Label(props: LabelProps): React.JSX.Element
 
 export interface LabelProps extends React.HTMLAttributes<HTMLSpanElement> {
-  /** Default primary (`--label`). */
+  /** Text color (default: primary/--label) */
   color?: 'secondary' | 'tertiary'
   /** Semantic text style. Default body. */
   font?: 'headline' | 'subheadline' | 'caption' | 'footnote'
@@ -56,11 +59,14 @@ export interface LabelProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 // FormRow
 
-/** Label column width is `--bike-form-label-width`. */
+/**
+ * A label + content row for inspector-style forms.
+ * Set `--bike-form-label-width` to adjust label column width.
+ */
 export function FormRow(props: FormRowProps): React.JSX.Element
 
 export interface FormRowProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Left column. */
+  /** Label text shown in the left column */
   label: React.ReactNode
 }
 
@@ -73,11 +79,24 @@ export interface FormGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 // Box
 
-/** macOS grouped-content box. */
+/**
+ * A grouped container ("box") matching macOS grouped content — a filled,
+ * hairline-bordered rounded rectangle for visually grouping related controls.
+ * An optional `label` renders a header above the content.
+ *
+ * ```tsx
+ * import { Box, FormGroup, FormRow } from 'bike/components'
+ * <Box label="Row templates">
+ *   <FormGroup>
+ *     <FormRow label="Year"><input type="text" /></FormRow>
+ *   </FormGroup>
+ * </Box>
+ * ```
+ */
 export function Box(props: BoxProps): React.JSX.Element
 
 export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Header above the content. */
+  /** Header shown above the box content */
   label?: React.ReactNode
 }
 
@@ -113,19 +132,26 @@ export interface SeparatorProps extends React.HTMLAttributes<HTMLHRElement> {}
 
 // SegmentedControl
 
+/**
+ * A tab-like segmented control matching NSSegmentedControl appearance.
+ *
+ * `size` scales text and metrics: mini 9px, small 11px, regular and large 13px.
+ */
 export function SegmentedControl(props: SegmentedControlProps): React.JSX.Element
 
 export interface SegmentedControlItem {
+  /** Value identifier for this segment */
   value: string
   label: React.ReactNode
 }
 
 export interface SegmentedControlProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   items: SegmentedControlItem[]
-  /** Selected value. */
+  /** Currently selected value */
   value?: string
+  /** Called when selection changes */
   onChange?: (value: string) => void
-  /** Same scale as `Label.size`. Default `regular`. */
+  /** Control size (default: "regular") */
   size?: 'mini' | 'small' | 'regular' | 'large'
 }
 
@@ -136,13 +162,15 @@ export function RadioGroup<T extends string = string>(props: RadioGroupProps<T>)
 
 export interface RadioGroupItem<T extends string = string> {
   value: T
+  /** Display label */
   label: React.ReactNode
 }
 
 export interface RadioGroupProps<T extends string = string> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   items: RadioGroupItem<T>[]
-  /** Selected value. */
+  /** Currently selected value */
   value?: T
+  /** Called when selection changes */
   onChange?: (value: T) => void
   /** Input `name`. Default a generated per-instance id. */
   name?: string

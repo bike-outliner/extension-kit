@@ -4,13 +4,15 @@ import { DOMProtocol } from '../core/dom-protocol'
 
 export interface Inspector extends View {
   /**
+   * Add an item to the inspector.
+   *
    * @see {@link https://github.com/bike-outliner/extension-kit/blob/main/docs/dom-context-tutorial.md#define-a-typed-messaging-protocol | Typed Messaging Protocols}
    */
   addItem<P extends DOMProtocol = DOMProtocol>(item: InspectorItem): Promise<DOMScriptHandle<P>>
 }
 
 export type InspectorItem = {
-  /** Tab bar tooltip. */
+  /** Label shown in the tab bar tooltip. */
   label: string
   script: DOMScript
 }

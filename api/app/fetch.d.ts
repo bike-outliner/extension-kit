@@ -2,10 +2,23 @@ import { JSONValue } from '../core/json'
 
 declare global {
   /**
-   * Partial Fetch API. The URL must match a `manifest.json` `host_permissions`
-   * match pattern, e.g. `https://example.com/*`, `https://*.example.com/*`
-   * (subdomains only, not example.com), `*://example.com/*` (any scheme).
-   * @see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns
+   * Fetch a URL.
+   *
+   * A partial implementation of the Fetch API.
+   *
+   * The fetch API requires host permissions in the manifest.json file:
+   *
+   * - `host_permissions` with a pattern matching the URL you want to fetch.
+   *   Pattern should follow
+   *   https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns
+   *
+   * Here are some example host patterns:
+   *
+   *  - `https://example.com/*` - matches all URLs on example.com
+   *  - `https://*.example.com/*` - matches all subdomains of example.com
+   *  - `http://example.com/*` - matches all URLs on example.com
+   *  - `*://example.com/*` - matches all URLs on example.com
+   *
    * @requires `host_permissions` match URL
    */
   function fetch(input: string, options?: Options): Promise<Response>

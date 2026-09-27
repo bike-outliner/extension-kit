@@ -1,9 +1,12 @@
 import { SFSymbolName } from '../core/bike-globals'
 
+/** An item to display in a choice box. */
 export interface ChoiceBoxItem {
+  /** The display name for this item. */
   name: string
-  /** Shown after the name. */
+  /** Optional container/category shown after the name (separated by tab). */
   container?: string
+  /** Optional SF Symbol name to display beside the item. */
   symbol?: SFSymbolName
 }
 
@@ -15,11 +18,11 @@ export interface ChoiceBoxSource {
    */
   prefix?: string
   placeholder?: string
-  /** Used when an item has no `symbol`. */
+  /** Default SF Symbol to use when an item doesn't specify one. */
   defaultSymbol?: SFSymbolName
-  /** Can dismiss without selecting. Default false. */
+  /** Whether the user can dismiss without selecting (default: false). */
   allowsEmptySelection?: boolean
-  /** Default false. */
+  /** Whether multiple items can be selected (default: false). */
   allowsMultipleSelection?: boolean
   /** A function is called once, on first activation, and cached. */
   items: ChoiceBoxItem[] | (() => ChoiceBoxItem[])

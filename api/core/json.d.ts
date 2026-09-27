@@ -7,6 +7,6 @@ export interface JSONStore {
   set(key: string, value: JSONValue | undefined): void
   delete(key: string): void
   observe(key: string, handler: (value: JSONValue | undefined) => void): Disposable
-  /** Fallbacks returned when no value is set. */
+  /** Register fallback values returned when no explicit value exists. */
   registerDefaults(defaults: Record<string, JSONValue>): void
 }

@@ -16,7 +16,10 @@ export interface BikeCommonGlobals {
    */
   readonly systemLocale: string
 
-  /** macOS first weekday, 0 = Sunday … 6 = Saturday. */
+  /**
+   * The user's preferred first day of the week from macOS System Preferences,
+   * as a JavaScript day number (0 = Sunday, 1 = Monday, ..., 6 = Saturday).
+   */
   readonly systemFirstWeekday: number
 
   /**
@@ -44,16 +47,24 @@ export interface DecodedRecurrence {
 
 /** `bike` members in app and DOM contexts. */
 export interface BikeUtilityGlobals extends BikeCommonGlobals {
-  /** UserDefaults with prefix `bike.ext.<extensionId>.`. */
+  /**
+   * Extension defaults, backed by UserDefaults with the prefix
+   * `bike.ext.<extensionId>.`.
+   */
   readonly defaults: JSONStore
 
   /**
-   * date-fns style pattern, e.g. `'yyyy-MM-dd'`. Week tokens `w`, `e`, `c`,
-   * `Y` use {@link systemFirstWeekday}; ISO `I` weeks start Monday.
+   * Formats a Date object using a pattern string (date-fns / CLDR-inspired,
+   * e.g. `'yyyy-MM-dd'`, `'MMMM d, yyyy'`).
+   *
+   * Week tokens `w`, `e`, `c`, `Y` use {@link systemFirstWeekday}; ISO `I`
+   * weeks start Monday.
+   *
    * @see https://date-fns.org/docs/format
    */
   formatDate(date: Date, pattern: string): string
 
+  /** Returns a URL string for the named SF Symbol. */
   symbolURL(name: SFSymbolName, options?: SFSymbolOptions): string
 
   /**

@@ -2,8 +2,7 @@ import { SelfOnlyOutlinePath, SelfOnlyValuePath } from '../core/outline-path'
 import { AttributeType } from './attribute'
 
 /**
- * Cached reduction over an outline axis, registered with `bike.summary(name,
- * config)` and read as `summary("name")` in queries.
+ * Incremental, cached reductions over an outline axis.
  *
  * With `type`, values reduce and emit in that wire encoding; registration
  * throws for a reduce the type can't order or add (summing dates, ordering
