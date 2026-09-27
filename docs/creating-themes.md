@@ -192,15 +192,10 @@ colors in the mix:
 }
 ```
 
-Mixing accepts `srgb`, `hsl`, `oklab`, `oklch`, `okhsl` and `okhsv`. The first four
-match CSS. `okhsl` and `okhsv` are Ottosson's Oklab-backed HSL and HSV: they are not
-CSS spaces, but their lightness is toe-corrected, so a ramp built in `okhsl` has
-evenly-spaced steps where the same ramp in `oklch` bunches up near white.
-
-Colors outside what the display can show — easy to write by hand in `oklch`, or to
-land on by raising lightness at constant chroma — are mapped back into gamut with
-their hue preserved. Chroma is reduced instead of the color shifting to a different
-hue, which is what clamping the red, green and blue channels separately would do.
+Mixing accepts `srgb`, `hsl`, `oklab`, `oklch`, `okhsl` and `okhsv`. `okhsl` and
+`okhsv` (Ottosson's Oklab HSL/HSV, not CSS) have even lightness steps, where
+`oklch` ramps bunch up near white. Out-of-gamut colors are mapped into gamut by
+reducing chroma, keeping hue.
 
 The `color-contrast` function selects the color with the highest contrast
 against a base color, useful for ensuring readability:
@@ -499,7 +494,8 @@ my-extension.bkext
 │   └── my-dark-theme.bktheme
 ```
 
-Themes are loaded directly from extension bundles. In Bike's theme menus, extension themes appear prefixed with the extension name. For example, `solarized.bktheme` in `bike.bkext` appears as "Bike: Solarized". See [Creating Extensions](creating-extensions.md) for more on building and installing extensions.
+Themes are loaded directly from extension bundles, with the extension name as a
+prefix (see [Theme Naming](#theme-naming)). See [Creating Extensions](creating-extensions.md) for more on building and installing extensions.
 
 ## Resources
 

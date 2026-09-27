@@ -33,8 +33,8 @@ export class Outline {
   readonly persistentMetadata: JSONStore
 
   /**
-   * Every row-attribute name used anywhere in this outline, sorted, with
-   * reserved names excluded. Requires a full scan of the outline.
+   * Every row-attribute name in this outline, sorted, with reserved names
+   * excluded. Requires a full scan of the outline.
    */
   readonly attributeNames: string[]
 
@@ -59,14 +59,9 @@ export class Outline {
    * `#ROWREF` is expanded into `bike://<this-outline-root>/#ROWREF`, which
    * selects the row. Anything else is parsed as an absolute URL.
    *
-   * A row reference in the focus or selection position of a `bike://` URL is
-   * resolved when the link opens, by trying, in order:
-   *
-   * 1. {@link PersistentId} — durable, and the only form Bike itself writes.
-   * 2. {@link RowId} — the session id, reassigned on every load, so it is
-   *    only good within one session. `row.id` is signed, and both the signed
-   *    and unsigned spellings of a session id name the same row.
-   * 3. Row number — 1-based position in outline order.
+   * Row references in `bike://` URLs resolve on open, trying in order: a
+   * {@link PersistentId} (the only form Bike writes), a session
+   * {@link RowId} (signed or unsigned spelling), then a 1-based row number.
    *
    * @param string - The link string to resolve.
    * @returns A URL, or undefined if the string is malformed or this
@@ -75,25 +70,14 @@ export class Outline {
   resolveLink(string: string): URL | undefined
 
   /**
-   * Resolve an attachment src to the attachment's metadata.
-   *
-   * `src` is the `embed` text attribute of an attachment run (e.g.
-   * `'assets/photo.png'`). Attachments added this session resolve to
-   * staged copies, so the URL is readable before the document saves.
-   *
-   * @param src - The embed src to resolve.
-   * @returns The attachment's metadata, or undefined when the src is
-   *   invalid, this outline has no document, or no attachment file exists.
+   * @param src An attachment run's `embed` attribute, e.g. `assets/photo.png`.
+   *   Unsaved attachments resolve to staged copies.
+   * @returns Undefined when `src` is invalid, the outline has no document, or
+   *   no file exists.
    */
   attachmentMetadata(src: string): AttachmentMetadata | undefined
 
-  /**
-   * Read an attachment's raw bytes.
-   *
-   * @param src - The embed src of the attachment.
-   * @returns A Promise resolving to the attachment's bytes; rejects when
-   *   the attachment can't be resolved (see `attachmentMetadata`) or read.
-   */
+  /** Rejects when the attachment can't be resolved or read. */
   attachmentBytes(src: string): Promise<Uint8Array>
 
   /**
@@ -156,16 +140,13 @@ export class Outline {
   explainQuery(path: OutlinePath): string
 
   /**
-   * Group several changes so the view updates once. Optional — use it when
-   * multiple edits should read as a single change.
+   * Groups changes so the view updates once.
    *
    * @returns The return value of the update closure.
    */
   transaction(options: TransactionOptions, update: () => any): any
 
-  /**
-   * Prevent the next edit from coalescing with the previous in undo stack
-   */
+  /** Keeps the next edit from coalescing with the previous undo entry. */
   breakUndoCoalescing(): void
 
   /**
@@ -173,27 +154,17 @@ export class Outline {
    */
   observeChanges(handler: (change: OutlineChange) => void): Disposable
 
-  /**
-   * Register a handler called once, when this outline's document closes —
-   * immediately before the document's `onClose`.
-   *
-   * @param handler - Called once when the outline closes.
-   * @returns A Disposable that unregisters the handler.
-   */
+  /** Called once when the document closes, just before the document's `onClose`. */
   onClose(handler: () => void): Disposable
 }
 
 export type OutlineArchive = { data: string; format: OutlineFormat }
 export type OutlineFormat = 'bike' | 'opml' | 'plaintext'
 
-/** Read-only metadata for a resolved attachment (embed asset). */
 export interface AttachmentMetadata {
-  /** The attachment's resolved file URL (staged copy when unsaved). */
+  /** File URL; a staged copy when unsaved. */
   readonly url: URL
-  /**
-   * The attachment's MIME type, derived from its file extension
-   * (`'application/octet-stream'` when unknown).
-   */
+  /** From the file extension; `application/octet-stream` when unknown. */
   readonly mimeType: string
 }
 
@@ -245,25 +216,18 @@ export interface Row {
   readonly outline: Outline
   /** Numeric row id, unique within outline but not persistent across saves */
   readonly id: RowId
-  /** Persistent id, or undefined when this row has none */
   persistentId?: PersistentId
-  /** This row's persistent id, minting one when it has none. */
+  /** Mints a persistent id when absent. */
   ensurePersistentId(): PersistentId
-  /** A `bike://` link to this row, naming both the outline and the row by persistent id. */
+  /** `bike://` link naming the outline and row by persistent id. */
   url(): URL
 
   /**
-   * This row's log — the `log`-typed child holding its history — or
-   * undefined when it keeps none.
-   *
-   * Entries inside are ordinary rows carrying `log-*` attributes by
-   * convention, so recording history is plain row insertion once you have
-   * the container. There is no entry API because entries need no type: a
-   * feature brings its own `log-*` names, and `log-date` is the one field
-   * every entry carries.
+   * The `log`-typed child holding this row's history. Entries are ordinary
+   * rows with `log-*` attributes; every entry has `log-date`.
    */
   readonly log?: Row
-  /** This row's log, creating it as the last child when absent. */
+  /** Creates the log as the last child when absent. */
   ensureLog(): Row
 
   /** Row's type, defaults to body */
@@ -271,40 +235,23 @@ export interface Row {
   /** Row's paragraph of text */
   text: AttributedString
 
-  /**
-   * Row attributes, as the WIRE strings the document stores. Undefined for a
-   * name this row doesn't carry.
-   */
+  /** Wire strings as stored. */
   readonly attributes: Record<RowAttributeName, string | undefined>
 
   /**
-   * Get an attribute's WIRE string, or undefined.
-   *
-   * Attributes are stored as wire strings; the typing lives in the value
-   * layer keyed by {@link AttributeType} — `bike.decodeValue(type, wire)` for
-   * a machine-facing JS value, `bike.displayValue(type, wire)` or
-   * `env.formatAttribute(name, wire)` for a human label.
+   * Wire string. Decode with `bike.decodeValue(type, wire)`, or label with
+   * `bike.displayValue(type, wire)` / `env.formatAttribute(name, wire)`.
    */
   getAttribute(name: RowAttributeName): string | undefined
 
   /**
-   * Set an attribute to a WIRE string. Passing anything but a string (other
-   * than null/undefined, which removes) is an error, as is a name
-   * {@link RowAttributeName} rejects.
-   *
-   * Build typed values with `bike.encodeValue(type, value)`, whose output is
-   * canonical — a Date becomes the same stamp native Toggle Done writes.
-   * Otherwise the caller owns canonicalization: a hand-written `PT90M` is
-   * stored verbatim, where an editor write would have normalized it to
-   * `PT1H30M`.
+   * Throws for a non-string (null/undefined removes) or a rejected
+   * {@link RowAttributeName}. Stored verbatim: use `bike.encodeValue` for
+   * canonical values (a hand-written `PT90M` is not normalized to `PT1H30M`).
    */
   setAttribute(name: RowAttributeName, wire: string): void
 
-  /**
-   * Remove attribute by name. More permissive than {@link setAttribute}: any
-   * name a document can actually hold may be removed, including one an import
-   * introduced that `setAttribute` would refuse to create.
-   */
+  /** Accepts any name a document can hold, including ones `setAttribute` rejects. */
   removeAttribute(name: RowAttributeName): void
 
   /** Row's level in the outline. Root is 0. */
@@ -355,9 +302,6 @@ export interface Row {
  * editor's stylesheets.
  */
 export class AttributedString {
-  /**
-   * Create an AttributedString from a Markdown string.
-   */
   static fromMarkdown(markdown: string): AttributedString
 
   /**
@@ -459,20 +403,10 @@ export class AttributedString {
 export type PersistentId = string
 
 /**
- * Row attribute names are UNPREFIXED. Bike adds the `data-` prefix itself when
- * it writes `.bike` and HTML, and strips it on read, so a name that starts
- * with `data-` would be saved doubled (`data-data-x`) and read back as
- * something else — it is rejected rather than mangled.
- *
- * Also rejected: `id`, `text`, `type`, `created` and `modified`, which are row
- * properties with fields of their own rather than attributes; `indent`, which
- * is Bike's own layout state; and anything the `.bike` writer could not emit —
- * an empty name, or one containing whitespace, `"`, `'`, `=`, `<`, `>`, `&`,
- * `/`, or starting with a digit, `-` or `.`.
- *
- * {@link Row.setAttribute} throws on a rejected name.
- * {@link Row.removeAttribute} is deliberately more permissive, so a name a
- * document picked up elsewhere can always be taken back out.
+ * Unprefixed; Bike adds and strips `data-` in `.bike`/HTML.
+ * {@link Row.setAttribute} rejects: names starting with `data-`, a digit, `-`
+ * or `.`; `id`, `text`, `type`, `created`, `modified`, `indent`; empty names;
+ * names containing whitespace, `"`, `'`, `=`, `<`, `>`, `&`, `/`.
  */
 export type RowAttributeName = string
 
@@ -587,7 +521,7 @@ export type CaretAnimation =
    * row to final position (default)
    */
   | 'slideWithRow'
-  /** Caret immediately jumps to final position and bounces */
+  /** Jumps to the final position and bounces. */
   | 'bounce'
   /** Caret immediately jumps to final position and large bounces */
   | 'largeBounce'

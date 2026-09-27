@@ -34,9 +34,8 @@ extension.bkext
 ```
 
 Each extension has a `manifest.json` file which contains the version,
-permissions, and other metadata. (The extension's id and display name aren't in
-the manifest — both are derived from the `.bkext` folder name.) Properties are
-documented in the extension kit:
+permissions, and other metadata. The id and display name come from the `.bkext`
+folder name. Properties are documented in the extension kit:
 [schemas/manifest.schema.json](../schemas/manifest.schema.json).
 
 Each subfolder corresponds to a different context where the extension code can

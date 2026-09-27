@@ -154,7 +154,6 @@ export type RulesLayerName =
  * Anytime this context changes the `userCache` is also invalidated.
  */
 export interface StyleContext {
-  /** Host platform the editor is running on */
   os: 'macOS' | 'iOS'
   /** True when editor has keyboard focus  */
   isKey: boolean
@@ -166,21 +165,21 @@ export interface StyleContext {
   isDarkMode: boolean
   /** True when in full screen mode  */
   isFullScreen: boolean
-  /** True when in full window mode (window chrome hidden, document fills the window) */
+  /** Window chrome hidden; document fills the window. */
   isFullWindow: boolean
   /** True when dragging selection  */
   isDragSource: boolean
   viewportSize: Size
-  /** Insets of overlapping chrome (e.g. floating toolbar/status bar) on the viewport. Subtract from `viewportSize` to get the visible content area. */
+  /** Overlapping chrome (floating toolbar, status bar) within `viewportSize`. */
   viewportContentInsets: Insets
   settings: EditorSettings
   theme: EditorTheme
   /** Cache for values derived from this editor state */
   userCache: Map<string, any>
   /**
-   * Consecutive-sibling counts of same-type ancestor down to this row The last
-   * entry is this row's own count. Empty body rows do not break the run.
-   * IMPORTANT: Set only for headings and ordered rows
+   * Consecutive same-type sibling counts from the outermost same-type ancestor
+   * to this row (last entry). Empty body rows don't break a run. Set only for headings and
+   * ordered rows.
    */
   consecutivePath?: number[]
 }
@@ -194,7 +193,7 @@ export interface EditorSettings {
   showFocusArrows: boolean
   /** Allow font scaling to better fit viewport  */
   allowFontScaling: boolean
-  /** Which control categories fade while typing. Empty means none do.  */
+  /** Control categories that fade while typing. */
   hiddenControlsWhenTyping: HiddenControl[]
   /** Writing focus mode  */
   writingFocusMode?: WritingFocusMode
@@ -240,12 +239,7 @@ export interface ViewportStyle {
    * background, use the `materials.editor` property in the theme.
    */
   backgroundColor: Color
-  /**
-   * The outline's base text font — the settings-derived font before any row
-   * rule (heading bold, note size) diverges from it. Row-independent chrome
-   * (value-aware badges) renders with this font, so set it whenever your
-   * stylesheet computes its own base font.
-   */
+  /** Base text font before row rules. Row-independent badges render with it. */
   font: Font
 }
 
@@ -260,7 +254,6 @@ export interface RowStyle extends DecorationContainer {
   opacity: number
   /** The row padding. Generally used to create outline indentation */
   padding: Insets
-  /** The row's text style, affects only the matched row's text, not contained rows */
   text: TextStyle
 }
 
@@ -294,7 +287,7 @@ export interface TextRunStyle extends TextContainer {
 /** Ligature - Text ligature style */
 export type Ligature = 'default' | 'none' | 'all'
 
-/** TextLineStyle - Wraps an NSUnderlineStyle. */
+/** Wraps `NSUnderlineStyle`. */
 export interface TextLineStyle {
   color: Color
   single: boolean

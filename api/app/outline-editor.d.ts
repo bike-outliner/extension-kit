@@ -10,28 +10,28 @@ export interface OutlineEditor extends View {
   /** Edited outline. */
   readonly outline: Outline
 
-  /** Make this editor the first responder within its window */
+  /** Makes this editor first responder in its window. */
   activate(): void
 
-  /** Root of focused outline in editor. (Defaults to outline root) */
+  /** Displayed root. Default outline root. */
   focus: Row
-  /** Focus in to the given row, or the selected row if none provided. */
+  /** @param row Default the selected row. */
   focusIn(row?: Row): void
-  /** Focus out one level in the focus stack. */
+  /** Pops one level of the focus stack. */
   focusOut(): void
 
-  /** Filter the display by an OutlinePath, resolved from the focus row when relative. */
+  /** Relative paths resolve from `focus`. */
   get filter(): { path: OutlinePath; label?: string; emptyMessage?: string } | undefined
   set filter(
     value:
       | OutlinePath
       | { 
         path: OutlinePath;
-        /** Stands in for the raw query in the filter field */
+        /** Shown in the filter field instead of the query. */
         label?: string; 
-        /** Message to show when nothing matches */
+        /** Shown when nothing matches. */
         emptyMessage?: string; 
-        /** If false, don't push a new location for each change in the filter */
+        /** False to not push a navigation location. */
         pushLocation?: boolean 
       }
       | undefined
@@ -55,7 +55,7 @@ export interface OutlineEditor extends View {
 
   /** Read editor selection. */
   readonly selection?: Selection
-  /** Observe selection. `debounce` is in milliseconds (default 1000). */
+  /** @param debounce Milliseconds. Default 1000. */
   observeSelection(observer: (selection?: Selection) => void, debounce?: number): Disposable
   /** Select rows to create a "block" selection. */
   selectRows(anchor: Row, head?: Row): void
@@ -63,33 +63,31 @@ export interface OutlineEditor extends View {
   selectText(row: Row, anchor: number, head?: number): void
   /** Place caret in a single rows text to create a "caret" selection. */
   selectCaret(row: Row, anchor: number, runAffinity?: Affinity, lineAffinity?: Affinity): void
-  /** Reveal a row, focusing out and expanding as needed. */
+  /** Focuses out and expands as needed. */
   revealRow(row: Row, revealChildren?: boolean): void
 
-  /** Present a menu, centered in the editor unless a placement is given. */
+  /** Centered in the editor without `placement`. */
   showMenu(options: ShowMenuOptions): void
   showMenu(placement: Placement, options: ShowMenuOptions): void
-  /** Present a value picker, centered in the editor unless a placement is given. */
+  /** Centered in the editor without `placement`. */
   showPicker(spec: PickerSpec): void
   showPicker(placement: Placement, spec: PickerSpec): void
-  /** Present the built-in type-aware menu for one attribute. */
+  /** Built-in type-aware menu for one attribute. */
   showAttributeMenu(attribute: string): void
   showAttributeMenu(placement: Placement, attribute: string): void
-  /** Present the row’s Attributes Editor */
   showAttributesEditor(row: Row): void
   /** Show a message in the editor's status bar. */
   showStatusMessage(message: string, timeout?: number): Disposable
-  /** Show autocomplete for current caret if any completions exist */
+  /** No-op when there are no completions at the caret. */
   showCompletions(): void
 
-  /** Group several changes so the view updates once. */
+  /** Groups changes so the view updates once. */
   transaction(options: TransactionOptions, update: () => any): any
 }
 
-/** Where a menu or picker appears. Omitted entirely, it centers in the editor. */
 export interface Placement {
   row: Row
-  /** Badge name, character index, or one image of a keyed badge. Default end of row text. */
+  /** Badge name, character index, or one image of a keyed badge. Default end of text. */
   anchor?: string | number | { badge: string; key?: string }
 }
 

@@ -1,7 +1,3 @@
-/**
- * Presented with `editor.showMenu(options)`.
- */
-
 import { SFSymbolName } from '../core/bike-globals'
 import { CommandName } from './commands'
 

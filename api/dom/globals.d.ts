@@ -4,27 +4,14 @@
 declare module '*.css' {}
 
 declare const bike: import('../core/bike-globals').BikeUtilityGlobals & {
-  /**
-   * Programmatic access to the same outline/editor automation the `bike`
-   * command-line tool and MCP server expose — read, observe, and mutate open
-   * outlines from a DOM extension. Methods return Promises; `observe*` methods
-   * stream snapshots until disposed (subscriptions are also auto-disposed
-   * when the script unloads).
-   */
+  /** The outline/editor automation the `bike` CLI and MCP server expose. */
   readonly session: BikeSession
 
   /**
-   * Build a `bike-attachment://` URL string serving an attachment (embed
-   * asset) of an open outline — usable directly in `<img src>` and with
-   * `fetch()`.
-   *
-   * An app context handing srcs to its DOM half should send the outline
-   * root's persistent id along (`outline.root.ensurePersistentId()`) so the
-   * DOM side can build these URLs.
-   *
-   * @param outlineId - The outline's persistent id (`SessionOutline.persistentId`).
-   * @param src - The embed src (e.g. `'assets/photo.png'`).
-   * @returns A `bike-attachment://` URL string.
+   * `bike-attachment://` URL for an open outline's attachment, usable in
+   * `<img src>` and `fetch()`.
+   * @param outlineId The outline root's persistent id.
+   * @param src The embed src, e.g. `'assets/photo.png'`.
    */
   attachmentURL(outlineId: OutlineId, src: string): string
 }

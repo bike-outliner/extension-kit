@@ -1,7 +1,4 @@
-/**
- * Global functions available in the app context's headless JSContext.
- * (The DOM context gets these from the standard DOM lib instead.)
- */
+/** App context globals. */
 
 declare function setTimeout(callback: (...args: any[]) => void, ms: number, ...args: any[]): number
 declare function clearTimeout(timeoutId: number): void

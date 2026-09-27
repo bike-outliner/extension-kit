@@ -1,18 +1,8 @@
 /**
- * Types for the `bike.session` DOM API — a CLI-inspired command set for
- * working with Bike outlines and editors from DOM extensions.
- *
- * These types are the payload reference. Behavior — targets and defaults
- * (`@window`/`@frontmost`), ids, row refs, sentinels, streaming, debounce — is
- * documented together with the `bike` CLI in the session automation reference:
+ * `bike.session` payload types, the wire format shared with the `bike` CLI and
+ * MCP server; field names differ from the `bike/app` types. Behavior (targets,
+ * ids, row refs, sentinels, streaming, debounce):
  * https://github.com/bike-outliner/extension-kit/blob/main/docs/session-automation.md
- *
- * NOTE: These Session* types mirror the wire format shared with the `bike`
- * CLI and MCP server, which uses compact field names. They intentionally
- * differ from the richer app-context types in `bike/app`:
- * `SessionRowChange` uses `old`/`new` where `RowChange` uses
- * `oldType`/`newType` etc., and `SessionTextRun` uses `string`/`attrs`
- * where `RowRun` uses `runString`/`runAttributes`.
  */
 
 type SessionId = number
@@ -186,10 +176,8 @@ interface SessionOutlineEditorChanges {
 }
 
 /**
- * Handle for an active `observe*` stream. Unlike the app context's
- * synchronous `Disposable`, disposal crosses the WebView/app bridge, so
- * `dispose()` is async and resolves once the stream has actually stopped.
- * Subscriptions are also auto-disposed when the DOM script unloads.
+ * `dispose()` resolves once the stream has stopped. Auto-disposed when the DOM
+ * script unloads.
  */
 interface SessionSubscription {
   dispose(): Promise<void>
@@ -260,13 +248,8 @@ interface BikeSession {
   }): Promise<SessionRow[]>
 
   /**
-   * Apply focus / filter / fold / selection / activate to the editor in one
-   * call. Operations apply in that fixed order.
-   *
-   * Note `focus` is Bike's focus — drill into a row — not keyboard focus.
-   * Keyboard focus is `activate`, which matters from a DOM context: clicking
-   * in a panel or inspector item makes its webview first responder, so a
-   * `select` alone leaves the caret in an editor that isn't taking keystrokes.
+   * Applies focus, filter, fold, selection, then activate. `focus` is the
+   * outline focus row; keyboard focus is `activate`.
    */
   updateEditor(params: {
     outline?: OutlineRef
@@ -276,11 +259,7 @@ interface BikeSession {
     selectHead?: RowRef
     expand?: RowRef[]
     collapse?: RowRef[]
-    /**
-     * Give the editor keyboard focus: activates Bike, brings the editor's
-     * window to the front, and makes the editor first responder. Applied last,
-     * after any selection.
-     */
+    /** As `OutlineEditor.activate` plus `Window.activate`. */
     activate?: boolean
   }): Promise<SessionEditor>
   

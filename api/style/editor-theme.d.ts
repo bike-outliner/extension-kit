@@ -138,9 +138,7 @@ export interface TextContainerTheme {
  * TextLineTheme - Styling properties for underline and strikethrough.
  *
  * All properties are optional. When a property is undefined, the style
- * should generally not apply a value. (This is the sparse theme-side
- * counterpart of the resolved `TextLineStyle` in `editor-style`, whose
- * properties are all required.)
+ * should generally not apply a value.
  */
 export interface TextLineTheme {
   readonly color?: Color

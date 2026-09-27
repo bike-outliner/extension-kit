@@ -1,4 +1,4 @@
-/** Path - Wraps an underlying CGPath. */
+/** Wraps `CGPath`. */
 export class Path {
   static rect(rect: Rect, transform?: AffineTransform): Path
   static roundedRect(
@@ -67,7 +67,7 @@ type LineCap = 'butt' | 'round' | 'square'
 type LineJoin = 'miter' | 'round' | 'bevel'
 type FillRule = 'evenOdd' | 'winding'
 
-/** AffineTransform - Wraps an underlying CGAffineTransform. */
+/** Wraps `CGAffineTransform`. */
 export class AffineTransform {
   constructor()
 
@@ -104,10 +104,6 @@ export class Insets {
   scaled(scale: number): Insets
 }
 
-/**
- * Rect - Wraps an underlying CGRect. (A class used by style-context drawing
- * APIs — distinct from the app context's plain `Rect` interface in `bike/app`.)
- */
 export class Rect {
   static zero(): Rect
 
@@ -119,7 +115,6 @@ export class Rect {
   height: number
 }
 
-/** Point - Wraps an underlying CGPoint. */
 export class Point {
   static zero(): Point
 
@@ -129,7 +124,6 @@ export class Point {
   y: number
 }
 
-/** Size - Wraps an underlying CGSize. */
 export class Size {
   static zero(): Size
 

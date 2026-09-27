@@ -1,4 +1,3 @@
-/** Interface for managing the clipboard — `bike.clipboard`. */
 export interface Clipboard {
   /**
    * Reads the text from the clipboard.

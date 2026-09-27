@@ -21,7 +21,7 @@ import { Outline } from './outline'
 declare global {
   /** The bike global API. */
   const bike: BikeUtilityGlobals & {
-    /** Bring the bike application to the foreground */
+    /** Brings Bike to the foreground. */
     activate(): void
 
     /** The build # of the bike app. */
@@ -34,33 +34,28 @@ declare global {
     readonly commands: Commands
     /** The interface for adding keybindings. */
     readonly keybindings: Keybindings
-
-    /** The interface for adding text input handlers. */
     readonly input: Input
     /** The interface to read/write to the system clipboard. */
     readonly clipboard: Clipboard
     /** The interface for extension settings UI. */
     readonly settings: Settings
-    /** Secure storage for secrets (API tokens, passwords, etc) */
     readonly keychain: Keychain
-    
-    /** Register a row badge. See `BadgeConfig`. */
+
     badge(name: string, config: BadgeConfig): Disposable
-    /** Register a summary (subtree or ancestor reduction), readable as `summary("name")`. */
+    /** Readable in queries as `summary("name")`. */
     summary(name: string, config: SummaryConfig): Disposable
-    /** Declare how the editor treats an attribute everywhere. See `AttributeConfig`. */
     attribute(name: string, config: AttributeConfig): Disposable
-    /** Register a rule that derives changes from each outline transaction. See `ReconcileConfig`. */
+    /** Derives changes from each outline transaction. */
     reconcile(name: string, config: ReconcileConfig): Disposable
-    /** Observe current and future attribute definitions. */
+    /** Called with current and future attribute definitions. */
     observeAttributes(handler: (infos: AttributeInfo[]) => void): Disposable
-    /** Parse free text as a value of the named attribute ("next fri", "2h 30m"). */
+    /** Parses free text ("next fri", "2h 30m") per the attribute's definition. */
     parseAttribute(name: string, text: string): AttributeParseResult | undefined
-    /** Format a wire value through the named attribute's definition. */
+    /** Formats a wire value per the attribute's definition. */
     displayAttribute(name: string, wire: string): string
-    /** Parse free text as a bare type with default facets. */    
+    /** Parses free text as `type` with default facets. */
     parseValue(type: AttributeType, text: string): AttributeParseResult | undefined
-    /** Format a wire value as a bare type with default facets. */
+    /** Formats a wire value as `type` with default facets. */
     displayValue(type: AttributeType, wire: string): string
 
     /** All windows. */
@@ -88,9 +83,9 @@ declare global {
     /** Observer called current and future frontmost outline editors. */
     observeFrontmostOutlineEditor(handler: (_: OutlineEditor | undefined) => void): Disposable
 
-    /** All connected screens. `screens[0]` is the primary (menu bar) screen */
+    /** `screens[0]` is the menu bar screen. */
     readonly screens: Screen[]
-    /** The primary screen (the one with the menu bar). */
+    /** The menu bar screen. */
     readonly mainScreen: Screen
 
     /**
@@ -103,55 +98,30 @@ declare global {
     showAlert(options: AlertOptions, window?: Window): Promise<AlertResult>
 
     /**
-     * Show a fuzzy-filtering choice box for selecting from one or more sources of items.
-     *
-     * Pass a single source for the simple case, or an array of sources to enable
-     * prefix-driven mode switching: typing a source's `prefix` at the start of the
-     * search field swaps to that source's items and per-source chrome (placeholder,
-     * default symbol, selection rules) live. Exactly one source must omit `prefix` —
-     * that's the default, shown when no other prefix matches. The rest must have
-     * unique non-empty prefixes.
+     * Fuzzy-filtering picker. See `ChoiceBoxSource.prefix` for multiple sources.
      *
      * @param sources - A single source or an array of sources to choose from
      * @param window - A window to attach the choice box to
-     * @returns A promise that resolves to the picked items + their indices and the
-     *   submitted source's prefix, or `null` if the user cancelled.
+     * @returns `null` when cancelled.
      */
     showChoiceBox(sources: ChoiceBoxSource | ChoiceBoxSource[], window?: Window): Promise<ChoiceBoxResult | null>
 
     /**
-     * Show a panel or window.
-     *
-     * With `window`: the panel is associated with that document window and
-     * closes when the window closes. Floating, non-modal (unlike sheets).
-     *
-     * Without `window`: standalone panel not tied to any document. And will
-     * stay open until disposed by the extension or closed by user.
+     * Floating, non-modal panel. With `window` it closes with that window.
+     * Without `window` it will stay open until disposed by the extension or
+     * closed by user.
      *
      * @param options - The options for the panel
      * @param window - A window to associate the panel with
-     * @returns A promise that resolves to a PanelHandle<P>.
      * @see
      * {@link https://github.com/bike-outliner/extension-kit/blob/main/docs/dom-context-tutorial.md#define-a-typed-messaging-protocol | Typed Messaging Protocols}
      */
     showPanel<P extends DOMProtocol = DOMProtocol>(options: PanelOptions, window?: Window): Promise<PanelHandle<P>>
 
-    /**
-     * Get an outline editor for testing.
-     *
-     * On first call, creates a new untitled document with an empty outline.
-     * On subsequent calls, resets the existing test document to an empty
-     * outline with no undo history and returns its editor.
-     */
+    /** Editor of a test document, reset to an empty outline with no undo history on each call. */
     testEditor(): OutlineEditor
 
-    /**
-     * Get an outline for testing.
-     *
-     * On first call, creates a new untitled document with an empty outline.
-     * On subsequent calls, resets the existing test document to an empty
-     * outline with no undo history and returns its outline.
-     */
+    /** Outline of a test document, reset to empty with no undo history on each call. */
     testOutline(): Outline
   }
 }

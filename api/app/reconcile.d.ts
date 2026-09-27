@@ -2,41 +2,39 @@ import { Outline, OutlineChange, RowAttributeName } from './outline'
 import { RelativeOutlinePath } from '../core/outline-path'
 
 /**
- * Rules that derive one change from another, for all open outlines.
- *
- * Registered with `bike.reconcile(name, config)`. One registration covers every
- * outline, open now or opened later. The rule runs inside the transaction that
- * is closing, so what it writes shares that undo step.
+ * Rules registered with `bike.reconcile(name, config)` apply to every outline,
+ * open now or later. A rule runs inside the closing transaction, so its writes
+ * share that undo step.
  */
 
 /** Rows arriving under, or leaving, a parent. */
 export interface ReconcileStructuralGuard {
   /**
-   * Matched against the PARENT the rows arrived under or left, not against the
-   * rows themselves. Omit to match wherever it happened.
+   * Matched against the PARENT the rows arrived under or left, not the rows.
+   * Omitted, matches any parent.
    */
   parent?: RelativeOutlinePath
 }
 
 /** A row itself changing — its attributes, type, text, or persistent id. */
 export interface ReconcileModifiedGuard {
-  /** Matched against the ROW that changed. Omit to match any row. */
+  /** Matched against the changed row. Omitted, matches any row. */
   row?: RelativeOutlinePath
   /**
-   * Narrows to attribute writes with one of these names. Without it, every edit
-   * to a matching row wakes the rule, typing included.
+   * Only attribute writes with these names. Omitted, every edit to a matching
+   * row matches, typing included.
    */
   attribute?: RowAttributeName | RowAttributeName[]
 }
 
 /**
- * What has to have happened for a rule to be worth waking.
+ * What must have happened for a rule to run.
  *
  * Buckets are ORed, keys inside a bucket ANDed. An undeclared bucket never
  * matches; an empty one (`inserted: {}`) matches its whole kind. A guard with no
- * bucket at all is rejected — omit `when` to be woken by everything.
+ * bucket is rejected.
  *
- * A guard GATES, it does not filter: a woken rule still receives the whole
+ * A guard gates, it does not filter: a woken rule still receives the whole
  * transaction's changes.
  *
  * Subjects are read as the outline stands once the transaction's changes are in,
@@ -69,8 +67,7 @@ export interface ReconcileGuard {
  */
 export interface ReconcileConfig {
   /**
-   * Only wake this rule when the transaction did something it asked for,
-   * decided natively without entering JavaScript.
+   * Evaluated natively, without entering JavaScript.
    *
    * ```ts
    * bike.reconcile('refile', {
@@ -83,8 +80,8 @@ export interface ReconcileConfig {
    * })
    * ```
    *
-   * Omit to be woken by every transaction. A move counts as BOTH an insertion
-   * under the parent it landed in and a removal from the parent it left.
+   * Omitted, every transaction wakes the rule. A move counts as both an
+   * insertion under the new parent and a removal from the old one.
    */
   when?: ReconcileGuard
 
@@ -101,9 +98,8 @@ export interface ReconcileConfig {
    * redoing. Called for every other edit, including ones arriving from sync or
    * another extension, and for transient outlines Bike opens internally.
    *
-   * Runs synchronously inside the closing transaction, so every edit in every
-   * open outline pays for it — keep it quick. A throw is logged and leaves the
-   * transaction, the other rules, and whatever this rule already wrote in place.
+   * Runs synchronously on every edit in every open outline. A throw is logged
+   * and leaves the transaction, the other rules, and this rule's writes in place.
    */
   reconcile(outline: Outline, changes: OutlineChange[]): void
 }

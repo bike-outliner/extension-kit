@@ -16,7 +16,7 @@ necessary when you want a fully custom view.
 - Communicate with the originating app context using `postMessage` and `onmessage`.
 - Import the API using `import { SYMBOL } from 'bike/dom'`.
 
-**Note** This tutorial uses `postMessage` and `onmessage` for communication between the app and DOM contexts. A simpler by less flexible alternative is to use the session API. See the [Todos](../../example-extensions/src/todos.bkext/) example for that approach.
+**Note** This tutorial uses `postMessage` and `onmessage` for communication between the app and DOM contexts. A simpler by less flexible alternative is to use the session API. See the [Todos](https://github.com/bike-outliner/example-extensions/tree/main/src/todos.bkext) example for that approach.
 
 ## Setup
 
@@ -39,10 +39,10 @@ App and DOM contexts communicate via `postMessage` and `onmessage`. To get
 compile-time safety, define a **typed protocol** that describes the message
 types flowing in each direction.
 
-A protocol extends `DOMProtocol` from `bike/core` and declares the message types flowing in each direction:
+A protocol extends `DOMProtocol` from `bike/core`:
 
-- `toDOM` — messages sent from the app context *to* the DOM context
-- `toApp` — messages sent from the DOM context *to* the app context
+- `toDOM`: app context → DOM context
+- `toApp`: DOM context → app context
 
 Create a new file at `dom/protocols.ts`:
 
@@ -55,7 +55,7 @@ export interface ArchiveDoneProtocol extends DOMProtocol {
 }
 ```
 
-This protocol says the app side will send an `archiveCount` message with a `count`, and the DOM side won't send anything back (`never`).
+The app sends `archiveCount` messages; the DOM sends nothing (`never`).
 
 Protocol files should always be placed in `dom/protocols.ts`. This file is
 typechecked in both the app and DOM contexts, so both sides share a single
@@ -77,7 +77,7 @@ export async function activate(context: DOMExtensionContext<ArchiveDoneProtocol>
 }
 ```
 
-By passing `ArchiveDoneProtocol` as the type parameter to `DOMExtensionContext`, `context.onmessage` receives the correctly typed message. If you try to access a property that doesn't exist on the protocol, the compiler will catch it.
+The `ArchiveDoneProtocol` type parameter types the messages `context.onmessage` receives.
 
 ### Modify the App Context
 
@@ -123,7 +123,8 @@ function archiveDoneCommand(context: CommandContext): boolean {
 }
 ```
 
-The `presentSheet<ArchiveDoneProtocol>` type parameter ensures `handle.postMessage` only accepts messages matching the `toDOM` type. The returned `SheetHandle` also types `handle.onmessage` using `toApp` (plus built-in sheet lifecycle events like `bike:dismissed`).
+The type parameter restricts `handle.postMessage` to `toDOM` messages and types
+`handle.onmessage` with `toApp` plus sheet events such as `bike:dismissed`.
 
 Save, and your modified extension should rebuild and install.
 
@@ -137,11 +138,17 @@ Bike bundles and loads a single copy of React into each web view. The extension 
 
 ## Receiving Dropped Rows
 
-When outline rows are dragged over your DOM script's web view, Bike dispatches synthetic DOM events on the element under the cursor: `bike:rowdragenter`, `bike:rowdragover`, `bike:rowdragleave`, and `bike:rowdrop`. The events bubble, so a delegated listener on `context.element` covers your whole UI.
+Rows dragged over a web view dispatch bubbling events on the element under the
+cursor: `bike:rowdragenter`, `bike:rowdragover`, `bike:rowdragleave` and
+`bike:rowdrop`.
 
-Acceptance mirrors HTML5 drag-and-drop: call `preventDefault()` on `bike:rowdragenter` or `bike:rowdragover` to accept the drop. If nothing accepts, the cursor shows the drag isn't allowed and no `bike:rowdrop` fires. Native drags don't trigger CSS `:hover`, so use the enter/over/leave events to toggle your own highlight class.
-
-Each event's `detail` carries `{ outline, rows, clientX, clientY }` in `bike.session`'s id spaces — the source outline's persistent id and the dragged rows' session ids — so you can pass them straight to `bike.session` calls, even when the rows came from a different document:
+- Call `preventDefault()` on `bike:rowdragenter` or `bike:rowdragover` to accept
+  the drop. Otherwise no `bike:rowdrop` fires.
+- Native drags don't trigger CSS `:hover`; toggle highlight classes from the
+  enter/over/leave events.
+- `detail` is `{ outline, rows, clientX, clientY }`: the source outline's
+  persistent id and the rows' session ids, usable directly with `bike.session`,
+  even across documents.
 
 ```typescript
 context.element.addEventListener('bike:rowdragover', (e) => {
@@ -153,7 +160,8 @@ context.element.addEventListener('bike:rowdrop', (e) => {
 })
 ```
 
-For a working example see the calendar core extension, which sets a row's `due` date when you drop it on a calendar day.
+The calendar core extension uses this to set `due` when a row is dropped on a
+day.
 
 ## Next Steps
 

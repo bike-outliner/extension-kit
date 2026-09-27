@@ -2,7 +2,6 @@ import { Disposable } from '../app/system'
 
 export type JSONValue = string | number | boolean | null | { [property: string]: JSONValue } | JSONValue[]
 
-/** A key-value store of JSON values. */
 export interface JSONStore {
   get(key: string): JSONValue | undefined
   set(key: string, value: JSONValue | undefined): void

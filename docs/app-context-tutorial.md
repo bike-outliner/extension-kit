@@ -84,9 +84,8 @@ Done!" in the logs.
 
 ## Adding a Toolbar Button
 
-A command can suggest a default button by giving its definition a `button` with
-an SF Symbol `symbol` and a `location` of `'titlebar'`, `'toolbar'`, or
-`'statusbar'`:
+Give the command definition a `button` with an SF Symbol and a `location` of
+`'titlebar'`, `'toolbar'` or `'statusbar'`:
 
 ```typescript
 export async function activate(context: AppExtensionContext) {
@@ -101,12 +100,9 @@ export async function activate(context: AppExtensionContext) {
 }
 ```
 
-The button is a suggestion, not a fixed placement. The first time the command is
-seen Bike adds the button to the requested location; from there the user owns it.
-In **Interface Explorer** they can move it to another bar, change its symbol, or
-remove it, and that choice persists across reloads — a removed button is not
-re-added. The button shows a "from \<extension>" label there, and right-clicking
-it offers **Reset to Extension Default** to restore the placement declared here.
+Bike adds the button the first time it sees the command. After that the user
+owns it: Interface Explorer can move, change or remove it, and **Reset to
+Extension Default** restores it.
 
 ## Archive Implementation
 

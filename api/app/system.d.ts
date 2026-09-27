@@ -10,13 +10,7 @@ export interface Permissions {
 /** Permissions that can be granted through `manifest.json`. */
 export type Permission = 'openURL' | 'clipboardRead' | 'clipboardWrite' | 'keychain'
 
-/**
- * Undoes whatever returned it — an observer, a command, a sidebar item.
- *
- * Everything an extension registers is disposed automatically when it
- * deactivates, so keep a Disposable only to undo something earlier than that.
- * Some (SidebarItem) double as a handle for modifying what they added.
- */
+/** Undoes whatever returned it. Everything is disposed when the extension deactivates. */
 export interface Disposable {
   dispose(): void
 }

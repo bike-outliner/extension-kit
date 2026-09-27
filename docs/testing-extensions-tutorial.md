@@ -4,8 +4,7 @@ Write tests for your extensions using the built-in test harness.
 
 - Entry points: `tests/*.test.ts`
 - Tests run in the app context (`bike/app` API)
-- `describe`, `it`, and `assert` are ambient globals provided by the test
-  harness (typed by the extension kit — no import needed)
+- `describe`, `it`, and `assert` are globals; no import needed
 
 ## Setup
 
@@ -25,7 +24,7 @@ npx bike-ext test tutorial     # Build, install, and run tests for a specific ex
 The test command builds and installs the extension to test into Bike. It then
 launches Bike in a special test mode that runs the tests and prints results to
 the terminal. The process exits with code 0 if all tests pass, or 1 if there are
-any failures.
+any failures. It refuses to run when an extension under test is disabled in Bike.
 
 Use `BIKE_PATH` environment variable to specify the exact path to Bike.app if
 the test command is not finding it.
@@ -79,10 +78,9 @@ describe("My Tests", () => {
 })
 ```
 
-Async tests run sequentially — each test waits for the previous one to complete.
-Modifications to the outline persist across tests, so you can set up state in
-one test and make assertions on it in later tests. You can also use
-`bike.testEditor()` to get a fresh outline.
+Async tests run sequentially. Modifications to the outline persist across
+tests, so you can set up state in one test and make assertions on it in later
+tests. You can also use `bike.testEditor()` to get a fresh outline.
 
 ## Testing the Archive Done Command
 
