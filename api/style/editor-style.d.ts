@@ -183,6 +183,11 @@ export interface StyleContext {
    * IMPORTANT: Set only for headings and ordered rows
    */
   consecutivePath?: number[]
+  /**
+   * True when the row reads right to left. Its layout is mirrored, so use this
+   * only for what a mirror can't do, such as a glyph's orientation.
+   */
+  isRightToLeft: boolean
 }
 
 export interface EditorSettings {

@@ -48,6 +48,8 @@ export interface OutlineEditor extends View {
   isExpanded(row: Row): boolean
   /** True if row is collapsed */
   isCollapsed(row: Row): boolean
+  /** True if row reads right to left (laid out mirrored) */
+  isRightToLeft(row: Row): boolean
   /** Expand the given rows with given options. */
   expand(rows?: Row[], options?: FoldOptions): void
   /** Collapse the given rows with given options. */
