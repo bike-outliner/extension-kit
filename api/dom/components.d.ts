@@ -13,7 +13,7 @@ import { SFSymbolName } from '../core/bike-globals'
 export function SFSymbol(props: SFSymbolProps): React.JSX.Element
 
 export interface SFSymbolProps extends React.HTMLAttributes<HTMLSpanElement> {
-  /** SF Symbol name (e.g. "chevron.left", "star.fill") */
+  /** SF Symbol name (e.g. "chevron.backward", "star.fill"; use backward/forward so it mirrors right to left) */
   name: SFSymbolName
   weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'
   scale?: 'small' | 'medium' | 'large'

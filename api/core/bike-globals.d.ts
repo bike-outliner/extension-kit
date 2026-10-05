@@ -1,7 +1,7 @@
 import { JSONStore } from './json'
 
 /**
- * An SF Symbol name, e.g. `'star'`, `'chevron.left'`, `'calendar'`.
+ * An SF Symbol name, e.g. `'star'`, `'chevron.forward'`, `'calendar'`. Use backward/forward names for direction so they mirror right to left.
  * Browse the catalog in Apple's SF Symbols app.
  */
 export type SFSymbolName = string
@@ -38,6 +38,14 @@ export interface BikeCommonGlobals {
    * Bike's menus even when {@link systemLocale} prefers another language.
    */
   readonly uiLanguage: string
+
+  /**
+   * The direction of Bike's interface: `'rtl'` when it lays out right to left
+   * (e.g. Arabic or Hebrew). DOM pages already have `<html dir>` set to it, so
+   * logical CSS (`margin-inline-start`, `text-align: start`) mirrors on its own;
+   * use this for layout done in code, such as which arrow key moves forward.
+   */
+  readonly layoutDirection: 'ltr' | 'rtl'
 
   /**
    * Translates user-facing text. Write the English text in place; Bike looks it

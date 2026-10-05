@@ -177,7 +177,7 @@
   font: -apple-system-body;
   color: var(--label);
   flex-shrink: 0;
-  text-align: right;
+  text-align: end;
   width: var(--bike-form-label-width, 80px);
 }
 
@@ -233,7 +233,7 @@
   cursor: pointer;
   font: -apple-system-body;
   color: var(--label);
-  text-align: left;
+  text-align: start;
   padding: 0;
 }
 
@@ -244,11 +244,11 @@
 }
 
 .bike-disclosure__accessory--trailing {
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .bike-disclosure__accessory--leading {
-  margin-left: 0;
+  margin-inline-start: 0;
 }
 
 .bike-disclosure__triangle {
@@ -260,6 +260,11 @@
 
 .bike-disclosure__triangle--expanded {
   transform: rotate(90deg);
+}
+
+/* chevron.forward points left in right to left, so it turns the other way to point down. */
+:dir(rtl) .bike-disclosure__triangle--expanded {
+  transform: rotate(-90deg);
 }
 
 .bike-disclosure__label {
@@ -282,7 +287,7 @@
      calc(var(--bike-disclosure-triangle-width) + 4px) — the triangle's width is
      published by the component, and 4px is the header's gap. Declared after the
      `padding` shorthand so it wins. */
-  padding-left: var(--bike-disclosure-content-indent, 0);
+  padding-inline-start: var(--bike-disclosure-content-indent, 0);
   margin-bottom: var(--bike-disclosure-content-spacing-after, 0);
 }
 
@@ -359,7 +364,7 @@
 .bike-segmented__item + .bike-segmented__item::before {
   content: '';
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 20%;
   height: 60%;
   width: 0.5px;

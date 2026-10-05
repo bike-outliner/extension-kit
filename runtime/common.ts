@@ -30,7 +30,7 @@ interface SFSymbolOptions {
 /**
  * Returns a URL string for the named SF Symbol.
  *
- * @param name - SF Symbol name (e.g. "chevron.left", "star.fill")
+ * @param name - SF Symbol name (e.g. "chevron.backward", "star.fill"; use backward/forward so it mirrors right to left)
  * @param options - Optional weight and scale
  */
 function symbolURL(name: string, options?: SFSymbolOptions): string {

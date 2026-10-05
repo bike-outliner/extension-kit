@@ -9,7 +9,7 @@ import './components.css'
  *
  * ```tsx
  * import { SFSymbol } from 'bike/components'
- * <SFSymbol name="chevron.left" scale="small" weight="medium" />
+ * <SFSymbol name="chevron.backward" scale="small" weight="medium" />
  * ```
  */
 export function SFSymbol({ name, weight, scale, style, className = '', ...rest }: SFSymbolProps) {
@@ -36,7 +36,7 @@ export function SFSymbol({ name, weight, scale, style, className = '', ...rest }
 }
 
 export interface SFSymbolProps extends React.HTMLAttributes<HTMLSpanElement> {
-  /** SF Symbol name (e.g. "chevron.left", "star.fill") */
+  /** SF Symbol name (e.g. "chevron.backward", "star.fill"; use backward/forward so it mirrors right to left) */
   name: string
   /** Symbol weight */
   weight?: 'ultralight' | 'thin' | 'light' | 'regular' | 'medium' | 'semibold' | 'bold' | 'heavy' | 'black'

@@ -30,6 +30,14 @@ Add a translation by copying `en.json` to `locales/<language>.json` (`de.json`, 
 - `bike.formatDate` uses month and weekday names for `bike.systemLocale`, the same locale as the `Intl` calls below, so a calendar's dates read in one language.
 - Use `Intl.NumberFormat`, `Intl.ListFormat`, `Intl.DateTimeFormat(…).formatRange` and `toLocaleString(bike.systemLocale)` rather than building them by hand.
 
+## Right to left
+
+When Bike's interface runs right to left (Arabic, Hebrew), `bike.layoutDirection` is `'rtl'`, and DOM pages get `<html dir="rtl">` with `lang` set to `bike.uiLanguage`.
+
+- Use logical CSS, so layouts mirror on their own: `margin-inline-start/end`, `padding-inline-*`, `inset-inline-*`, `text-align: start/end` and `border-start-start-radius`, not `left`/`right`.
+- Name direction-encoding SF Symbols with `forward`/`backward` (`chevron.forward`), which Bike draws mirrored. `left`/`right` symbols never flip.
+- Read `bike.layoutDirection` for anything done in code, such as which arrow key moves forward.
+
 ## Identity
 
 Don't use translated text as an identifier:
