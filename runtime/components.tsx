@@ -115,7 +115,9 @@ export function Label({ color, font, size, className = '', children, ...rest }: 
     size ? `bike-label--size-${size}` : '',
     className,
   ].filter(Boolean).join(' ')
-  return <span className={classes} {...rest}>{children}</span>
+  // <bdi> takes its direction from its own text, so untranslated English keeps its
+  // punctuation in a right-to-left UI without changing the label's alignment.
+  return <span className={classes} {...rest}><bdi>{children}</bdi></span>
 }
 
 export interface LabelProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -149,7 +151,7 @@ export function FormRow({ label, children, className = '', ...rest }: FormRowPro
   const classes = ['bike-form-row', className].filter(Boolean).join(' ')
   return (
     <div className={classes} {...rest}>
-      <span className="bike-form-row__label">{label}</span>
+      <span className="bike-form-row__label"><bdi>{label}</bdi></span>
       <span className="bike-form-row__content">{children}</span>
     </div>
   )
@@ -207,7 +209,7 @@ export function Disclosure({ label, expanded, defaultExpanded = false, onChange,
       <div className="bike-disclosure__header">
         <button className="bike-disclosure__toggle" onClick={toggle} type="button">
           <SFSymbol className={`bike-disclosure__triangle${isExpanded ? ' bike-disclosure__triangle--expanded' : ''}`} name="chevron.forward" weight="semibold" scale="small" />
-          <span className="bike-disclosure__label">{label}</span>
+          <span className="bike-disclosure__label"><bdi>{label}</bdi></span>
           {accessory && accessoryAlignment === 'leading' && <span className="bike-disclosure__accessory bike-disclosure__accessory--leading">{accessory}</span>}
         </button>
         {accessory && accessoryAlignment === 'trailing' && <span className="bike-disclosure__accessory bike-disclosure__accessory--trailing">{accessory}</span>}

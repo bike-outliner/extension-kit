@@ -111,6 +111,13 @@ export class SymbolConfiguration {
   preferringMonochrome(): SymbolConfiguration
   preferringMulticolor(): SymbolConfiguration
   preferringHierarchical(): SymbolConfiguration
+  /**
+   * Draws the symbol's left-to-right or right-to-left variant whatever Bike's
+   * own direction. `forward`/`backward` symbols otherwise follow
+   * {@link BikeCommonGlobals.layoutDirection}; in a row decoration pass the
+   * row's direction (`context.isRightToLeft`) so they point along the row.
+   */
+  withLayoutDirection(direction: 'ltr' | 'rtl'): SymbolConfiguration
 }
 
 /** SymbolScale – Use font for symbol size, then adjust with symbol scale */

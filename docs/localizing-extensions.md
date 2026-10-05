@@ -37,6 +37,7 @@ When Bike's interface runs right to left (Arabic, Hebrew), `bike.layoutDirection
 - Use logical CSS, so layouts mirror on their own: `margin-inline-start/end`, `padding-inline-*`, `inset-inline-*`, `text-align: start/end` and `border-start-start-radius`, not `left`/`right`.
 - Name direction-encoding SF Symbols with `forward`/`backward` (`chevron.forward`), which Bike draws mirrored. `left`/`right` symbols never flip.
 - Read `bike.layoutDirection` for anything done in code, such as which arrow key moves forward.
+- Put text in `Label` (or wrap it in `<bdi>`). A page that runs right to left otherwise treats every paragraph as right to left, so untranslated English gets its punctuation at the wrong end (":Settings").
 
 ## Identity
 
