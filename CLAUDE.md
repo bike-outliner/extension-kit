@@ -58,6 +58,7 @@ extension-kit/
 ├── lib/                    # Build tooling
 │   ├── build.mjs           #   Main esbuild orchestration
 │   ├── plugins.mjs         #   esbuild plugins (validate, typecheck, install)
+│   ├── localize.mjs        #   Collects English for locales/en.json
 │   ├── build-runtime.mjs   #   React runtime build
 │   ├── typecheck.mjs       #   TypeScript compiler API wrapper
 │   ├── new.mjs             #   Extension scaffolding
@@ -95,7 +96,7 @@ App and DOM communicate via `postMessage`/`onmessage` on `DOMScriptHandle` (app 
 `build.mjs` creates an esbuild context with four plugins from `plugins.mjs`:
 
 1. **externalGlobalPlugin** — Maps `react`, `react-dom`, `bike/components` to `window.*` globals
-2. **copyAndValidatePlugin** — Copies `manifest.json` and `.bktheme` files, validating both against their JSON schemas
+2. **copyAndValidatePlugin** — Copies `manifest.json` and `.bktheme` files, validating both against their JSON schemas. Also writes each extension's `locales/en.json` (`bike.localize` literals, derived command titles, name and description) and copies `locales/` to the output; see `docs/localizing-extensions.md`
 3. **typecheckPlugin** — Runs `typecheckContexts()` for all three contexts plus any per-extension tsconfigs
 4. **installExtensionPlugin** — Copies built extensions to Bike's Extensions directory; only added to the build when the `--install` flag is passed
 

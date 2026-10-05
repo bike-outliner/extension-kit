@@ -16,7 +16,7 @@
     },
     "description": {
       "type": "string",
-      "description": "A brief description of what the extension does."
+      "description": "A brief description of what the extension does. Translate it, like the derived display name, in locales/<language>.json."
     },
     "author": {
       "type": "string",

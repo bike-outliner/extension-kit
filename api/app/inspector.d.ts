@@ -18,7 +18,9 @@ export interface Inspector extends View {
 }
 
 export type InspectorItem = {
-  /** Label shown in the tab bar tooltip. */
+  /** Stable within the extension; keys the user's tab and visibility choices. */
+  id: string
+  /** Label shown in the tab bar tooltip. Localize it with `bike.localize`. */
   label: string
   script: DOMScript
 }

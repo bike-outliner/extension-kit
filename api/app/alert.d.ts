@@ -25,6 +25,9 @@ export interface AlertField {
 export interface AlertResult {
   /** The title of the button that dismissed the alert. */
   button: string
+  /** The index in `buttons` of the button that dismissed the alert. Compare this rather than
+   * `button` when titles are localized. */
+  buttonIndex: number
   /** Field values at dismissal, keyed by each field's `id`. */
   values: Record<string, string | boolean | number>
 }

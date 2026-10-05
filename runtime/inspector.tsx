@@ -202,7 +202,7 @@ function removeTab(tabId: string) {
 
 // --- Apply full config from Swift ---
 
-interface ConfigItem { label: string; hidden: boolean; tab: string }
+interface ConfigItem { id: string; label: string; hidden: boolean; tab: string }
 interface ConfigTab { tab: string }
 interface Config { items: ConfigItem[]; tabs: ConfigTab[] }
 
@@ -247,7 +247,7 @@ function applyConfig(configJSON: string) {
     const targetPanel = tabPanels.get(item.tab)
     if (!targetPanel) continue
     const el = document.querySelector(
-      `[data-inspector-label="${CSS.escape(item.label)}"]`
+      `[data-inspector-id="${CSS.escape(item.id)}"]`
     ) as HTMLElement | null
     if (!el || el.parentElement === targetPanel) continue
     targetPanel.appendChild(el)
@@ -257,10 +257,10 @@ function applyConfig(configJSON: string) {
   for (const t of config.tabs) {
     const panel = tabPanels.get(t.tab)
     if (!panel) continue
-    const labels = config.items.filter(i => i.tab === t.tab).map(i => i.label)
-    for (const label of labels) {
+    const ids = config.items.filter(i => i.tab === t.tab).map(i => i.id)
+    for (const id of ids) {
       const el = panel.querySelector(
-        `[data-inspector-label="${CSS.escape(label)}"]`
+        `[data-inspector-id="${CSS.escape(id)}"]`
       ) as HTMLElement | null
       if (el) panel.appendChild(el)
     }
@@ -277,7 +277,7 @@ function applyConfig(configJSON: string) {
   // Show/hide items
   for (const item of config.items) {
     const els = document.querySelectorAll(
-      `[data-inspector-label="${CSS.escape(item.label)}"]`
+      `[data-inspector-id="${CSS.escape(item.id)}"]`
     )
     for (const el of els) {
       ;(el as HTMLElement).style.display = item.hidden ? 'none' : ''

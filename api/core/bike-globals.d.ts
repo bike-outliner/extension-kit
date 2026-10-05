@@ -33,6 +33,33 @@ export interface BikeCommonGlobals {
   readonly systemFirstWeekday: number
 
   /**
+   * The language of Bike's own interface as a BCP 47 tag (e.g. "en", "de").
+   * {@link localize} translates into this language, so extension text matches
+   * Bike's menus even when {@link systemLocale} prefers another language.
+   */
+  readonly uiLanguage: string
+
+  /**
+   * Translates user-facing text. Write the English text in place; Bike looks it
+   * up in the extension's `locales/<language>.json` for {@link uiLanguage} and
+   * returns the English when there's no translation.
+   *
+   * `bike-ext build` collects each literal `bike.localize('…')` into
+   * `locales/en.json`, along with derived command titles and the extension's
+   * name and description, as the list to translate. Pass whole sentences, not
+   * fragments, so translators can reorder words.
+   *
+   * `values` fill `{name}` placeholders. `{name, plural, one {…} other {…}}`
+   * picks a branch by the language's plural rules (`=0`-style branches match
+   * exactly), and `#` inside a branch shows the count. Numbers are formatted
+   * for {@link systemLocale}.
+   *
+   * @example bike.localize('Show {title}', { title })
+   * @example bike.localize('{count, plural, one {# task} other {# tasks}} done', { count })
+   */
+  localize(english: string, values?: Record<string, string | number>): string
+
+  /**
    * Returns a `bike-extension://` URL for a file in this extension's folder.
    *
    * @param path - Relative path within the extension folder (e.g., "images/icon.png")
