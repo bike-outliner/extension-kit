@@ -8,6 +8,7 @@ export interface AlertOptions {
   title?: string
   message?: string
   style?: AlertStyle
+  /** Button titles, first is the default. Missing or empty shows a single OK button. */
   buttons?: string[]
   fields?: AlertField[]
 }

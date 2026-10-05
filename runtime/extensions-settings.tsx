@@ -1,14 +1,14 @@
 // Extension settings runtime
 // Manages settings items contributed by extensions.
-// Items stack vertically in alphabetical order by label — NOT the order they
-// are added, which is extension activation order and therefore depends on how
-// the extensions folder happened to enumerate.
+// Items are keyed by id and stack vertically in alphabetical order by label —
+// NOT the order they are added, which is extension activation order and
+// therefore depends on how the extensions folder happened to enumerate.
 
 declare global {
   interface Window {
-    __bikeAddSettingsItem?: (label: string) => void
-    __bikeRemoveSettingsItem?: (label: string) => void
-    __bikeGetSettingsContainer?: (label: string) => HTMLElement | null
+    __bikeAddSettingsItem?: (id: string, label: string) => void
+    __bikeRemoveSettingsItem?: (id: string) => void
+    __bikeGetSettingsContainer?: (id: string) => HTMLElement | null
   }
 }
 
@@ -45,13 +45,14 @@ document.body.appendChild(content)
 // --- State ---
 const items = new Map<string, HTMLDivElement>()
 
-function getContainer(label: string): HTMLElement | null {
-  return items.get(label) || null
+function getContainer(id: string): HTMLElement | null {
+  return items.get(id) || null
 }
 
-function addItem(label: string) {
-  if (items.has(label)) return
+function addItem(id: string, label: string) {
+  if (items.has(id)) return
   const container = document.createElement('div')
+  container.dataset.settingsId = id
   container.dataset.settingsLabel = label
   // Insert before the first section whose label sorts after this one, so the
   // pane reads the same however the extensions loaded. `localeCompare` rather
@@ -61,14 +62,14 @@ function addItem(label: string) {
     return other != null && other.localeCompare(label) > 0
   })
   content.insertBefore(container, next ?? null)
-  items.set(label, container)
+  items.set(id, container)
 }
 
-function removeItem(label: string) {
-  const container = items.get(label)
+function removeItem(id: string) {
+  const container = items.get(id)
   if (container) {
     container.remove()
-    items.delete(label)
+    items.delete(id)
   }
 }
 

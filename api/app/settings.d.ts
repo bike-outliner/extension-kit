@@ -13,7 +13,9 @@ export interface Settings extends View {
 }
 
 export type SettingsItem = {
-  /** Label (unused currently) */
+  /** Stable within the extension; keys the item's section in the pane. */
+  id: string
+  /** Section label; the pane sorts sections by it. Localize it with `bike.localize`. */
   label: string
   /** The script to run */
   script: DOMScript

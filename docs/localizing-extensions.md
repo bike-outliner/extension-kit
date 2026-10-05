@@ -19,13 +19,15 @@ bike.localize('{count, plural, one {# task} other {# tasks}} archived', { count 
 
 - every `bike.localize('…')` literal
 - command titles. Bike derives titles from command ids (`due:set-today` → "Due: Set Today"), so pick ids that read well
-- the extension's name (derived from the folder name) and its manifest `description`
+- the extension's name (derived from the folder name), its theme names (from `.bktheme` file names) and its manifest `description`
+
+Manifests have no `name` and commands have no separate `title`: the derived names are what get translated.
 
 Add a translation by copying `en.json` to `locales/<language>.json` (`de.json`, `pt-BR.json`) and replacing the values. Missing keys fall back to English. The build copies `locales/` into the built extension.
 
 ## Dates, numbers and lists
 
-- `bike.formatDate` uses month and weekday names for `bike.systemLocale`.
+- `bike.formatDate` uses month and weekday names for `bike.systemLocale`, the same locale as the `Intl` calls below, so a calendar's dates read in one language.
 - Use `Intl.NumberFormat`, `Intl.ListFormat`, `Intl.DateTimeFormat(…).formatRange` and `toLocaleString(bike.systemLocale)` rather than building them by hand.
 
 ## Identity
@@ -33,5 +35,6 @@ Add a translation by copying `en.json` to `locales/<language>.json` (`de.json`, 
 Don't use translated text as an identifier:
 
 - Give inspector items a stable `id`. Bike saves their tab and visibility under it.
+- Give settings items a stable `id`. Bike keys the item's section in the settings pane by it, and sorts sections by `label`.
 - Compare an alert's `buttonIndex`, not its `button` title.
 - Text written into the user's outline (a new row's text, a calendar week name) is written once in the current language. Find those rows by type or attribute, never by their text.
