@@ -85,8 +85,22 @@ export interface OutlineEditor extends View {
   showCompletions(): void
 
   /** Group several changes so the view updates once. */
-  transaction(options: TransactionOptions, update: () => any): any
+  transaction(options: OutlineEditorTransactionOptions, update: () => any): any
 }
+
+/** `TransactionOptions`, plus the Back step an editor transaction records. */
+export type OutlineEditorTransactionOptions =
+  | 'default'
+  | (Exclude<TransactionOptions, 'default'> & {
+      /**
+       * `true` records the view from before `update` as a Back step, for jumps
+       * that only move the selection or scroll. `false` records none, even when
+       * `update` sets `focus` or `filter`. Unset, setting `focus` or `filter`
+       * records one. A transaction records at most one step, skipped if Back
+       * already returns here. Recording clears Forward.
+       */
+      pushLocation?: boolean
+    })
 
 /** Where a menu or picker appears. Omitted entirely, it centers in the editor. */
 export interface Placement {
