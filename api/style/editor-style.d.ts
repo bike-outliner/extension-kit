@@ -210,6 +210,7 @@ export interface EditorSettings {
   /** Line width (characters)  */
   lineWidth?: number
   lineHeightMultiple: number
+  /** Space between rows, in ems  */
   rowSpacingMultiple: number
 }
 
