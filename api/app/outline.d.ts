@@ -524,6 +524,9 @@ export type Affinity = 'upstream' | 'downstream'
  * RowSource will be copied into new rows in the outline. If any of the row
  * source IDs already exist in the outline new IDs will be generated and any
  * links imported will be updated to point to the new IDs.
+ *
+ * Rows from one outline keep their nesting when their parent is also listed.
+ * Pass `row.descendantsWithSelf` to copy a branch.
  */
 export type RowSource =
   | string[]
