@@ -9,8 +9,7 @@ import { View } from './workspace'
 export interface OutlineEditor extends View {
   /**
    * Unique id for this editor (one per window pane) while it's open; not
-   * saved across launches. Compare editors with `id`; `===` fails because
-   * each call can return a new wrapper.
+   * saved across launches. Compare editors with `id`; not `===`.
    */
   readonly id: string
 
