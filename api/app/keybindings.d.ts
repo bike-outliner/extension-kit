@@ -1,4 +1,5 @@
 import { CommandName } from './commands'
+import { OutlineEditor, Selection } from './outline-editor'
 import { Disposable } from './system'
 
 /** Interface to manage outline editor Keybindings. */
@@ -38,8 +39,30 @@ export interface Keybindings {
     priority?: number
   }): Disposable
 
+  /**
+   * Adds a handler that sees each key press once, before the keymap's
+   * keybindings and menu shortcuts, while that keymap is active. Return true
+   * to consume the key; otherwise it's handled as usual. Skipped during IME
+   * composition and while a keybinding sequence is part-typed.
+   *
+   * @returns Disposable removes the handler.
+   */
+  addKeyHandler(handler: {
+    keymap: KeymapName
+    priority?: number
+    handle(event: KeyEvent): boolean
+  }): Disposable
+
   /** Debugging function to list all keybindings. */
   toString(): string
+}
+
+/** A key press passed to a key handler. */
+export interface KeyEvent {
+  /** Lowercase keybinding spelling, e.g. `j`, `shift-g`, `control-r`, `escape`. */
+  readonly key: string
+  readonly editor: OutlineEditor
+  readonly selection?: Selection
 }
 
 /**
