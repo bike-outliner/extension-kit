@@ -235,7 +235,7 @@ export interface CaretStyle {
 export type CaretBlinkStyle = 'discrete' | 'continuous' | 'none'
 
 /** ViewportStyle – The global viewport style */
-export interface ViewportStyle {
+export interface ViewportStyle extends DecorationContainer {
   /** The viewport insets  */
   padding: Insets
   /**
@@ -274,8 +274,12 @@ export interface RowStyle extends DecorationContainer {
  * TextStyle - The style for row text.
  */
 export interface TextStyle extends TextContainer {
+  /** Magnifies the text, its padding and decorations (default 1) */
   scale: number
+  /** Line height as a multiple of the font's natural height (default 1) */
   lineHeightMultiple: number
+  /** Rounds each line's height up to a multiple of this many points (default 0, off) */
+  lineHeightStep: number
 }
 
 /**
@@ -354,10 +358,10 @@ export interface DecorationContainer {
 /**
  * Decoration - Add visual decorations to outline.
  *
- * Decorations are attached to rows, row texts, or row text runs. They can have
- * a background color, border, and corner radius. They can also have image
- * content. Decorations do not affect layout, you need to make space for them
- * using row and text padding and margins.
+ * Decorations are attached to the viewport, rows, row texts, or row text runs.
+ * They can have a background color, border, and corner radius. They can also
+ * have image content. Decorations do not affect layout, you need to make space
+ * for them using row and text padding and margins.
  *
  * Decorations can be marked `mergable`. Similar mergable decorations may be
  * combined into a single shape. The exact merging behavior depends on where the
@@ -397,7 +401,7 @@ export interface Decoration {
   color: Color
   /** Radian rotation (default 0) */
   rotation: number
-  /** Depth ordering (default 0) */
+  /** Depth ordering (default 0, above the container's content; negative draws behind) */
   zPosition: number
   /** Relative (0-1) Position on decoration that is positioned (default to center, 0.5, 0.5) */
   anchor: Point
