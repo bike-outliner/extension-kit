@@ -2,6 +2,7 @@ import { RelativeOutlinePath } from '../core/outline-path'
 import { Image, Font, Color } from '../core/graphics'
 import { Insets, Rect, Point, Size } from '../core/geometry'
 import { EditorTheme } from './editor-theme'
+import { JSONValue } from '../core/json'
 
 /**
  * Defines EditorStyle – Ordered list of style rules.
@@ -175,6 +176,8 @@ export interface StyleContext {
   viewportContentInsets: Insets
   settings: EditorSettings
   theme: EditorTheme
+  /** The outline's persistent metadata (read-only) */
+  metadata: { readonly [key: string]: JSONValue }
   /** Cache for values derived from this editor state */
   userCache: Map<string, any>
   /**
