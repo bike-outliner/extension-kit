@@ -14,12 +14,16 @@ Build tooling and API types for [Bike Outliner](https://www.hogbaysoftware.com/b
 ```sh
 mkdir my-extensions && cd my-extensions
 npm init -y
+echo "allow-git=root" > .npmrc
+npm pkg set allowScripts.esbuild=true --json
 npm install --save-dev https://github.com/bike-outliner/extension-kit
 npx bike-ext new my-extension
 npx bike-ext build --install
 ```
 
 You should now see a new extension in Bike named "My Extension".
+
+Newer npm versions refuse git dependencies (`EALLOWGIT`) and block dependency install scripts by default. The `.npmrc` lets npm install the kit from GitHub, and `allowScripts` lets esbuild's install script run.
 
 ## Updating
 
@@ -28,6 +32,8 @@ To update the `extension-kit` dependency in the future run:
 ```sh
 npm install https://github.com/bike-outliner/extension-kit --save-dev
 ```
+
+If this fails with `EALLOWGIT`, or warns that esbuild's install script was blocked, run the `.npmrc` and `npm pkg set` lines from Quick start in your project folder.
 
 ## Commands
 
